@@ -1,11 +1,11 @@
 import React from "react";
-import { Platform, Text } from "react-native";
+import { Text } from "react-native";
 import { createStackNavigator, createAppContainer } from "react-navigation";
-import BookList from "./components/BookList/BookList";
-import BookReader from "./components/BookReader/BookReader";
-import ThemeColors from "./util/ThemeColors";
-
-const isIOS = Platform.OS == "ios";
+import BookList from "./app/components/BookList/BookList";
+import BookReader from "./app/components/BookReader/BookReader";
+import ThemeColors from "./app/util/ThemeColors";
+import startupTasks from "./app/util/startupTasks";
+import I18n from "./app/i18n/i18n";
 
 const RootStack = createAppContainer(
   createStackNavigator(
@@ -16,7 +16,7 @@ const RootStack = createAppContainer(
     {
       initialRouteName: "BookList",
       defaultNavigationOptions: {
-        title: "Bloom Reader",
+        title: I18n.t("Bloom Reader"),
         headerStyle: {
           backgroundColor: ThemeColors.red
         },
@@ -36,12 +36,12 @@ export default class App extends React.PureComponent {
   }
 
   async componentDidMount() {
-    // await checkVersionAndDoUpdates();  // Add this back in to run startup tasks
+    await startupTasks();
     this.setState({ loaded: true });
     //SplashScreen.hide();  // Add this back in with the splash screen
   }
 
   render() {
-    return this.state.loaded ? <RootStack /> : <Text>"Loading.."</Text>;
+    return this.state.loaded ? <RootStack /> : <Text>Loading..</Text>;
   }
 }
