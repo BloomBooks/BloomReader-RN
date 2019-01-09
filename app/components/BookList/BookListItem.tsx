@@ -1,5 +1,4 @@
 import React from "react";
-import PropTypes from "prop-types";
 import { View, Image, Text } from "react-native";
 import { Book } from "../../models/Book";
 import * as BookStorage from "../../util/BookStorage"

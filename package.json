@@ -10,7 +10,6 @@
   "dependencies": {
     "@types/react-native-i18n": "^2.0.0",
     "@types/react-navigation": "^3.0.1",
-    "prop-types": "^15.6.2",
     "react": "16.6.3",
     "react-native": "0.57.8",
     "react-native-fs": "^2.13.3",

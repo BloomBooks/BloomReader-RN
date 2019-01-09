@@ -1,5 +1,4 @@
 import React from "react";
-import PropTypes from "prop-types";
 import { SafeAreaView, Text } from "react-native";
 import * as BookStorage from "../../util/BookStorage";
 import { WebView } from "react-native-webview";
