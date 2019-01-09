@@ -18,12 +18,21 @@ The .bloomd is a Zip archive with the following contents:
     - Normally the filename is name of the book with the extension ".htm". 
     - Because there is only one html file, BloomReader simply chooses whichever file has the .htm(l) extension.
  - The assets needed by the html file, images and other media
+ - meta.json
+   - See below
  - Optionally a thumbnail
     - The filename is "thumbnail" plus an appropriate extension
     - The format is PNG or JPG
     - The extension needs to match the format (".png" or ".jpg")
     - Dimensions? (Right now I have BR displaying 70x57 which came from the Moon & Cap thumbnail dimensions)
 
-## We should also talk about MetaData, but I haven't got to that yet
+## Meta Data
+
+The meta data is contained in meta.json. The following properties are consumed by BloomReader. All of them are assumed to exist in the file unless otherwise stated.
+
+- tags: array of strings
+   - each string is in the format "{tagname}:{value}"
+   - BR looks for the "bloomshelf" tag which is optional
+
 
     
