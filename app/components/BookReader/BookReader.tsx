@@ -1,11 +1,21 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { SafeAreaView, Text } from "react-native";
-import BookStorage from "../../util/BookStorage";
+import * as BookStorage from "../../util/BookStorage";
 import { WebView } from "react-native-webview";
+import {NavigationScreenProp} from "react-navigation"
 
-export default class BookReader extends React.PureComponent {
-  state = {};
+export interface Props {
+  navigation: NavigationScreenProp<any,any>
+}
+
+export interface State {
+  bookPath?: string,
+  html?: string
+}
+
+export default class BookReader extends React.PureComponent<Props, State> {
+  state: State = {};
 
   book = () => {
     return this.props.navigation.getParam("book");
@@ -34,7 +44,3 @@ export default class BookReader extends React.PureComponent {
     );
   }
 }
-
-BookReader.propTypes = {
-  navigation: PropTypes.object.isRequired
-};

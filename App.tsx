@@ -27,8 +27,12 @@ const RootStack = createAppContainer(
   )
 );
 
-export default class App extends React.PureComponent {
-  constructor(props) {
+export interface State {
+  loaded?: boolean
+}
+
+export default class App extends React.PureComponent<any, State> {
+  constructor(props: any) {
     super(props);
     this.state = {
       loaded: false

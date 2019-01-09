@@ -1,5 +1,5 @@
 import { NativeModules } from "react-native";
-import BookStorage from "../util/BookStorage";
+import * as BookStorage from "../util/BookStorage";
 
 const ImportBooksModule = NativeModules.ImportBooksModule;
 
