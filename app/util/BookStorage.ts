@@ -3,6 +3,7 @@ import RNFS from "react-native-fs";
 import { unzip } from "react-native-zip-archive";
 import { Book, Shelf } from "../models/BookOrShelf";
 import { BookCollection } from "../models/BookCollection";
+import { nameFromPath } from "./FileUtil";
 
 const booksDir = RNFS.DocumentDirectoryPath + "/books";
 const thumbsDir = RNFS.DocumentDirectoryPath + "/thumbs";
@@ -30,24 +31,18 @@ export async function importBookFile(
 }
 
 async function addBookToList(filename: string, list: Book[]) {
-  const bookName = bookNameFromFilename(filename);
-  const tmpBookPath = await extractBookToTmp(
-    booksDir + "/" + filename,
-    bookName
-  );
-  const thumbPath: string | undefined = await saveThumbnail(
-    tmpBookPath,
-    bookName
-  );
+  const tmpBookPath = await extractBookToTmp(filename);
+  const thumbPath: string | undefined = await saveThumbnail(tmpBookPath);
   const metaData = JSON.parse(await RNFS.readFile(`${tmpBookPath}/meta.json`));
   RNFS.unlink(tmpBookPath);
-  const existingBookIndex = list.findIndex(book => book.name == bookName);
+  const existingBookIndex = list.findIndex(book => book.filename == filename);
   if (existingBookIndex >= 0) list.splice(existingBookIndex, 1);
   const book = {
-    name: bookName,
     filename: filename,
-    thumbPath: thumbPath,
+    title: metaData.title,
+    allTitles: JSON.parse(metaData.allTitles),
     tags: metaData.tags,
+    thumbPath: thumbPath,
     modified: Date.now()
   };
   list.push(book);
@@ -130,19 +125,21 @@ async function writeList(key: string, list: object[]) {
   await AsyncStorage.setItem(key, JSON.stringify(list));
 }
 
-async function extractBookToTmp(zipPath: string, bookName: string) {
-  const path = RNFS.CachesDirectoryPath + "/" + bookName;
-  return await unzip(zipPath, path);
+async function extractBookToTmp(filename: string) {
+  const inPath = `${booksDir}/${filename}`;
+  const outPath = `${RNFS.CachesDirectoryPath}/${filename}_FILES`;
+  return await unzip(inPath, outPath);
 }
 
-async function saveThumbnail(bookPath: string, bookName: string) {
+async function saveThumbnail(bookPath: string) {
   const fileList = await RNFS.readdir(bookPath);
   const thumbFilename = fileList.find(filename =>
     filename.startsWith("thumbnail.")
   );
   if (thumbFilename) {
     const inPath = bookPath + "/" + thumbFilename;
-    let outPath = thumbsDir + "/" + bookName;
+    let outPath =
+      thumbsDir + "/" + bookNameFromFilename(nameFromPath(bookPath));
     await RNFS.mkdir(outPath);
     outPath += "/" + thumbFilename;
     await RNFS.moveFile(inPath, outPath);

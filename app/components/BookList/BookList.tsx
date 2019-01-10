@@ -93,7 +93,7 @@ export default class BookList extends React.PureComponent<Props, State> {
       <SafeAreaView style={{ flex: 1 }}>
       <FlatList
         data={this.state.list}
-        keyExtractor={item => (item.isShelf ? (item as Shelf).id : (item as Book).name)}
+        keyExtractor={item => (item.isShelf ? (item as Shelf).id : (item as Book).filename)}
         renderItem={({ item }) => (
           <TouchableOpacity
             onPress={() =>

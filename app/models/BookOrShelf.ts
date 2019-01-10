@@ -6,14 +6,15 @@ export interface BookOrShelf {
 }
 
 export interface Book extends BookOrShelf {
-  name: string;
-  filename: string;
+  filename: string; // Used as the unique identifier
+  title: string;
+  allTitles: { [localeName: string]: string };
   thumbPath?: string;
   modified: number; // millis UTC
 }
 
 export interface Shelf extends BookOrShelf {
-  id: string;
+  id: string; // Used as the unique identifier
   label: Array<{ [localeName: string]: string }>;
   color: string;
 }
@@ -39,7 +40,7 @@ export function displayName(bookOrShelf: BookOrShelf) {
   const language = currentLang();
   return bookOrShelf.isShelf
     ? shelfDisplayName(bookOrShelf as Shelf, language)
-    : bookDisplayName(bookOrShelf as Book);
+    : bookDisplayName(bookOrShelf as Book, language);
 }
 
 function shelfDisplayName(shelf: Shelf, language: string) {
@@ -47,7 +48,7 @@ function shelfDisplayName(shelf: Shelf, language: string) {
   return label ? label[language] : Object.values(shelf.label[0])[0];
 }
 
-function bookDisplayName(book: Book) {
-  // Refactor - use list of names from MetaData and i18n
-  return book.name;
+function bookDisplayName(book: Book, language: string) {
+  let name = book.allTitles[language];
+  return name ? name : book.title;
 }
