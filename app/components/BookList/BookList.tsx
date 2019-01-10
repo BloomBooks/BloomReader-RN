@@ -9,19 +9,20 @@ import {
 } from "react-native";
 import * as BookStorage from "../../util/BookStorage";
 import BookListItem from "./BookListItem";
-import ImportBookModule from "../../native_modules/ImportBookModule";
+import * as ImportBookModule from "../../native_modules/ImportBookModule";
 import {NavigationScreenProp} from "react-navigation"
-import { Book } from "../../models/Book";
 import I18n from "../../i18n/i18n";
-import BookShelfListItem from "./BookShelfListItem";
-import BookOrShelf from "../../util/BookOrShelf";
+import ShelfListItem from "./ShelfListItem";
+import {Book, Shelf, goesOnShelf, displayName, BookOrShelf} from "../../models/BookOrShelf";
+import { BookCollection } from "../../models/BookCollection";
 
 export interface Props {
   navigation: NavigationScreenProp<any,any>
 }
 
 export interface State {
-  list: Array<Book>
+  list: Array<BookOrShelf>,
+  collection?: BookCollection
 }
 
 export default class BookList extends React.PureComponent<Props, State> {
@@ -32,6 +33,7 @@ export default class BookList extends React.PureComponent<Props, State> {
     };
   }
 
+  // The shelf that we are displaying - undefined for the root BookList
   shelf = () => {
     return this.props.navigation.getParam("shelf");
   };
@@ -41,7 +43,7 @@ export default class BookList extends React.PureComponent<Props, State> {
     let collection = this.props.navigation.getParam("collection");
     if (!collection) {
       // No collection passed in means this is the root BookList
-      collection = await BookStorage.getBooksAndShelves();
+      collection = await BookStorage.getBookCollection();
       this.checkForBooksToImport();
     }
     this.setState({ collection: collection, list: this.makeList(collection) });
@@ -58,20 +60,19 @@ export default class BookList extends React.PureComponent<Props, State> {
     }
   }
 
-  makeList = collection => {
-    let list = collection.shelves
+  makeList = (collection: BookCollection) => {
+    return (collection.shelves as BookOrShelf[])
       .filter(shelf =>
-        BookOrShelf.goesOnShelf(shelf, this.shelf(), collection.shelves)
+        goesOnShelf(shelf, this.shelf(), collection.shelves)
       )
       .concat(
         collection.books.filter(book =>
-          BookOrShelf.goesOnShelf(book, this.shelf(), collection.shelves)
+          goesOnShelf(book, this.shelf(), collection.shelves)
         )
       )
       .sort((a, b) =>
-        BookOrShelf.displayName(a).localeCompare(BookOrShelf.displayName(b))
+        displayName(a).localeCompare(displayName(b))
       );
-    return list;
   };
 
   openBook = (book: Book) => {
@@ -80,7 +81,7 @@ export default class BookList extends React.PureComponent<Props, State> {
     });
   };
 
-  openShelf = shelf => {
+  openShelf = (shelf: Shelf) => {
     this.props.navigation.push("BookList", {
       collection: this.state.collection,
       shelf: shelf
@@ -92,17 +93,17 @@ export default class BookList extends React.PureComponent<Props, State> {
       <SafeAreaView style={{ flex: 1 }}>
       <FlatList
         data={this.state.list}
-        keyExtractor={item => (item.isShelf ? item.id : item.name)}
+        keyExtractor={item => (item.isShelf ? (item as Shelf).id : (item as Book).name)}
         renderItem={({ item }) => (
           <TouchableOpacity
             onPress={() =>
-              item.isShelf ? this.openShelf(item) : this.openBook(item)
+              item.isShelf ? this.openShelf(item as Shelf) : this.openBook(item as Book)
             }
           >
             {item.isShelf ? (
-              <BookShelfListItem shelf={item} />
+              <ShelfListItem shelf={item as Shelf} />
             ) : (
-              <BookListItem book={item} />
+              <BookListItem book={item as Book} />
             )}
           </TouchableOpacity>
         )}

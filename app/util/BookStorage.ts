@@ -1,7 +1,8 @@
 import { AsyncStorage } from "react-native";
 import RNFS from "react-native-fs";
 import { unzip } from "react-native-zip-archive";
-import { Book } from "../models/Book";
+import { Book, Shelf } from "../models/BookOrShelf";
+import { BookCollection } from "../models/BookCollection";
 
 const booksDir = RNFS.DocumentDirectoryPath + "/books";
 const thumbsDir = RNFS.DocumentDirectoryPath + "/thumbs";
@@ -15,8 +16,10 @@ export async function createDirectories() {
   await RNFS.mkdir(thumbsDir);
 }
 
-export async function importBookFile(filename) {
-  let bookList = await readList(bookListKey);
+export async function importBookFile(
+  filename: string
+): Promise<BookCollection> {
+  let bookList: Book[] = await readList(bookListKey);
   const book = await addBookToList(filename, bookList);
   writeList(bookListKey, bookList);
   return {
@@ -26,20 +29,17 @@ export async function importBookFile(filename) {
   };
 }
 
-async function addBookToList(filename, list) {
+async function addBookToList(filename: string, list: Book[]) {
   const bookName = bookNameFromFilename(filename);
   const tmpBookPath = await extractBookToTmp(
     booksDir + "/" + filename,
     bookName
   );
-  const thumbPath: (string | undefined)  = await saveThumbnail(tmpBookPath, bookName);
+  const thumbPath: string | undefined = await saveThumbnail(
+    tmpBookPath,
+    bookName
+  );
   const metaData = JSON.parse(await RNFS.readFile(`${tmpBookPath}/meta.json`));
-  let list: Book[] = await getBookList();
-  let existingBook = list.find(book => book.name == bookName);
-  let book;
-  if (existingBook) book = updateBookEntry(existingBook, filename, thumbPath);
-  else book = addBookEntry(list, filename, thumbPath);
-  writeBookList(list);
   RNFS.unlink(tmpBookPath);
   const existingBookIndex = list.findIndex(book => book.name == bookName);
   if (existingBookIndex >= 0) list.splice(existingBookIndex, 1);
@@ -47,16 +47,18 @@ async function addBookToList(filename, list) {
     name: bookName,
     filename: filename,
     thumbPath: thumbPath,
-    metaData: metaData,
-    modified: Date.UTC()
+    tags: metaData.tags,
+    modified: Date.now()
   };
   list.push(book);
   return book;
 }
 
-async function importBooksDir(filepath) {
-  let bookList = await readList(bookListKey);
-  let shelfList = await readList(shelfListKey);
+export async function importBooksDir(
+  filepath: string
+): Promise<BookCollection> {
+  let bookList: Book[] = await readList(bookListKey);
+  let shelfList: Shelf[] = await readList(shelfListKey);
   const files = await RNFS.readDir(filepath);
   for (let i = 0; i < files.length; ++i) {
     let file = files[i];
@@ -77,21 +79,18 @@ async function importBooksDir(filepath) {
   };
 }
 
-function addShelfToList(newShelf, list) {
+function addShelfToList(newShelf: Shelf, list: Shelf[]) {
   newShelf.isShelf = true;
   let existingShelfIndex = list.findIndex(shelf => shelf.id == newShelf.id);
   if (existingShelfIndex >= 0) list.splice(existingShelfIndex, 1);
   list.push(newShelf);
 }
 
-export async function getBooksAndShelves() {
+export async function getBookCollection(): Promise<BookCollection> {
   return {
     books: await readList(bookListKey),
     shelves: await readList(shelfListKey)
   };
-
-async function writeBookList(list: Array<Book>) {
-  await AsyncStorage.setItem(bookListKey, JSON.stringify(list));
 }
 
 export async function openBookForReading(book: Book) {
@@ -122,12 +121,12 @@ function bookNameFromFilename(filename: string) {
   return filename.replace(/\.bloomd$/, "");
 }
 
-async function readList(key) {
+async function readList(key: string) {
   const listJson = await AsyncStorage.getItem(key);
   return listJson ? JSON.parse(listJson) : [];
 }
 
-async function writeList(key, list) {
+async function writeList(key: string, list: object[]) {
   await AsyncStorage.setItem(key, JSON.stringify(list));
 }
 
