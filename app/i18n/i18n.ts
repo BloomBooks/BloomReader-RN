@@ -6,8 +6,8 @@ I18n.fallbacks = true;
 I18n.translations = { en, fr };
 
 // Strip off the dash and following from the locale to get lang code
-I18n.currentLang = function() {
-  return this.currentLocale().replace(/-.*/, "");
+export function currentLang() {
+  return I18n.currentLocale().replace(/-.*/, "");
 };
 
 export default I18n;

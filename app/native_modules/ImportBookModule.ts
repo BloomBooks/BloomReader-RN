@@ -1,5 +1,5 @@
 import { NativeModules } from "react-native";
-import BookStorage from "../util/BookStorage";
+import * as BookStorage from "../util/BookStorage";
 import RNFS from "react-native-fs";
 import FileUtil from "../util/FileUtil";
 

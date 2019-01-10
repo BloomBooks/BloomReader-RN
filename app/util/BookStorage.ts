@@ -1,6 +1,7 @@
 import { AsyncStorage } from "react-native";
 import RNFS from "react-native-fs";
 import { unzip } from "react-native-zip-archive";
+import { Book } from "../models/Book";
 
 const booksDir = RNFS.DocumentDirectoryPath + "/books";
 const thumbsDir = RNFS.DocumentDirectoryPath + "/thumbs";
@@ -9,22 +10,12 @@ const keyPrefix = "bloomreader.books.";
 const bookListKey = keyPrefix + "books";
 const shelfListKey = keyPrefix + "shelves";
 
-export default {
-  createDirectories: createDirectories,
-  importBookFile: importBookFile,
-  importBooksDir: importBooksDir,
-  getBooksAndShelves: getBooksAndShelves,
-  openBookForReading: openBookForReading,
-  getThumbnail: getThumbnail,
-  fetchHtml: fetchHtml
-};
-
-async function createDirectories() {
+export async function createDirectories() {
   await RNFS.mkdir(booksDir);
   await RNFS.mkdir(thumbsDir);
 }
 
-async function importBookFile(filename) {
+export async function importBookFile(filename) {
   let bookList = await readList(bookListKey);
   const book = await addBookToList(filename, bookList);
   writeList(bookListKey, bookList);
@@ -41,8 +32,14 @@ async function addBookToList(filename, list) {
     booksDir + "/" + filename,
     bookName
   );
-  const thumbPath = await saveThumbnail(tmpBookPath, bookName);
+  const thumbPath: (string | undefined)  = await saveThumbnail(tmpBookPath, bookName);
   const metaData = JSON.parse(await RNFS.readFile(`${tmpBookPath}/meta.json`));
+  let list: Book[] = await getBookList();
+  let existingBook = list.find(book => book.name == bookName);
+  let book;
+  if (existingBook) book = updateBookEntry(existingBook, filename, thumbPath);
+  else book = addBookEntry(list, filename, thumbPath);
+  writeBookList(list);
   RNFS.unlink(tmpBookPath);
   const existingBookIndex = list.findIndex(book => book.name == bookName);
   if (existingBookIndex >= 0) list.splice(existingBookIndex, 1);
@@ -87,18 +84,21 @@ function addShelfToList(newShelf, list) {
   list.push(newShelf);
 }
 
-async function getBooksAndShelves() {
+export async function getBooksAndShelves() {
   return {
     books: await readList(bookListKey),
     shelves: await readList(shelfListKey)
   };
+
+async function writeBookList(list: Array<Book>) {
+  await AsyncStorage.setItem(bookListKey, JSON.stringify(list));
 }
 
-async function openBookForReading(book) {
+export async function openBookForReading(book: Book) {
   return await unzip(bookPath(book), openBookDir);
 }
 
-async function getThumbnail(book) {
+export async function getThumbnail(book: Book) {
   if (!book.thumbPath) return undefined;
   return {
     data: await RNFS.readFile(book.thumbPath, "base64"),
@@ -108,17 +108,17 @@ async function getThumbnail(book) {
   };
 }
 
-async function fetchHtml() {
+export async function fetchHtml() {
   const fileList = await RNFS.readDir(openBookDir);
   const htmlFile = fileList.find(entry => /\.html?$/.test(entry.name));
   return htmlFile ? await RNFS.readFile(htmlFile.path) : "";
 }
 
-function bookPath(book) {
+function bookPath(book: Book) {
   return booksDir + "/" + book.filename;
 }
 
-function bookNameFromFilename(filename) {
+function bookNameFromFilename(filename: string) {
   return filename.replace(/\.bloomd$/, "");
 }
 
@@ -131,12 +131,12 @@ async function writeList(key, list) {
   await AsyncStorage.setItem(key, JSON.stringify(list));
 }
 
-async function extractBookToTmp(zipPath, bookName) {
+async function extractBookToTmp(zipPath: string, bookName: string) {
   const path = RNFS.CachesDirectoryPath + "/" + bookName;
   return await unzip(zipPath, path);
 }
 
-async function saveThumbnail(bookPath, bookName) {
+async function saveThumbnail(bookPath: string, bookName: string) {
   const fileList = await RNFS.readdir(bookPath);
   const thumbFilename = fileList.find(filename =>
     filename.startsWith("thumbnail.")

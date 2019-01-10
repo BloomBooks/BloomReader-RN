@@ -1,5 +1,4 @@
 import React from "react";
-import PropTypes from "prop-types";
 import {
   SafeAreaView,
   Text,
@@ -8,15 +7,25 @@ import {
   FlatList,
   View
 } from "react-native";
-import BookStorage from "../../util/BookStorage";
+import * as BookStorage from "../../util/BookStorage";
 import BookListItem from "./BookListItem";
 import ImportBookModule from "../../native_modules/ImportBookModule";
+import {NavigationScreenProp} from "react-navigation"
+import { Book } from "../../models/Book";
 import I18n from "../../i18n/i18n";
 import BookShelfListItem from "./BookShelfListItem";
 import BookOrShelf from "../../util/BookOrShelf";
 
-export default class BookList extends React.PureComponent {
-  constructor(props) {
+export interface Props {
+  navigation: NavigationScreenProp<any,any>
+}
+
+export interface State {
+  list: Array<Book>
+}
+
+export default class BookList extends React.PureComponent<Props, State> {
+  constructor(props: Props) {
     super(props);
     this.state = {
       list: []
@@ -26,6 +35,7 @@ export default class BookList extends React.PureComponent {
   shelf = () => {
     return this.props.navigation.getParam("shelf");
   };
+
 
   async componentDidMount() {
     let collection = this.props.navigation.getParam("collection");
@@ -64,7 +74,7 @@ export default class BookList extends React.PureComponent {
     return list;
   };
 
-  openBook = book => {
+  openBook = (book: Book) => {
     this.props.navigation.navigate("BookReader", {
       book: book
     });
@@ -80,28 +90,24 @@ export default class BookList extends React.PureComponent {
   render() {
     return (
       <SafeAreaView style={{ flex: 1 }}>
-        <FlatList
-          data={this.state.list}
-          keyExtractor={item => (item.isShelf ? item.id : item.name)}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              onPress={() =>
-                item.isShelf ? this.openShelf(item) : this.openBook(item)
-              }
-            >
-              {item.isShelf ? (
-                <BookShelfListItem shelf={item} />
-              ) : (
-                <BookListItem book={item} />
-              )}
-            </TouchableOpacity>
-          )}
-        />
+      <FlatList
+        data={this.state.list}
+        keyExtractor={item => (item.isShelf ? item.id : item.name)}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            onPress={() =>
+              item.isShelf ? this.openShelf(item) : this.openBook(item)
+            }
+          >
+            {item.isShelf ? (
+              <BookShelfListItem shelf={item} />
+            ) : (
+              <BookListItem book={item} />
+            )}
+          </TouchableOpacity>
+        )}
+      />
       </SafeAreaView>
     );
   }
 }
-
-BookList.propTypes = {
-  navigation: PropTypes.object.isRequired
-};

@@ -1,10 +1,18 @@
 import React from "react";
-import PropTypes from "prop-types";
 import { View, Image, Text } from "react-native";
-import BookStorage from "../../util/BookStorage";
+import { Book } from "../../models/Book";
+import * as BookStorage from "../../util/BookStorage"
 
-export default class BookListItem extends React.PureComponent {
-  state = {};
+export interface Props {
+  book: Book
+}
+
+export interface State {
+  thumbnail?: {format: string, data: string}
+}
+
+export default class BookListItem extends React.PureComponent<Props, State> {
+  state: State = {};
 
   async componentDidMount() {
     const thumbnail = await BookStorage.getThumbnail(this.props.book);
@@ -31,7 +39,3 @@ export default class BookListItem extends React.PureComponent {
     );
   }
 }
-
-BookListItem.propTypes = {
-  book: PropTypes.object.isRequired
-};
