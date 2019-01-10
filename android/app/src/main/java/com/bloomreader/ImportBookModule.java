@@ -107,7 +107,7 @@ public class ImportBookModule extends ReactContextBaseJavaModule {
         Log.d("ImportBook", "Copying " + filename + " to " + bundlePath);
         IOUtilities.copyFile(context, uri, bundlePath);
 
-        Log.d("ImportBook", "Extracting " + filename + " to " + filename);
+        Log.d("ImportBook", "Extracting " + filename);
         File bundle = new File(bundlePath);
         File extractDirectory = new File(bundlePath + "_files");
         Archiver archiver = ArchiverFactory.createArchiver(ArchiveFormat.TAR);

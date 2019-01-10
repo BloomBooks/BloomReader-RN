@@ -1,15 +1,11 @@
 import { NativeModules } from "react-native";
 import BookStorage from "../util/BookStorage";
 import RNFS from "react-native-fs";
-import FileUtil from "../util/FileUtil";
+import * as FileUtil from "../util/FileUtil";
 
 const ImportBooksModule = NativeModules.ImportBooksModule;
 
-export default {
-  checkForBooksToImport: checkForBooksToImport
-};
-
-async function checkForBooksToImport() {
+export async function checkForBooksToImport() {
   const importPath = await ImportBooksModule.checkForBooksToImport();
   if (importPath) {
     const statResult = await RNFS.stat(importPath);

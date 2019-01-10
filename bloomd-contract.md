@@ -20,11 +20,11 @@ The .bloomd is a Zip archive with the following contents:
  - The assets needed by the html file, images and other media
  - meta.json
    - See below
- - Optionally a thumbnail
+ - Optionally a thumbnail  (Is it actually optional?)
     - The filename is "thumbnail" plus an appropriate extension
     - The format is PNG or JPG
     - The extension needs to match the format (".png" or ".jpg")
-    - Dimensions? (Right now I have BR displaying 70x57 which came from the Moon & Cap thumbnail dimensions)
+    - Dimensions? Thumbnails are assumed to be square
 
 ## Meta Data
 

@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Image, Text } from "react-native";
-import { Book } from "../../models/Book";
+import { Book } from "../../models/BookOrShelf";
 import * as BookStorage from "../../util/BookStorage";
 
 export interface IProps {
@@ -24,7 +24,7 @@ export default class BookListItem extends React.PureComponent<IProps, IState> {
       <View style={{ flexDirection: "row", padding: 8 }}>
         {this.state.thumbnail && (
           <Image
-            style={{ width: 70, height: 57 }}
+            style={{ width: 64, height: 64 }}
             source={{
               uri: `data:image/${this.state.thumbnail.format};base64,${
                 this.state.thumbnail.data
