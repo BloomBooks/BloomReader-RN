@@ -2,23 +2,21 @@ import React from "react";
 import { SafeAreaView, Text } from "react-native";
 import * as BookStorage from "../../util/BookStorage";
 import { WebView } from "react-native-webview";
-import {NavigationScreenProp} from "react-navigation"
+import { NavigationScreenProp } from "react-navigation";
 
-export interface Props {
-  navigation: NavigationScreenProp<any,any>
+export interface IProps {
+  navigation: NavigationScreenProp<any, any>;
 }
 
-export interface State {
-  bookPath?: string,
-  html?: string
+export interface IState {
+  bookPath?: string;
+  html?: string;
 }
 
-export default class BookReader extends React.PureComponent<Props, State> {
-  state: State = {};
+export default class BookReader extends React.PureComponent<IProps, IState> {
+  state: IState = {};
 
-  book = () => {
-    return this.props.navigation.getParam("book");
-  };
+  private book = () => this.props.navigation.getParam("book");
 
   async componentDidMount() {
     const bookPath = await BookStorage.openBookForReading(this.book());

@@ -10,7 +10,7 @@ export interface Book extends BookOrShelf {
   title: string;
   allTitles: { [localeName: string]: string };
   thumbPath?: string;
-  modified: number; // millis UTC
+  modifiedAt: number; // millis UTC
 }
 
 export interface Shelf extends BookOrShelf {
@@ -44,11 +44,11 @@ export function displayName(bookOrShelf: BookOrShelf) {
 }
 
 function shelfDisplayName(shelf: Shelf, language: string) {
-  let label = shelf.label.find(aLabel => !!aLabel[language]);
+  const label = shelf.label.find(aLabel => !!aLabel[language]);
   return label ? label[language] : Object.values(shelf.label[0])[0];
 }
 
 function bookDisplayName(book: Book, language: string) {
-  let name = book.allTitles[language];
+  const name = book.allTitles[language];
   return name ? name : book.title;
 }
