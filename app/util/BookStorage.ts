@@ -20,9 +20,12 @@ export async function importBookFile(filename: string) {
     booksDir + "/" + filename,
     bookName
   );
-  const thumbPath: (string | undefined)  = await saveThumbnail(tmpBookPath, bookName);
-  let list: Book[] = await getBookList();
-  let existingBook = list.find(book => book.name == bookName);
+  const thumbPath: string | undefined = await saveThumbnail(
+    tmpBookPath,
+    bookName
+  );
+  const list: Book[] = await getBookList();
+  const existingBook = list.find(book => book.name == bookName);
   let book;
   if (existingBook) book = updateBookEntry(existingBook, filename, thumbPath);
   else book = addBookEntry(list, filename, thumbPath);
@@ -71,22 +74,30 @@ function bookNameFromFilename(filename: string) {
   return filename.replace(/\.bloomd$/, "");
 }
 
-function addBookEntry(list: Book[], filename: string, thumbPath: (string | undefined)) {
+function addBookEntry(
+  list: Book[],
+  filename: string,
+  thumbPath: string | undefined
+) {
   const book = {
     name: bookNameFromFilename(filename),
     filename: filename,
     thumbPath: thumbPath,
-    modified: Date.now()
+    modifiedAt: Date.now()
   };
   list.push(book);
   list.sort((a, b) => a.name.localeCompare(b.name));
   return book;
 }
 
-function updateBookEntry(book: Book, filename: string, thumbPath: (string | undefined)) {
+function updateBookEntry(
+  book: Book,
+  filename: string,
+  thumbPath: string | undefined
+) {
   book.filename = filename;
   book.thumbPath = thumbPath;
-  book.modified = Date.now();
+  book.modifiedAt = Date.now();
   return book;
 }
 

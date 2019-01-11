@@ -8,19 +8,19 @@ import {
 import * as BookStorage from "../../util/BookStorage";
 import BookListItem from "./BookListItem";
 import ImportBookModule from "../../native_modules/ImportBookModule";
-import {NavigationScreenProp} from "react-navigation"
+import { NavigationScreenProp } from "react-navigation";
 import { Book } from "../../models/Book";
 
-export interface Props {
-  navigation: NavigationScreenProp<any,any>
+export interface IProps {
+  navigation: NavigationScreenProp<any, any>;
 }
 
-export interface State {
-  list: Array<Book>
+export interface IState {
+  list: Array<Book>;
 }
 
-export default class BookList extends React.PureComponent<Props, State> {
-  constructor(props: Props) {
+export default class BookList extends React.PureComponent<IProps, IState> {
+  constructor(props: IProps) {
     super(props);
     this.state = {
       list: []
@@ -30,6 +30,8 @@ export default class BookList extends React.PureComponent<Props, State> {
   async componentDidMount() {
     const list = await BookStorage.getBookList();
     this.setState({ list: list });
+    // Having a file shared with us results in a new instance of our app,
+    // so we can check for imports in componentDidMount()
     this.checkForBookToImport();
   }
 
@@ -41,11 +43,10 @@ export default class BookList extends React.PureComponent<Props, State> {
     }
   }
 
-  openBook = (book: Book) => {
+  private openBook = (book: Book) =>
     this.props.navigation.navigate("BookReader", {
       book: book
     });
-  };
 
   render() {
     return (
