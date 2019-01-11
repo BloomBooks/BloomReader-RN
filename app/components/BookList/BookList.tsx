@@ -18,9 +18,12 @@ import {
   Shelf,
   goesOnShelf,
   displayName,
-  BookOrShelf
+  BookOrShelf,
+  sortedListForShelf
 } from "../../models/BookOrShelf";
 import { BookCollection } from "../../models/BookCollection";
+import { BRHeaderButtons, Item } from "../shared/BRHeaderButtons";
+import { AndroidBackHandler } from "react-navigation-backhandler";
 
 export interface IProps {
   navigation: NavigationScreenProp<any, any>;
@@ -29,6 +32,7 @@ export interface IProps {
 export interface IState {
   list: Array<BookOrShelf>;
   collection?: BookCollection;
+  selectedItem?: BookOrShelf;
 }
 
 export default class BookList extends React.PureComponent<IProps, IState> {
@@ -37,43 +41,72 @@ export default class BookList extends React.PureComponent<IProps, IState> {
     this.state = {
       list: []
     };
+    props.navigation.setParams({
+      clearSelectedItem: this.clearSelectedItem,
+      deleteSelectedItem: async () => {
+        const newCollection = await BookStorage.deleteItem(this.state
+          .selectedItem as BookOrShelf);
+        this.updateCollection(newCollection);
+        this.clearSelectedItem();
+      },
+      shareSelectedItem: () => {
+        console.warn(`TODO: Implement`);
+        this.clearSelectedItem();
+      }
+    });
   }
 
   // The shelf that we are displaying - undefined for the root BookList
   private shelf = () => this.props.navigation.getParam("shelf");
 
+  private collection = () =>
+    this.props.navigation.getParam("collection") || this.state.collection;
+
+  updateCollection = (collection: BookCollection) => {
+    this.state.collection
+      ? this.setState({ collection: collection })
+      : this.props.navigation.getParam("updateCollection")(collection);
+    this.setState({ list: sortedListForShelf(this.shelf(), collection) });
+  };
+
+  private setSelectedItem = (item: BookOrShelf) => {
+    this.setState({ selectedItem: item });
+    this.props.navigation.setParams({ selectedItem: item });
+  };
+
+  clearSelectedItem = () => {
+    this.setState({ selectedItem: undefined });
+    this.props.navigation.setParams({ selectedItem: undefined });
+  };
+
   async componentDidMount() {
-    let collection = this.props.navigation.getParam("collection");
+    let collection = this.collection();
     if (!collection) {
       // No collection passed in means this is the root BookList
       collection = await BookStorage.getBookCollection();
+      this.setState({ collection: collection });
       // Having a file shared with us results in a new instance of our app,
       // so we can check for imports in componentDidMount()
       this.checkForBooksToImport();
     }
-    this.setState({ collection: collection, list: this.makeList(collection) });
+    this.setState({ list: sortedListForShelf(this.shelf(), collection) });
   }
 
-  async checkForBooksToImport() {
+  private async checkForBooksToImport() {
     const updatedCollection = await ImportBookModule.checkForBooksToImport();
     if (updatedCollection) {
-      this.setState({
-        collection: updatedCollection,
-        list: this.makeList(updatedCollection)
-      });
+      this.updateCollection(updatedCollection);
       if (updatedCollection.book) this.openBook(updatedCollection.book);
     }
   }
 
-  private makeList = (collection: BookCollection) =>
-    (collection.shelves as BookOrShelf[])
-      .filter(shelf => goesOnShelf(shelf, this.shelf(), collection.shelves))
-      .concat(
-        collection.books.filter(book =>
-          goesOnShelf(book, this.shelf(), collection.shelves)
-        )
-      )
-      .sort((a, b) => displayName(a).localeCompare(displayName(b)));
+  private itemTouch = (item: BookOrShelf) => {
+    if (this.state.selectedItem) this.clearSelectedItem();
+    else
+      item.isShelf
+        ? this.openShelf(item as Shelf)
+        : this.openBook(item as Book);
+  };
 
   private openBook = (book: Book) =>
     this.props.navigation.navigate("BookReader", {
@@ -82,33 +115,89 @@ export default class BookList extends React.PureComponent<IProps, IState> {
 
   private openShelf = (shelf: Shelf) =>
     this.props.navigation.push("BookList", {
-      collection: this.state.collection,
+      collection: this.collection(),
+      updateCollection: this.updateCollection,
       shelf: shelf
     });
+
+  static navigationOptions = ({
+    navigation
+  }: {
+    navigation: NavigationScreenProp<any, any>;
+  }) => {
+    const shelf: Shelf | undefined = navigation.getParam("shelf");
+    const selectedItem: BookOrShelf | undefined = navigation.getParam(
+      "selectedItem"
+    );
+    return selectedItem
+      ? {
+          headerTitle: displayName(selectedItem),
+          headerLeft: (
+            <BRHeaderButtons>
+              <Item
+                title="back"
+                iconName="md-arrow-back"
+                onPress={navigation.getParam("clearSelectedItem")}
+              />
+            </BRHeaderButtons>
+          ),
+          headerRight: (
+            <BRHeaderButtons>
+              <Item
+                title="share"
+                iconName="md-share"
+                onPress={navigation.getParam("shareSelectedItem")}
+              />
+              <Item
+                title="trash"
+                iconName="md-trash"
+                onPress={navigation.getParam("deleteSelectedItem")}
+              />
+            </BRHeaderButtons>
+          )
+        }
+      : {
+          headerTitle: shelf ? displayName(shelf) : I18n.t("Bloom Reader")
+        };
+  };
 
   render() {
     return (
       <SafeAreaView style={{ flex: 1 }}>
         <FlatList
+          extraData={this.state}
           data={this.state.list}
           keyExtractor={item =>
             item.isShelf ? (item as Shelf).id : (item as Book).filename
           }
           renderItem={({ item }) => (
             <TouchableOpacity
-              onPress={() =>
-                item.isShelf
-                  ? this.openShelf(item as Shelf)
-                  : this.openBook(item as Book)
-              }
+              onPress={() => this.itemTouch(item)}
+              onLongPress={() => this.setSelectedItem(item)}
             >
               {item.isShelf ? (
-                <ShelfListItem shelf={item as Shelf} />
+                <ShelfListItem
+                  shelf={item as Shelf}
+                  isSelected={this.state.selectedItem == item}
+                />
               ) : (
-                <BookListItem book={item as Book} />
+                <BookListItem
+                  book={item as Book}
+                  isSelected={this.state.selectedItem == item}
+                />
               )}
             </TouchableOpacity>
           )}
+        />
+        {/* Custom handler for Android back button */}
+        <AndroidBackHandler
+          onBackPress={() => {
+            if (this.state.selectedItem) {
+              this.clearSelectedItem();
+              return true;
+            }
+            return false; // Default back button behavior
+          }}
         />
       </SafeAreaView>
     );
