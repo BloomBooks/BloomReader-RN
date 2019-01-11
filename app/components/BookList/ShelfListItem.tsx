@@ -4,12 +4,19 @@ import { Shelf, displayName } from "../../models/BookOrShelf";
 
 interface IProps {
   shelf: Shelf;
+  isSelected: boolean;
 }
 
 export default function ShelfListItem(props: IProps) {
   const shelf = props.shelf;
   return (
-    <View style={{ flexDirection: "row", padding: 8 }}>
+    <View
+      style={{
+        flexDirection: "row",
+        padding: 8,
+        backgroundColor: props.isSelected ? "gray" : "white"
+      }}
+    >
       <Image
         style={{ backgroundColor: `#${shelf.color}` }}
         source={require("../../assets/bookshelf.png")}

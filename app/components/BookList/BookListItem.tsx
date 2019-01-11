@@ -5,6 +5,7 @@ import * as BookStorage from "../../util/BookStorage";
 
 export interface IProps {
   book: Book;
+  isSelected: boolean;
 }
 
 export interface IState {
@@ -22,7 +23,13 @@ export default class BookListItem extends React.PureComponent<IProps, IState> {
   render() {
     const book = this.props.book;
     return (
-      <View style={{ flexDirection: "row", padding: 8 }}>
+      <View
+        style={{
+          flexDirection: "row",
+          padding: 8,
+          backgroundColor: this.props.isSelected ? "gray" : "white"
+        }}
+      >
         {this.state.thumbnail && (
           <Image
             style={{ width: 64, height: 64 }}

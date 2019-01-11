@@ -13,9 +13,12 @@
     "react-native-fs": "^2.13.3",
     "react-native-gesture-handler": "^1.0.12",
     "react-native-i18n": "^2.0.15",
+    "react-native-vector-icons": "^6.1.0",
     "react-native-webview": "^3.0.0",
     "react-native-zip-archive": "^3.0.1",
-    "react-navigation": "^3.0.9"
+    "react-navigation": "^3.0.9",
+    "react-navigation-backhandler": "^1.2.0",
+    "react-navigation-header-buttons": "^2.1.1"
   },
   "devDependencies": {
     "@types/jest": "^23.3.12",
@@ -25,9 +28,6 @@
     "@types/react-navigation": "^3.0.1",
     "@types/react-test-renderer": "^16.0.3",
     "babel-jest": "23.6.0",
-    "eslint": "^5.11.1",
-    "eslint-plugin-react": "^7.12.3",
-    "eslint-plugin-react-native": "^3.5.0",
     "jest": "23.6.0",
     "metro-react-native-babel-preset": "0.51.1",
     "react-devtools-core": "3.5.1",
