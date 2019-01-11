@@ -19,7 +19,7 @@ export async function createDirectories() {
 export async function importBookFile(
   filename: string
 ): Promise<BookCollection> {
-  let bookList: Book[] = await readList(bookListKey);
+  const bookList: Book[] = await readList(bookListKey);
   const book = await addBookToList(filename, bookList);
   writeList(bookListKey, bookList);
   return {
@@ -48,7 +48,7 @@ async function addBookToList(filename: string, list: Book[]) {
     filename: filename,
     thumbPath: thumbPath,
     tags: metaData.tags,
-    modified: Date.now()
+    modifiedAt: Date.now()
   };
   list.push(book);
   return book;
@@ -57,16 +57,16 @@ async function addBookToList(filename: string, list: Book[]) {
 export async function importBooksDir(
   filepath: string
 ): Promise<BookCollection> {
-  let bookList: Book[] = await readList(bookListKey);
-  let shelfList: Shelf[] = await readList(shelfListKey);
+  const bookList: Book[] = await readList(bookListKey);
+  const shelfList: Shelf[] = await readList(shelfListKey);
   const files = await RNFS.readDir(filepath);
   for (let i = 0; i < files.length; ++i) {
-    let file = files[i];
+    const file = files[i];
     if (file.name.endsWith(".bloomd")) {
       await RNFS.moveFile(file.path, `${booksDir}/${file.name}`);
       await addBookToList(file.name, bookList);
     } else if (file.name.endsWith(".bloomshelf")) {
-      let shelfInfo = JSON.parse(await RNFS.readFile(file.path));
+      const shelfInfo = JSON.parse(await RNFS.readFile(file.path));
       addShelfToList(shelfInfo, shelfList);
     }
   }
@@ -81,7 +81,7 @@ export async function importBooksDir(
 
 function addShelfToList(newShelf: Shelf, list: Shelf[]) {
   newShelf.isShelf = true;
-  let existingShelfIndex = list.findIndex(shelf => shelf.id == newShelf.id);
+  const existingShelfIndex = list.findIndex(shelf => shelf.id == newShelf.id);
   if (existingShelfIndex >= 0) list.splice(existingShelfIndex, 1);
   list.push(newShelf);
 }

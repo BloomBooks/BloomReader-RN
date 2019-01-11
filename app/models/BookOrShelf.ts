@@ -9,7 +9,7 @@ export interface Book extends BookOrShelf {
   name: string;
   filename: string;
   thumbPath?: string;
-  modified: number; // millis UTC
+  modifiedAt: number; // millis UTC
 }
 
 export interface Shelf extends BookOrShelf {
