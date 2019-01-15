@@ -141,7 +141,7 @@ async function deleteShelf(
   return collection;
 }
 
-function bookPath(book: Book): string {
+export function bookPath(book: Book): string {
   return booksDir + "/" + book.filename;
 }
 

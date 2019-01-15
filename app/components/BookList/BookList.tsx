@@ -25,7 +25,11 @@ import { BookCollection } from "../../models/BookCollection";
 import { BRHeaderButtons, Item } from "../shared/BRHeaderButtons";
 import { AndroidBackHandler } from "react-navigation-backhandler";
 import Icon from "react-native-vector-icons/Ionicons";
+<<<<<<< HEAD
 import { DrawerUnlocker } from "../DrawerMenu/DrawerLocker";
+=======
+import * as Share from "../../util/Share";
+>>>>>>> Share .bloomd files with other apps.
 
 export interface IProps {
   navigation: NavigationScreenProp<any, any>;
@@ -55,7 +59,7 @@ export default class BookList extends React.PureComponent<IProps, IState> {
         this.clearSelectedItem();
       },
       shareSelectedItem: () => {
-        console.warn(`TODO: Implement`);
+        Share.share(this.state.selectedItem as BookOrShelf);
         this.clearSelectedItem();
       }
     });
