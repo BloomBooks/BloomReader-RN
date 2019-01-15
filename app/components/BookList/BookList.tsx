@@ -24,6 +24,7 @@ import {
 import { BookCollection } from "../../models/BookCollection";
 import { BRHeaderButtons, Item } from "../shared/BRHeaderButtons";
 import { AndroidBackHandler } from "react-navigation-backhandler";
+import Icon from "react-native-vector-icons/Ionicons";
 
 export interface IProps {
   navigation: NavigationScreenProp<any, any>;
@@ -157,7 +158,18 @@ export default class BookList extends React.PureComponent<IProps, IState> {
           )
         }
       : {
-          headerTitle: shelf ? displayName(shelf) : I18n.t("Bloom Reader")
+          headerTitle: shelf ? displayName(shelf) : I18n.t("Bloom Reader"),
+          headerLeft: shelf ? (
+            undefined
+          ) : (
+            <BRHeaderButtons>
+              <Item
+                title="drawer"
+                iconName="md-menu"
+                onPress={navigation.toggleDrawer}
+              />
+            </BRHeaderButtons>
+          )
         };
   };
 
