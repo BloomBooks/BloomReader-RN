@@ -12,7 +12,9 @@ export default class DrawerMenu extends React.PureComponent<
   IState
 > {
   render() {
+    // Have the drawer cover most of the screen
     const drawerWidth = Dimensions.get("window").width - 16;
+    // Image ratio is 600x156 pixels, adjust height to match width of drawer
     const imageHeight = (drawerWidth / 600) * 156;
     return (
       <SafeAreaView>

@@ -1,5 +1,5 @@
 export const notes = `Bloom Reader
-Copyright SIL International 2017
+Copyright SIL International
 
 Support: https://community.software.sil.org/c/bloom
 
