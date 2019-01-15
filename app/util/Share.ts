@@ -7,19 +7,29 @@ export async function share(item: BookOrShelf): Promise<void> {
   else shareBook(item as Book);
 }
 
-export function shareAll(): void {
-  // Share the whole collection
+export async function shareAll(): Promise<void> {
+  const bundlePath = await BookStorage.bundleAll();
+  shareBundle(bundlePath);
+}
+
+async function shareShelfBundle(shelf: Shelf): Promise<void> {
+  const bundlePath = await BookStorage.bundleShelf(shelf);
+  shareBundle(bundlePath);
+}
+
+function shareBundle(bundlePath: string): void {
+  Share.open({
+    url: `file://${bundlePath}`,
+    type: "application/*", // This gets us a better selection of apps to share with than "application/bloom" and seems to work just the same
+    subject: "My Bloom Books.bloombundle"
+  });
 }
 
 function shareBook(book: Book): void {
   const path = BookStorage.bookPath(book);
   Share.open({
     url: `file://${path}`,
-    type: "application/zip", // This gets us a better selection of apps to share with than "application/bloom" and seems to work just the same
+    type: "application/*", // This gets us a better selection of apps to share with than "application/bloom" and seems to work just the same
     subject: book.filename
   });
-}
-
-async function shareShelfBundle(shelf: Shelf): Promise<void> {
-  // Bundle up the shelf and then share it
 }

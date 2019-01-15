@@ -42,6 +42,10 @@ package com.bloomreader;
 import android.content.Context;
 import android.net.Uri;
 
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
+import org.apache.commons.compress.utils.IOUtils;
+
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
@@ -287,18 +291,18 @@ public class IOUtilities {
 //        tar(fileList, destinationPath);
 //    }
 //
-//    public static void tar(File[] files, String destinationPath) throws IOException {
-//        TarArchiveOutputStream tarOutput = new TarArchiveOutputStream(new FileOutputStream(destinationPath));
-//        for(File file : files) {
-//            TarArchiveEntry entry = new TarArchiveEntry(file, file.getName());
-//            tarOutput.putArchiveEntry(entry);
-//            FileInputStream in = new FileInputStream(file);
-//            IOUtils.copy(in, tarOutput);
-//            in.close();
-//            tarOutput.closeArchiveEntry();
-//        }
-//        tarOutput.close();
-//    }
+    public static void tar(File[] files, String destinationPath) throws IOException {
+        TarArchiveOutputStream tarOutput = new TarArchiveOutputStream(new FileOutputStream(destinationPath));
+        for(File file : files) {
+            TarArchiveEntry entry = new TarArchiveEntry(file, file.getName());
+            tarOutput.putArchiveEntry(entry);
+            FileInputStream in = new FileInputStream(file);
+            IOUtils.copy(in, tarOutput);
+            in.close();
+            tarOutput.closeArchiveEntry();
+        }
+        tarOutput.close();
+    }
 //
 //    public static void makeBloomBundle(String destinationPath) throws IOException {
 //        FilenameFilter filter = new FilenameFilter() {

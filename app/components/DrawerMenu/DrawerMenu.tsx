@@ -4,6 +4,7 @@ import I18n from "../../i18n/i18n";
 import DrawerMenuItem from "./DrawerMenuItem";
 import { DrawerItemsProps } from "react-navigation";
 import { Notes } from "../NotesScreen/NotesScreen";
+import * as Share from "../../util/Share";
 
 interface IState {}
 
@@ -32,7 +33,10 @@ export default class DrawerMenu extends React.PureComponent<
         <DrawerMenuItem
           label={I18n.t("Share Books")}
           iconName="md-share"
-          onPress={() => {}}
+          onPress={() => {
+            Share.shareAll();
+            this.props.navigation.closeDrawer();
+          }}
         />
         <DrawerMenuItem
           label={I18n.t("Share Bloom Reader app")}
