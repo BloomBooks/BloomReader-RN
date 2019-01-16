@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Image, Text } from "react-native";
-import { Book } from "../../models/BookOrShelf";
+import { Book, displayName } from "../../models/BookOrShelf";
 import * as BookStorage from "../../util/BookStorage";
 
 export interface IProps {
@@ -20,6 +20,7 @@ export default class BookListItem extends React.PureComponent<IProps, IState> {
   }
 
   render() {
+    const book = this.props.book;
     return (
       <View style={{ flexDirection: "row", padding: 8 }}>
         {this.state.thumbnail && (
@@ -33,7 +34,7 @@ export default class BookListItem extends React.PureComponent<IProps, IState> {
           />
         )}
         <Text style={{ fontSize: 20, fontWeight: "bold", paddingLeft: 4 }}>
-          {this.props.book.name}
+          {displayName(book)}
         </Text>
       </View>
     );
