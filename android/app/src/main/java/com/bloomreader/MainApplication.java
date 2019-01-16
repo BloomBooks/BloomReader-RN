@@ -37,6 +37,7 @@ public class MainApplication extends Application implements ReactApplication, Sh
           new RNGestureHandlerPackage(),
           new ImportBooksPackage(),
           new BloomBundlePackage(),
+          new ShareApkPackage(),
           new RNFSPackage()
       );
     }

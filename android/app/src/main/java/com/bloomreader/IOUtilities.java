@@ -200,17 +200,17 @@ public class IOUtilities {
             return false;
         }
     }
-//
-//    public static boolean copyFile(String fromPath, String toPath) {
-//        try {
-//            InputStream in = new FileInputStream(fromPath);
-//            return copyFile(in, toPath);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return false;
-//        }
-//    }
-//
+
+    public static boolean copyFile(String fromPath, String toPath) {
+        try {
+            InputStream in = new FileInputStream(fromPath);
+            return copyFile(in, toPath);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public static boolean copyFile(Context context, Uri bookUri, String toPath){
         try {
             FileDescriptor fd = context.getContentResolver().openFileDescriptor(bookUri, "r").getFileDescriptor();

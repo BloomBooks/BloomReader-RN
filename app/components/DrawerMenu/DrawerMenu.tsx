@@ -41,7 +41,10 @@ export default class DrawerMenu extends React.PureComponent<
         <DrawerMenuItem
           label={I18n.t("Share Bloom Reader app")}
           iconName="md-share"
-          onPress={() => {}}
+          onPress={() => {
+            Share.shareApp();
+            this.props.navigation.closeDrawer();
+          }}
         />
         <DrawerMenuItem
           label={I18n.t("Find Bloom books on this device")}

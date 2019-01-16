@@ -1,6 +1,7 @@
 import { BookOrShelf, Book, Shelf } from "../models/BookOrShelf";
 import * as BookStorage from "./BookStorage";
 import Share from "react-native-share";
+import * as ShareApkModule from "../native_modules/ShareApkModule";
 
 export async function share(item: BookOrShelf): Promise<void> {
   if (item.isShelf) shareShelfBundle(item as Shelf);
@@ -10,6 +11,15 @@ export async function share(item: BookOrShelf): Promise<void> {
 export async function shareAll(): Promise<void> {
   const bundlePath = await BookStorage.bundleAll();
   shareBundle(bundlePath);
+}
+
+export async function shareApp(): Promise<void> {
+  const apkPath = await ShareApkModule.getShareableApkPath();
+  Share.open({
+    url: `file://${apkPath}`,
+    type: "application/*",
+    subject: "Bloom Reader.apk"
+  });
 }
 
 async function shareShelfBundle(shelf: Shelf): Promise<void> {
