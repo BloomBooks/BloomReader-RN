@@ -10,12 +10,14 @@ import BookReader from "./app/components/BookReader/BookReader";
 import ThemeColors from "./app/util/ThemeColors";
 import startupTasks from "./app/util/startupTasks";
 import I18n from "./app/i18n/i18n";
-import Drawer from "./app/components/DrawerMenu/Drawer";
+import DrawerMenu from "./app/components/DrawerMenu/DrawerMenu";
+import NotesScreen from "./app/components/NotesScreen/NotesScreen";
 
 const StackNavigator = createStackNavigator(
   {
     BookList: BookList,
-    BookReader: BookReader
+    BookReader: BookReader,
+    NotesScreen: NotesScreen
   },
   {
     initialRouteName: "BookList",
@@ -32,7 +34,7 @@ const StackNavigator = createStackNavigator(
 const DrawerNavigator = createDrawerNavigator(
   { StackNavigator: StackNavigator },
   {
-    contentComponent: Drawer,
+    contentComponent: DrawerMenu,
     drawerWidth: Dimensions.get("window").width - 16
   }
 );
