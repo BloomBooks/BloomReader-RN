@@ -31,6 +31,7 @@ const StackNavigator = createStackNavigator(
     }
   }
 );
+
 const DrawerNavigator = createDrawerNavigator(
   { StackNavigator: StackNavigator },
   {
@@ -39,17 +40,21 @@ const DrawerNavigator = createDrawerNavigator(
   }
 );
 
+// The StackNavigator is nested inside the DrawerNavigator
+// This works better and enables the drawer to use the full height of the screen
 const AppContainer = createAppContainer(DrawerNavigator);
 
 export interface IState {
-  loaded?: boolean;
+  loaded: boolean;
+  drawerLockMode: "unlocked" | "locked-closed";
 }
 
 export default class App extends React.PureComponent<any, IState> {
   constructor(props: any) {
     super(props);
     this.state = {
-      loaded: false
+      loaded: false,
+      drawerLockMode: "unlocked"
     };
   }
 
@@ -60,6 +65,16 @@ export default class App extends React.PureComponent<any, IState> {
   }
 
   render() {
-    return this.state.loaded ? <AppContainer /> : <Text>Loading..</Text>;
+    return this.state.loaded ? (
+      <AppContainer
+        screenProps={{
+          drawerLockMode: this.state.drawerLockMode,
+          setDrawerLockMode: (lockMode: "unlocked" | "locked-closed") =>
+            this.setState({ drawerLockMode: lockMode })
+        }}
+      />
+    ) : (
+      <Text>Loading..</Text>
+    );
   }
 }

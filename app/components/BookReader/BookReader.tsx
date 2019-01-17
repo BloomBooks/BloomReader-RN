@@ -3,9 +3,13 @@ import { SafeAreaView, Text } from "react-native";
 import * as BookStorage from "../../util/BookStorage";
 import { WebView } from "react-native-webview";
 import { NavigationScreenProp } from "react-navigation";
+import { DrawerLocker } from "../DrawerMenu/DrawerLocker";
 
 export interface IProps {
   navigation: NavigationScreenProp<any, any>;
+  screenProps: {
+    setDrawerLockMode: () => {};
+  };
 }
 
 export interface IState {
@@ -37,6 +41,9 @@ export default class BookReader extends React.PureComponent<IProps, IState> {
           <WebView source={{ html: this.state.html }} />
           // <Text>{this.state.html}</Text>
         )}
+        <DrawerLocker
+          setDrawerLockMode={this.props.screenProps.setDrawerLockMode}
+        />
       </SafeAreaView>
     );
   }

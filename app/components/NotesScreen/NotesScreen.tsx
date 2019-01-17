@@ -3,21 +3,34 @@ import { Text, StyleSheet, ScrollView, SafeAreaView } from "react-native";
 import Hyperlink from "react-native-hyperlink";
 import ThemeColors from "../../util/ThemeColors";
 import { NavigationScreenProp } from "react-navigation";
+import { DrawerLocker } from "../DrawerMenu/DrawerLocker";
+import I18n from "../../i18n/i18n";
 
 export enum Notes {
-  ReleaseNotes,
-  AboutBloomReader,
-  AboutBloom,
-  AboutSIL
+  ReleaseNotes = "Release Notes",
+  AboutBloomReader = "About Bloom Reader",
+  AboutBloom = "About Bloom",
+  AboutSIL = "About SIL"
 }
 
 interface IProps {
   navigation: NavigationScreenProp<any, any>;
+  screenProps: {
+    setDrawerLockMode: () => {};
+  };
 }
 
 interface IState {}
 
 export default class NotesScreen extends React.PureComponent<IProps, IState> {
+  static navigationOptions = ({
+    navigation
+  }: {
+    navigation: NavigationScreenProp<any, any>;
+  }) => ({
+    headerTitle: I18n.t(navigation.getParam("notes"))
+  });
+
   render() {
     return (
       <SafeAreaView style={styles.container}>
@@ -28,6 +41,9 @@ export default class NotesScreen extends React.PureComponent<IProps, IState> {
             </Text>
           </Hyperlink>
         </ScrollView>
+        <DrawerLocker
+          setDrawerLockMode={this.props.screenProps.setDrawerLockMode}
+        />
       </SafeAreaView>
     );
   }
