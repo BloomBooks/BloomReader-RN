@@ -9,6 +9,9 @@ import android.os.AsyncTask;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 
+import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.WritableMap;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -109,7 +112,7 @@ public class NewBookListenerService {
             float version = Float.parseFloat(protocolVersion);
             if (version <  2.0f) {
                 if (!reportedVersionProblem) {
-                    getFromWifiModule.sendProgressMessage("You need a newer version of Bloom editor to exchange data with this BloomReader\n");
+                    getFromWifiModule.sendProgressMessage("BloomTooOld");
                     reportedVersionProblem = true;
                 }
                 return;
@@ -117,7 +120,7 @@ public class NewBookListenerService {
                 // Desktop currently uses 2.0 exactly; the plan is that non-breaking changes
                 // will tweak the minor version number, breaking will change the major.
                 if (!reportedVersionProblem) {
-                    getFromWifiModule.sendProgressMessage("You need a newer version of BloomReader to exchange data with this sender\n");
+                    getFromWifiModule.sendProgressMessage("BloomReaderTooOld");
                     reportedVersionProblem = true;
                 }
                 return;
@@ -125,6 +128,9 @@ public class NewBookListenerService {
             File localBookDirectory = new File(context.getFilesDir() + File.separator + "books");  //TODO - extract this to IOUtilities
             File bookFile = new File(localBookDirectory, title + IOUtilities.BOOK_FILE_EXTENSION);
             boolean bookExists = bookFile.exists();
+            WritableMap messageLiterals = Arguments.createMap();
+            messageLiterals.putString("title", title);
+            messageLiterals.putString("sender", sender);
             // If the book doesn't exist it can't be up to date.
             if (bookExists && IsBookUpToDate(bookFile, title, newBookVersion)) {
                 // Enhance: possibly we might want to announce this again if the book has been off the air
@@ -141,15 +147,15 @@ public class NewBookListenerService {
                 // an add, a book would drop out of both. Another approach would be a dictionary
                 // mapping title to last-advertised-time, and if > 5s ago announce again.
                 if (!_announcedBooks.contains(title)) {
-                    getFromWifiModule.sendProgressMessage("Already have this version");
+                    getFromWifiModule.sendProgressMessage("AlreadyHaveThisVersion", messageLiterals);
                     _announcedBooks.add(title); // don't keep saying this.
                 }
             }
             else {
                 if (bookExists)
-                    getFromWifiModule.sendProgressMessage("Found new version");
+                    getFromWifiModule.sendProgressMessage("FoundNewVersion", messageLiterals);
                 else
-                    getFromWifiModule.sendProgressMessage("Found file");
+                    getFromWifiModule.sendProgressMessage("FoundFile", messageLiterals);
                 // It can take a few seconds for the transfer to get going. We won't ask for this again unless
                 // we don't start getting it in a reasonable time.
                 addsToSkipBeforeRetry = 3;
@@ -231,7 +237,7 @@ public class NewBookListenerService {
         stopSyncServer();
         gettingBook = false;
 
-        final String resultMessage = success ? "Done" : "Transfer failed";
+        final String resultMessage = success ? "Done" : "TransferFailed";
         getFromWifiModule.sendProgressMessage(resultMessage);
 
         // BaseActivity.playSoundFile(R.raw.bookarrival);

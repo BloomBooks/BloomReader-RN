@@ -45,7 +45,7 @@ public class GetFromWifiModule extends ReactContextBaseJavaModule {
     public void listen() {
         String wifiName = getWifiName(reactContext);
         if (wifiName == null) {
-            sendProgressMessage("No Wifi Connected");
+            sendProgressMessage("NoWifiConnected");
         }
         else {
             // For some reason the name of the ILC network comes with quotes already around it.
@@ -54,7 +54,9 @@ public class GetFromWifiModule extends ReactContextBaseJavaModule {
                 wifiName = "\"" + wifiName;
             if (!wifiName.endsWith("\""))
                 wifiName = wifiName + "\"";
-            sendProgressMessage( "Looking for ads");  // TODO - Use the Wifi name
+            WritableMap messageLiterals = Arguments.createMap();
+            messageLiterals.putString("network", wifiName);
+            sendProgressMessage( "LookingForAds", messageLiterals);
 
             startBookListener();
         }
