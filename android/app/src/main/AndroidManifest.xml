@@ -9,7 +9,7 @@
 
     <!-- Get name of Wifi network for receiving books -->
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    
+
     <!-- So that just for the duration of WiFi transfer we can hold a lock. -->
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
 
@@ -108,11 +108,7 @@
 
         </activity>
         <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
-
-        <service
-            android:name=".NewBookListenerService"
-            android:enabled="true"
-            android:exported="true" />
+        
         <service
             android:name=".SyncService"
             android:enabled="true"

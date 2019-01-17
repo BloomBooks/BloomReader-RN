@@ -32,27 +32,37 @@ import java.util.Set;
  * Based on ideas from https://gist.github.com/finnjohnsen/3654994
  */
 
-public class NewBookListenerService extends Service {
-    DatagramSocket socket;
-    Thread UDPBroadcastThread;
+public class NewBookListenerService {
+    private Context context;
+    private DatagramSocket socket;
+    private Thread UDPBroadcastThread;
     private Boolean shouldRestartSocketListen=true;
 
     // port on which the desktop is listening for our book request.
     // Must match Bloom Desktop UDPListener._portToListen.
     // Must be different from ports in NewBookListenerService.startListenForUDPBroadcast
     // and SyncServer._serverPort.
-    int desktopPort = 5915;
-    boolean gettingBook = false;
-    boolean httpServiceRunning = false;
-    int addsToSkipBeforeRetry;
-    boolean reportedVersionProblem = false;
+    private int desktopPort = 5915;
+    private boolean gettingBook = false;
+    private boolean httpServiceRunning = false;
+    private int addsToSkipBeforeRetry;
+    private boolean reportedVersionProblem = false;
     private Set<String> _announcedBooks = new HashSet<String>();
     WifiManager.MulticastLock multicastLock;
 
-    @Nullable
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
+    public NewBookListenerService(Context context) {
+        this.context = context;
+    }
+
+    public void startListening() {
+        shouldRestartSocketListen = true;
+        startListenForUDPBroadcast();
+    }
+
+    public void stopListening() {
+        shouldRestartSocketListen = false;
+        if (socket != null)
+            socket.close();
     }
 
     private void listen(Integer port) throws Exception {
@@ -64,7 +74,7 @@ public class NewBookListenerService extends Service {
 
         // This seems to have become necessary for receiving a packet around Android 8.
         WifiManager wifi;
-        wifi = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        wifi = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         multicastLock = wifi.createMulticastLock("lock");
         multicastLock.acquire();
 
@@ -95,7 +105,7 @@ public class NewBookListenerService extends Service {
             float version = Float.parseFloat(protocolVersion);
             if (version <  2.0f) {
                 if (!reportedVersionProblem) {
-                    GetFromWifiModule.sendProgressMessage(this, "You need a newer version of Bloom editor to exchange data with this BloomReader\n");
+                    GetFromWifiModule.sendProgressMessage(context, "You need a newer version of Bloom editor to exchange data with this BloomReader\n");
                     reportedVersionProblem = true;
                 }
                 return;
@@ -103,12 +113,12 @@ public class NewBookListenerService extends Service {
                 // Desktop currently uses 2.0 exactly; the plan is that non-breaking changes
                 // will tweak the minor version number, breaking will change the major.
                 if (!reportedVersionProblem) {
-                    GetFromWifiModule.sendProgressMessage(this, "You need a newer version of BloomReader to exchange data with this sender\n");
+                    GetFromWifiModule.sendProgressMessage(context, "You need a newer version of BloomReader to exchange data with this sender\n");
                     reportedVersionProblem = true;
                 }
                 return;
             }
-            File localBookDirectory = new File(getFilesDir() + File.separator + "books");  //TODO - extract this to IOUtilities
+            File localBookDirectory = new File(context.getFilesDir() + File.separator + "books");  //TODO - extract this to IOUtilities
             File bookFile = new File(localBookDirectory, title + IOUtilities.BOOK_FILE_EXTENSION);
             boolean bookExists = bookFile.exists();
             // If the book doesn't exist it can't be up to date.
@@ -127,15 +137,15 @@ public class NewBookListenerService extends Service {
                 // an add, a book would drop out of both. Another approach would be a dictionary
                 // mapping title to last-advertised-time, and if > 5s ago announce again.
                 if (!_announcedBooks.contains(title)) {
-                    GetFromWifiModule.sendProgressMessage(this, "Already have this version");
+                    GetFromWifiModule.sendProgressMessage(context, "Already have this version");
                     _announcedBooks.add(title); // don't keep saying this.
                 }
             }
             else {
                 if (bookExists)
-                    GetFromWifiModule.sendProgressMessage(this, "Found new version");
+                    GetFromWifiModule.sendProgressMessage(context, "Found new version");
                 else
-                    GetFromWifiModule.sendProgressMessage(this, "Found file");
+                    GetFromWifiModule.sendProgressMessage(context, "Found file");
                 // It can take a few seconds for the transfer to get going. We won't ask for this again unless
                 // we don't start getting it in a reasonable time.
                 addsToSkipBeforeRetry = 3;
@@ -199,16 +209,16 @@ public class NewBookListenerService extends Service {
     private void startSyncServer() {
         if (httpServiceRunning)
             return;
-        Intent serviceIntent = new Intent(this, SyncService.class);
-        startService(serviceIntent);
+        Intent serviceIntent = new Intent(context, SyncService.class);
+        context.startService(serviceIntent);
         httpServiceRunning = true;
     }
 
     private void stopSyncServer() {
         if (!httpServiceRunning)
             return;
-        Intent serviceIntent = new Intent(this, SyncService.class);
-        stopService(serviceIntent);
+        Intent serviceIntent = new Intent(context, SyncService.class);
+        context.stopService(serviceIntent);
         httpServiceRunning = false;
     }
 
@@ -219,7 +229,7 @@ public class NewBookListenerService extends Service {
         gettingBook = false;
 
         final String resultMessage = success ? "Done" : "Transfer failed";
-        GetFromWifiModule.sendProgressMessage(this, resultMessage);
+        GetFromWifiModule.sendProgressMessage(context, resultMessage);
 
         // BaseActivity.playSoundFile(R.raw.bookarrival);
         // We already played a sound for this file, don't need to play another when we resume
@@ -306,25 +316,6 @@ public class NewBookListenerService extends Service {
             }
         });
         UDPBroadcastThread.start();
-    }
-
-    void stopListen() {
-        shouldRestartSocketListen = false;
-        if (socket != null)
-            socket.close();
-    }
-
-    @Override
-    public void onDestroy() {
-        stopListen();
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        shouldRestartSocketListen = true;
-        startListenForUDPBroadcast();
-        //Log.i("UDP", "Service started");
-        return START_STICKY;
     }
 
     // This class is responsible to send one message packet to the IP address we

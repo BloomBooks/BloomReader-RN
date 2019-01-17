@@ -8,6 +8,7 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -27,6 +28,7 @@ public class GetFromWifiModule extends ReactContextBaseJavaModule {
     private ReactApplicationContext reactContext;
     private ArrayList<String> newBookPaths = new ArrayList<String>();
     private ProgressReceiver mProgressReceiver;
+    private NewBookListenerService newBookListenerService;
 
     public GetFromWifiModule(ReactApplicationContext reactContext) {
         super(reactContext);
@@ -129,12 +131,16 @@ public class GetFromWifiModule extends ReactContextBaseJavaModule {
 
     // TODO - I don't think we need a service for this. We're doing it in the foreground
     private void startBookListener() {
-        Intent serviceIntent = new Intent(reactContext, NewBookListenerService.class);
-        reactContext.startService(serviceIntent);
+        newBookListenerService = new NewBookListenerService(reactContext);
+        newBookListenerService.startListening();
     }
 
     private void stopBookListener() {
-        Intent serviceIntent = new Intent(reactContext, NewBookListenerService.class);
-        reactContext.stopService(serviceIntent);
+        if (newBookListenerService == null)
+            Log.e("GetFromWiFi", "stopListening() called, but we weren't listening!");
+        else {
+            newBookListenerService.stopListening();
+            newBookListenerService = null;
+        }
     }
 }
