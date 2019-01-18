@@ -20,49 +20,49 @@ import java.util.List;
 
 public class MainApplication extends Application implements ReactApplication, ShareApplication {
 
-  private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
-    @Override
-    public boolean getUseDeveloperSupport() {
+    private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
+        @Override
+        public boolean getUseDeveloperSupport() {
       return BuildConfig.DEBUG;
     }
 
+        @Override
+        protected List<ReactPackage> getPackages() {
+            return Arrays.<ReactPackage>asList(
+                new MainReactPackage(),
+                new RNSharePackage(),
+                new RNI18nPackage(),
+                new RNCWebViewPackage(),
+                new RNZipArchivePackage(),
+                new RNGestureHandlerPackage(),
+                new RNFSPackage(),
+                new ImportBooksPackage(),
+                new BloomBundlePackage(),
+                new ShareApkPackage(),
+                new GetFromWifiPackage()
+            );
+        }
+
+        @Override
+        protected String getJSMainModuleName() {
+            return "index";
+        }
+    };
+
     @Override
-    protected List<ReactPackage> getPackages() {
-      return Arrays.<ReactPackage>asList(
-          new MainReactPackage(),
-            new RNSharePackage(),
-            new RNI18nPackage(),
-          new RNCWebViewPackage(),
-          new RNZipArchivePackage(),
-          new RNGestureHandlerPackage(),
-          new ImportBooksPackage(),
-          new BloomBundlePackage(),
-          new ShareApkPackage(),
-          new GetFromWifiPackage(),
-          new RNFSPackage()
-      );
+    public ReactNativeHost getReactNativeHost() {
+        return mReactNativeHost;
     }
 
     @Override
-    protected String getJSMainModuleName() {
-      return "index";
+    public void onCreate() {
+        super.onCreate();
+        SoLoader.init(this, /* native exopackage */ false);
     }
-  };
 
-  @Override
-  public ReactNativeHost getReactNativeHost() {
-    return mReactNativeHost;
-  }
-
-  @Override
-  public void onCreate() {
-    super.onCreate();
-    SoLoader.init(this, /* native exopackage */ false);
-  }
-
-  @Override
-  public String getFileProviderAuthority() {
-    // The name of the FileProvider defined in the Manifest
-    return BuildConfig.APPLICATION_ID + ".provider";
-  }
+    @Override
+    public String getFileProviderAuthority() {
+        // The name of the FileProvider defined in the Manifest
+        return BuildConfig.APPLICATION_ID + ".provider";
+    }
 }
