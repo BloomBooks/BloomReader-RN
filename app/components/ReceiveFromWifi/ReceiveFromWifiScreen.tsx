@@ -1,8 +1,17 @@
 import React from "react";
-import { SafeAreaView, Text, Button } from "react-native";
+import {
+  SafeAreaView,
+  Text,
+  Button,
+  ScrollView,
+  StyleSheet,
+  View
+} from "react-native";
 import { NavigationScreenProp, NavigationEvents } from "react-navigation";
 import { DrawerLocker } from "../DrawerMenu/DrawerLocker";
 import * as GetFromWifiModule from "../../native_modules/GetFromWifiModule";
+import ThemeColors from "../../util/ThemeColors";
+import I18n from "../../i18n/i18n";
 
 interface IProps {
   navigation: NavigationScreenProp<any, any>;
@@ -12,7 +21,8 @@ interface IProps {
 }
 
 interface IState {
-  progress: string;
+  currentProgressMessage: string;
+  progressHistory: string;
 }
 
 export default class ReceiveFromWifiScreen extends React.PureComponent<
@@ -24,25 +34,37 @@ export default class ReceiveFromWifiScreen extends React.PureComponent<
   constructor(props: IProps) {
     super(props);
     this.state = {
-      progress: ""
+      currentProgressMessage: "",
+      progressHistory: ""
     };
   }
 
   render() {
     return (
-      <SafeAreaView>
-        <Text>This is the receive from wifi screen</Text>
-        <Text>{this.state.progress}</Text>
-        <Button
-          onPress={() => this.props.navigation.navigate("BookList")}
-          title="Done"
-        />
+      <SafeAreaView style={styles.container}>
+        <ScrollView style={styles.scroll}>
+          <Text style={[styles.text, styles.currentMessageText]}>
+            {this.state.currentProgressMessage}
+          </Text>
+          <Text style={styles.text}>{this.state.progressHistory}</Text>
+        </ScrollView>
+        <View style={styles.btnContainer}>
+          <Button
+            onPress={() => this.props.navigation.navigate("BookList")}
+            title={I18n.t("OK")}
+            color={ThemeColors.red}
+          />
+        </View>
         <NavigationEvents
           onDidFocus={() => {
             this.progressListener = GetFromWifiModule.startWifiReceiver(
               (message: string) => {
                 this.setState(prevState => ({
-                  progress: message + "\n\n" + prevState.progress
+                  currentProgressMessage: message,
+                  progressHistory:
+                    prevState.currentProgressMessage +
+                    "\n\n" +
+                    prevState.progressHistory
                 }));
               }
             );
@@ -59,3 +81,23 @@ export default class ReceiveFromWifiScreen extends React.PureComponent<
     );
   }
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 12
+  },
+  scroll: {
+    flex: 1
+  },
+  text: {
+    fontSize: 18
+  },
+  currentMessageText: {
+    fontWeight: "bold",
+    marginBottom: 12
+  },
+  btnContainer: {
+    alignSelf: "flex-end"
+  }
+});
