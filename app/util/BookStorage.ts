@@ -91,6 +91,7 @@ export async function getBookCollection(): Promise<BookCollection> {
 }
 
 export async function openBookForReading(book: Book): Promise<string> {
+  await RNFS.unlink(openBookDir);
   return await unzip(bookPath(book), openBookDir);
 }
 
@@ -173,6 +174,7 @@ async function deleteBook(
 ): Promise<BookCollection> {
   collection.books = collection.books.filter(b => b.filename != book.filename);
   RNFS.unlink(bookPath(book));
+  if (book.thumbPath) RNFS.unlink(book.thumbPath);
   return collection;
 }
 
@@ -215,17 +217,16 @@ async function extractBookToTmp(filename: string): Promise<string> {
   return await unzip(inPath, outPath);
 }
 
-async function saveThumbnail(bookPath: string): Promise<string | undefined> {
-  const fileList = await RNFS.readdir(bookPath);
+async function saveThumbnail(tmpBookPath: string): Promise<string | undefined> {
+  const fileList = await RNFS.readdir(tmpBookPath);
   const thumbFilename = fileList.find(filename =>
     filename.startsWith("thumbnail.")
   );
   if (thumbFilename) {
-    const inPath = bookPath + "/" + thumbFilename;
-    let outPath =
-      thumbsDir + "/" + bookNameFromFilename(nameFromPath(bookPath));
-    await RNFS.mkdir(outPath);
-    outPath += "/" + thumbFilename;
+    const extension = thumbFilename.slice(thumbFilename.lastIndexOf("."));
+    const inPath = tmpBookPath + "/" + thumbFilename;
+    const outPath =
+      thumbsDir + "/" + nameFromPath(tmpBookPath).replace(/\.\w+$/, extension);
     await RNFS.moveFile(inPath, outPath);
     return outPath;
   }
