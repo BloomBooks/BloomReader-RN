@@ -47,7 +47,7 @@ async function addBookToList(filename: string, list: Book[]): Promise<Book> {
   const book = {
     filename: filename,
     title: metaData.title,
-    allTitles: JSON.parse(metaData.allTitles),
+    allTitles: JSON.parse(metaData.allTitles.replace("\n", " ")), // Remove newlines to avoid JSON parse error
     tags: metaData.tags,
     thumbPath: thumbPath,
     modifiedAt: Date.now()
