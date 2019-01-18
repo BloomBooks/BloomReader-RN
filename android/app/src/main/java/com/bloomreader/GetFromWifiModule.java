@@ -20,14 +20,15 @@ import com.facebook.react.modules.core.DeviceEventManagerModule;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 
-// An activity that is made to look like a dialog (see the theme associated with it in
-// the main manifest and defined in styles.xml) and which implements the command to receive
-// Bloom books from Wifi (i.e., from a desktop running Bloom...eventually possibly from
-// another copy of BloomReader). This is launched from a menu option in the main activity.
+/*
+    Module for receiving books over WiFi from Bloom.
+    The JavaScript initiates by calling listen() and concludes by calling stopListening().
+    This module sends ProgressMessage and NewBook events to the Javascript.
+ */
+
 public class GetFromWifiModule extends ReactContextBaseJavaModule {
     private ReactApplicationContext reactContext;
     private ArrayList<String> newBookPaths = new ArrayList<String>();
-    private ProgressReceiver mProgressReceiver;
     private NewBookListenerService newBookListenerService;
 
     public GetFromWifiModule(ReactApplicationContext reactContext) {
@@ -42,13 +43,9 @@ public class GetFromWifiModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void listen() {
-        mProgressReceiver = new ProgressReceiver();
-        LocalBroadcastManager.getInstance(reactContext).registerReceiver(mProgressReceiver,
-                new IntentFilter(NewBookListenerService.BROADCAST_BOOK_LISTENER_PROGRESS));
-
         String wifiName = getWifiName(reactContext);
         if (wifiName == null) {
-            sendProgressMessage(reactContext, "No Wifi Connected");
+            sendProgressMessage("No Wifi Connected");
         }
         else {
             // For some reason the name of the ILC network comes with quotes already around it.
@@ -57,13 +54,17 @@ public class GetFromWifiModule extends ReactContextBaseJavaModule {
                 wifiName = "\"" + wifiName;
             if (!wifiName.endsWith("\""))
                 wifiName = wifiName + "\"";
-            sendProgressMessage(reactContext, "Looking for ads");  // TODO - Use the Wifi name
+            sendProgressMessage( "Looking for ads");  // TODO - Use the Wifi name
 
             startBookListener();
         }
     }
 
-    private void sendProgressMessageToView(String messageKey, WritableMap messageLiterals) {
+    public void sendProgressMessage(String messageKey) {
+        sendProgressMessage(messageKey, null);
+    }
+
+    public void sendProgressMessage(String messageKey, WritableMap messageLiterals) {
         WritableMap eventParams = Arguments.createMap();
         eventParams.putString("messageKey", messageKey);
         eventParams.putMap("messageLiterals", messageLiterals);
@@ -75,24 +76,6 @@ public class GetFromWifiModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void stopListening() {
         stopBookListener();
-        LocalBroadcastManager.getInstance(reactContext).unregisterReceiver(mProgressReceiver);
-    }
-
-    // This is used by various companion classes that want to display stuff in our progress window.
-    public static void sendProgressMessage(Context context, String message) {
-        Intent progressIntent = new Intent(NewBookListenerService.BROADCAST_BOOK_LISTENER_PROGRESS)
-                .putExtra(NewBookListenerService.BROADCAST_BOOK_LISTENER_PROGRESS_CONTENT, message);
-        LocalBroadcastManager.getInstance(context).sendBroadcast(progressIntent);
-    }
-
-    // This class supports receiving the messages sent by calls to sendProgressMessage()
-    private class ProgressReceiver extends BroadcastReceiver {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String message = intent.getStringExtra(NewBookListenerService.BROADCAST_BOOK_LISTENER_PROGRESS_CONTENT);
-            sendProgressMessageToView(message, null); // TODO - Send literals
-        }
     }
 
     // Get the human-readable name of the WiFi network that the Android is connected to
@@ -129,15 +112,14 @@ public class GetFromWifiModule extends ReactContextBaseJavaModule {
         }
     }
 
-    // TODO - I don't think we need a service for this. We're doing it in the foreground
     private void startBookListener() {
-        newBookListenerService = new NewBookListenerService(reactContext);
+        newBookListenerService = new NewBookListenerService(reactContext, this);
         newBookListenerService.startListening();
     }
 
     private void stopBookListener() {
         if (newBookListenerService == null)
-            Log.e("GetFromWiFi", "stopListening() called, but we weren't listening!");
+            Log.e("GetFromWifi", "stopListening() called, but we weren't listening!");
         else {
             newBookListenerService.stopListening();
             newBookListenerService = null;

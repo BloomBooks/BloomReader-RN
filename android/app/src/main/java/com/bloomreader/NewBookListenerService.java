@@ -34,6 +34,8 @@ import java.util.Set;
 
 public class NewBookListenerService {
     private Context context;
+    private GetFromWifiModule getFromWifiModule;
+    private SyncService syncService;
     private DatagramSocket socket;
     private Thread UDPBroadcastThread;
     private Boolean shouldRestartSocketListen=true;
@@ -50,8 +52,9 @@ public class NewBookListenerService {
     private Set<String> _announcedBooks = new HashSet<String>();
     WifiManager.MulticastLock multicastLock;
 
-    public NewBookListenerService(Context context) {
+    public NewBookListenerService(Context context, GetFromWifiModule getFromWifiModule) {
         this.context = context;
+        this.getFromWifiModule = getFromWifiModule;
     }
 
     public void startListening() {
@@ -73,8 +76,9 @@ public class NewBookListenerService {
         }
 
         // This seems to have become necessary for receiving a packet around Android 8.
+        // Does it overlap at all with the WiFi lock we obtain in the SyncService?
         WifiManager wifi;
-        wifi = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        wifi = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         multicastLock = wifi.createMulticastLock("lock");
         multicastLock.acquire();
 
@@ -105,7 +109,7 @@ public class NewBookListenerService {
             float version = Float.parseFloat(protocolVersion);
             if (version <  2.0f) {
                 if (!reportedVersionProblem) {
-                    GetFromWifiModule.sendProgressMessage(context, "You need a newer version of Bloom editor to exchange data with this BloomReader\n");
+                    getFromWifiModule.sendProgressMessage("You need a newer version of Bloom editor to exchange data with this BloomReader\n");
                     reportedVersionProblem = true;
                 }
                 return;
@@ -113,7 +117,7 @@ public class NewBookListenerService {
                 // Desktop currently uses 2.0 exactly; the plan is that non-breaking changes
                 // will tweak the minor version number, breaking will change the major.
                 if (!reportedVersionProblem) {
-                    GetFromWifiModule.sendProgressMessage(context, "You need a newer version of BloomReader to exchange data with this sender\n");
+                    getFromWifiModule.sendProgressMessage("You need a newer version of BloomReader to exchange data with this sender\n");
                     reportedVersionProblem = true;
                 }
                 return;
@@ -137,15 +141,15 @@ public class NewBookListenerService {
                 // an add, a book would drop out of both. Another approach would be a dictionary
                 // mapping title to last-advertised-time, and if > 5s ago announce again.
                 if (!_announcedBooks.contains(title)) {
-                    GetFromWifiModule.sendProgressMessage(context, "Already have this version");
+                    getFromWifiModule.sendProgressMessage("Already have this version");
                     _announcedBooks.add(title); // don't keep saying this.
                 }
             }
             else {
                 if (bookExists)
-                    GetFromWifiModule.sendProgressMessage(context, "Found new version");
+                    getFromWifiModule.sendProgressMessage("Found new version");
                 else
-                    GetFromWifiModule.sendProgressMessage(context, "Found file");
+                    getFromWifiModule.sendProgressMessage("Found file");
                 // It can take a few seconds for the transfer to get going. We won't ask for this again unless
                 // we don't start getting it in a reasonable time.
                 addsToSkipBeforeRetry = 3;
@@ -209,16 +213,15 @@ public class NewBookListenerService {
     private void startSyncServer() {
         if (httpServiceRunning)
             return;
-        Intent serviceIntent = new Intent(context, SyncService.class);
-        context.startService(serviceIntent);
+        syncService = new SyncService(context, getFromWifiModule);
+        syncService.startSyncServer();
         httpServiceRunning = true;
     }
 
     private void stopSyncServer() {
         if (!httpServiceRunning)
             return;
-        Intent serviceIntent = new Intent(context, SyncService.class);
-        context.stopService(serviceIntent);
+        syncService.stopSyncServer();
         httpServiceRunning = false;
     }
 
@@ -229,7 +232,7 @@ public class NewBookListenerService {
         gettingBook = false;
 
         final String resultMessage = success ? "Done" : "Transfer failed";
-        GetFromWifiModule.sendProgressMessage(context, resultMessage);
+        getFromWifiModule.sendProgressMessage(resultMessage);
 
         // BaseActivity.playSoundFile(R.raw.bookarrival);
         // We already played a sound for this file, don't need to play another when we resume

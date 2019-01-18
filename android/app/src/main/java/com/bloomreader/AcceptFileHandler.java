@@ -31,13 +31,16 @@ import java.util.concurrent.TimeoutException;
  */
 public class AcceptFileHandler implements HttpRequestHandler {
     private Context _parent;
-    public AcceptFileHandler(Context parent)
+    private GetFromWifiModule getFromWifiModule;
+
+    public AcceptFileHandler(Context parent, GetFromWifiModule getFromWifiModule)
     {
         _parent = parent;
+        this.getFromWifiModule = getFromWifiModule;
     }
     @Override
     public void handle(HttpRequest request, HttpResponse response, HttpContext httpContext) throws HttpException, IOException {
-        GetFromWifiModule.sendProgressMessage(_parent, "Downloading");
+        getFromWifiModule.sendProgressMessage("Downloading");
         File baseDir = destinationDir();
         Uri uri = Uri.parse(request.getRequestLine().getUri());
         String filePath = uri.getQueryParameter("path");

@@ -33,17 +33,19 @@ import cz.msebera.android.httpclient.protocol.ResponseServer;
  * which we eventually want in the Reader as well as the desktop...may be simpler.
  */
 public class SyncServer extends Thread {
-    Integer _serverPort = 5914; // Must match literal in BloomReaderPublisher.SendBookToWiFi()
+    private final int _serverPort = 5914; // Must match literal in BloomReaderPublisher.SendBookToWiFi()
     private ImmutableHttpProcessor httpproc = null;
     private BasicHttpContext httpContext = null;
     private HttpService httpService = null;
-    boolean _running;
-    Context _parent;
+    private boolean _running;
+    private Context _parent;
+    final private GetFromWifiModule getFromWifiModule;
 
-    public SyncServer(Context parent)
+    public SyncServer(Context parent, final GetFromWifiModule getFromWifiModule)
     {
         super("BloomReaderAndroidServer");
         _parent = parent;
+        this.getFromWifiModule = getFromWifiModule;
         httpproc = new ImmutableHttpProcessor(new ResponseDate(), new ResponseServer(), new ResponseContent(), new ResponseConnControl());
         httpContext = new BasicHttpContext();
 
@@ -52,7 +54,7 @@ public class SyncServer extends Thread {
             public HttpRequestHandler lookup(HttpRequest request) {
                 String uri = request.getRequestLine().getUri();
                 if (uri.contains("/putfile"))
-                    return new AcceptFileHandler(_parent);
+                    return new AcceptFileHandler(_parent, getFromWifiModule);
                 return null;
             }
         };
