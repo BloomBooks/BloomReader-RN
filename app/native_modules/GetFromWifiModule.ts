@@ -24,7 +24,7 @@ export interface NewBookListener {
   stopListening: () => void;
 }
 
-export function startWiFiReceiver(
+export function startWifiReceiver(
   handleProgressMessage: (message: string) => void
 ): ProgressListener {
   const subscription = DeviceEventEmitter.addListener(

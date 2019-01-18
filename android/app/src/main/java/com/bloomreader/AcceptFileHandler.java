@@ -41,13 +41,13 @@ public class AcceptFileHandler implements HttpRequestHandler {
     @Override
     public void handle(HttpRequest request, HttpResponse response, HttpContext httpContext) throws HttpException, IOException {
         getFromWifiModule.sendProgressMessage("Downloading");
-        File baseDir = destinationDir();
+        File baseDir = IOUtilities.booksDirectory(_parent);
         Uri uri = Uri.parse(request.getRequestLine().getUri());
-        String filePath = uri.getQueryParameter("path");
+        String filename = uri.getQueryParameter("path"); // For Bloom, the path is just a filename. I suspect it's called path because it was designed for HearThis.
 
         if (listener != null)
-            listener.receivingFile(filePath);
-        String path = baseDir  + "/" + filePath;
+            listener.receivingFile(filename);
+        String path = baseDir  + "/" + filename;
         HttpEntity entity = null;
         String result = "failure";
         if (request instanceof HttpEntityEnclosingRequest)
@@ -119,18 +119,12 @@ public class AcceptFileHandler implements HttpRequestHandler {
         }
         response.setEntity(new StringEntity(result));
         if (listener != null)
-            listener.receivedFile(filePath, result == "success");
-    }
-
-    private File destinationDir() {
-        File dir = new File(_parent.getCacheDir() + File.separator + "booksFromWifi");
-        dir.mkdir();
-        return dir;
+            listener.receivedFile(filename, result == "success");
     }
 
     public interface IFileReceivedNotification {
-        void receivingFile(String name);
-        void receivedFile(String name, boolean success);
+        void receivingFile(String filename);
+        void receivedFile(String filename, boolean success);
     }
 
     static IFileReceivedNotification listener;

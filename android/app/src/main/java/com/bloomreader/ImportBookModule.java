@@ -26,7 +26,6 @@ import static com.bloomreader.IOUtilities.BOOK_FILE_EXTENSION;
 
 
 public class ImportBookModule extends ReactContextBaseJavaModule {
-    public static final String booksDirectory = "books"; // TODO - Extract this to IOUtilities
     private static Uri uriToImport;
     
     private ReactContext context;
@@ -96,7 +95,8 @@ public class ImportBookModule extends ReactContextBaseJavaModule {
     }
 
     private String importBook(Uri bookUri, String filename){
-        String filepath = context.getFilesDir() + File.separator + booksDirectory + File.separator + filename;
+        File booksDir = IOUtilities.booksDirectory(context);
+        String filepath = booksDir.getAbsolutePath() + File.separator + filename;
         Log.d("ImportBook", "Copying " + filename + " to " + filepath);
         IOUtilities.copyFile(context, bookUri, filepath);
         return filepath;

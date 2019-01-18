@@ -125,7 +125,7 @@ public class NewBookListenerService {
                 }
                 return;
             }
-            File localBookDirectory = new File(context.getFilesDir() + File.separator + "books");  //TODO - extract this to IOUtilities
+            File localBookDirectory = IOUtilities.booksDirectory(context);
             File bookFile = new File(localBookDirectory, title + IOUtilities.BOOK_FILE_EXTENSION);
             boolean bookExists = bookFile.exists();
             WritableMap messageLiterals = Arguments.createMap();
@@ -186,7 +186,7 @@ public class NewBookListenerService {
         }
 
         @Override
-        public void receivingFile(String name) {
+        public void receivingFile(String filename) {
             // Once the receive actually starts, don't start more receives until we deal with this.
             // If our request for the book didn't produce a response, we'll ask again when we get
             // the next notification.
@@ -194,8 +194,8 @@ public class NewBookListenerService {
         }
 
         @Override
-        public void receivedFile(String name, boolean success) {
-            _parent.transferComplete(success);
+        public void receivedFile(String filename, boolean success) {
+            _parent.transferComplete(success, filename);
             if (success) {
                 // We won't announce subsequent up-to-date advertisements for this book.
                 _announcedBooks.add(_title);
@@ -232,13 +232,17 @@ public class NewBookListenerService {
     }
 
     // Called via EndOfTransferListener when desktop sends transfer complete notification.
-    private void transferComplete(boolean success) {
+    private void transferComplete(boolean success, String filename) {
         // We can stop listening for file transfers and notifications from the desktop.
         stopSyncServer();
         gettingBook = false;
 
-        final String resultMessage = success ? "Done" : "TransferFailed";
-        getFromWifiModule.sendProgressMessage(resultMessage);
+        if (success) {
+            getFromWifiModule.sendProgressMessage("Done");
+            getFromWifiModule.sendNewBookMessage(filename);
+        }
+        else
+            getFromWifiModule.sendProgressMessage("TransferFailed");
 
         // BaseActivity.playSoundFile(R.raw.bookarrival);
         // We already played a sound for this file, don't need to play another when we resume

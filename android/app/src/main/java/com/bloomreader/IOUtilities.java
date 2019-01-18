@@ -59,6 +59,12 @@ public class IOUtilities {
     public static final String BOOKSHELF_FILE_EXTENSION = ".bloomshelf";
     public static final String BLOOM_BUNDLE_FILE_EXTENSION = ".bloombundle";
 
+    public static File booksDirectory(Context context) {
+        File booksDir = new File(context.getFilesDir() + File.separator + "books");
+        booksDir.mkdir();
+        return booksDir;
+    }
+
 //    private static final int BUFFER_SIZE = 8192;
 //
 //    public static void showError(Context context, CharSequence message) {

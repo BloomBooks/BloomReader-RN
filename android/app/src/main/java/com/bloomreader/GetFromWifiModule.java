@@ -75,6 +75,14 @@ public class GetFromWifiModule extends ReactContextBaseJavaModule {
                 .emit("ProgressMessage", eventParams);
     }
 
+    public void sendNewBookMessage(String filename) {
+        WritableMap eventParams = Arguments.createMap();
+        eventParams.putString("filename", filename);
+        reactContext
+                .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                .emit("NewBook", eventParams);
+    }
+
     @ReactMethod
     public void stopListening() {
         stopBookListener();

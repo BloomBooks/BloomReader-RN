@@ -39,7 +39,7 @@ export default class ReceiveFromWifiScreen extends React.PureComponent<
         />
         <NavigationEvents
           onDidFocus={() => {
-            this.progressListener = GetFromWifiModule.startWiFiReceiver(
+            this.progressListener = GetFromWifiModule.startWifiReceiver(
               (message: string) => {
                 this.setState(prevState => ({
                   progress: message + "\n\n" + prevState.progress
