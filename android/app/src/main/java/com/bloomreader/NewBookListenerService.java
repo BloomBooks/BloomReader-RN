@@ -1,6 +1,7 @@
-package org.sil.bloom.reader.WiFi;
+package com.bloomreader;
 
 import android.app.Service;
+import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.net.wifi.WifiManager;
@@ -10,12 +11,6 @@ import android.support.annotation.Nullable;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.sil.bloom.reader.BaseActivity;
-import org.sil.bloom.reader.IOUtilities;
-import org.sil.bloom.reader.MainActivity;
-import org.sil.bloom.reader.R;
-import org.sil.bloom.reader.models.BookOrShelf;
-import org.sil.bloom.reader.models.BookCollection;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,8 +23,6 @@ import java.net.SocketException;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
-
-import static org.sil.bloom.reader.BloomReaderApplication.getOurDeviceName;
 
 
 /**
@@ -102,7 +95,7 @@ public class NewBookListenerService extends Service {
             float version = Float.parseFloat(protocolVersion);
             if (version <  2.0f) {
                 if (!reportedVersionProblem) {
-                    GetFromWiFiActivity.sendProgressMessage(this, "You need a newer version of Bloom editor to exchange data with this BloomReader\n");
+                    GetFromWifiModule.sendProgressMessage(this, "You need a newer version of Bloom editor to exchange data with this BloomReader\n");
                     reportedVersionProblem = true;
                 }
                 return;
@@ -110,12 +103,12 @@ public class NewBookListenerService extends Service {
                 // Desktop currently uses 2.0 exactly; the plan is that non-breaking changes
                 // will tweak the minor version number, breaking will change the major.
                 if (!reportedVersionProblem) {
-                    GetFromWiFiActivity.sendProgressMessage(this, "You need a newer version of BloomReader to exchange data with this sender\n");
+                    GetFromWifiModule.sendProgressMessage(this, "You need a newer version of BloomReader to exchange data with this sender\n");
                     reportedVersionProblem = true;
                 }
                 return;
             }
-            File localBookDirectory = BookCollection.getLocalBooksDirectory();
+            File localBookDirectory = new File(getFilesDir() + File.separator + "books");  //TODO - extract this to IOUtilities
             File bookFile = new File(localBookDirectory, title + IOUtilities.BOOK_FILE_EXTENSION);
             boolean bookExists = bookFile.exists();
             // If the book doesn't exist it can't be up to date.
@@ -134,15 +127,15 @@ public class NewBookListenerService extends Service {
                 // an add, a book would drop out of both. Another approach would be a dictionary
                 // mapping title to last-advertised-time, and if > 5s ago announce again.
                 if (!_announcedBooks.contains(title)) {
-                    GetFromWiFiActivity.sendProgressMessage(this, String.format(getString(R.string.already_have_version), title) + "\n\n");
+                    GetFromWifiModule.sendProgressMessage(this, "Already have this version");
                     _announcedBooks.add(title); // don't keep saying this.
                 }
             }
             else {
                 if (bookExists)
-                    GetFromWiFiActivity.sendProgressMessage(this, String.format(getString(R.string.found_new_version), title, sender) + "\n");
+                    GetFromWifiModule.sendProgressMessage(this, "Found new version");
                 else
-                    GetFromWiFiActivity.sendProgressMessage(this, String.format(getString(R.string.found_file), title, sender) + "\n");
+                    GetFromWifiModule.sendProgressMessage(this, "Found file");
                 // It can take a few seconds for the transfer to get going. We won't ask for this again unless
                 // we don't start getting it in a reasonable time.
                 addsToSkipBeforeRetry = 3;
@@ -225,13 +218,13 @@ public class NewBookListenerService extends Service {
         stopSyncServer();
         gettingBook = false;
 
-        final int resultId = success ? R.string.done : R.string.transferFailed;
-        GetFromWiFiActivity.sendProgressMessage(this, getString(resultId) + "\n\n");
+        final String resultMessage = success ? "Done" : "Transfer failed";
+        GetFromWifiModule.sendProgressMessage(this, resultMessage);
 
-        BaseActivity.playSoundFile(R.raw.bookarrival);
+        // BaseActivity.playSoundFile(R.raw.bookarrival);
         // We already played a sound for this file, don't need to play another when we resume
         // the main activity and notice the new file.
-        MainActivity.skipNextNewFileSound();
+        // MainActivity.skipNextNewFileSound();
     }
 
     // Get the IP address of this device (on the WiFi network) to transmit to the desktop.
@@ -260,6 +253,18 @@ public class NewBookListenerService extends Service {
         }
 
         return ip;
+    }
+
+    // It's slightly odd to use the Bluetooth name as a general device name (also used e.g.
+    // in WiFi function), but it's the only generally-available user-configurable device name we
+    // can find. (Some devices...e.g., JohnT's Note 4...have a setting for a more general device
+    // name, but others (e.g., Nexus) do not, and it's not obvious how to get at the one the
+    // Note has, anyway.)
+    private String getOurDeviceName() {
+        BluetoothAdapter myDevice = BluetoothAdapter.getDefaultAdapter();
+        if (myDevice != null)
+            return myDevice.getName();
+        return null;
     }
 
     // Determine whether the book is up to date, based on comparing the version file embedded in it

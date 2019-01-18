@@ -1,8 +1,23 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.bloomreader">
 
+    <!-- Used by RN for debugging -->
     <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- Used by RN for debugging - need to remove from production-->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+
+    <!-- Get name of Wifi network for receiving books -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    
+    <!-- So that just for the duration of WiFi transfer we can hold a lock. -->
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+
+    <!-- On later versions of Android this seems to be needed for receiving UDP broadcasts. -->
+    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
+
+    <!-- Used to get the device name for Wifi transfer -->
+    <uses-permission android:name="android.permission.BLUETOOTH"/>
 
     <application
       android:name=".MainApplication"
@@ -91,8 +106,17 @@
                 <data android:mimeType="application/bloombundle" />
             </intent-filter>
 
-      </activity>
-      <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
+        </activity>
+        <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
+
+        <service
+            android:name=".NewBookListenerService"
+            android:enabled="true"
+            android:exported="true" />
+        <service
+            android:name=".SyncService"
+            android:enabled="true"
+            android:exported="true" />
 
         <!-- Enables us to share files with other apps from specified directories -->
         <provider

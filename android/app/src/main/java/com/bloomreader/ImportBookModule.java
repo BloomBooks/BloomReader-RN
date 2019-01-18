@@ -26,7 +26,7 @@ import static com.bloomreader.IOUtilities.BOOK_FILE_EXTENSION;
 
 
 public class ImportBookModule extends ReactContextBaseJavaModule {
-    public static final String booksDirectory = "books";
+    public static final String booksDirectory = "books"; // TODO - Extract this to IOUtilities
     private static Uri uriToImport;
     
     private ReactContext context;

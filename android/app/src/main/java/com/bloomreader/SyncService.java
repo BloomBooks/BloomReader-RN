@@ -1,4 +1,4 @@
-package org.sil.bloom.reader.WiFi;
+package com.bloomreader;
 
 import android.app.Service;
 import android.content.Context;

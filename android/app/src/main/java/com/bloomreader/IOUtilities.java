@@ -31,10 +31,10 @@ package com.bloomreader;
 //import java.nio.charset.StandardCharsets;
 //import java.text.SimpleDateFormat;
 //import java.util.Date;
-//import java.util.zip.ZipEntry;
-//import java.util.zip.ZipFile;
-//import java.util.zip.ZipInputStream;
-//import java.util.zip.ZipOutputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 //
 //import static org.sil.bloom.reader.models.BookCollection.getLocalBooksDirectory;
 
@@ -125,30 +125,30 @@ public class IOUtilities {
 //        unzip(zis, targetDirectory);
 //    }
 //
-//    public static byte[] ExtractZipEntry(File input, String entryName) {
-//        try {
-//            ZipFile zip = new ZipFile(input);
-//            try {
-//                ZipEntry entry = zip.getEntry(entryName);
-//                if (entry == null) {
-//                    return null;
-//                }
-//                InputStream stream = zip.getInputStream(entry);
-//                try {
-//                    byte[] buffer = new byte[(int) entry.getSize()];
-//                    stream.read(buffer);
-//                    return buffer;
-//                } finally {
-//                    stream.close();
-//                }
-//            } finally {
-//                zip.close();
-//            }
-//        } catch (IOException e)
-//        {
-//            return null;
-//        }
-//    }
+    public static byte[] ExtractZipEntry(File input, String entryName) {
+        try {
+            ZipFile zip = new ZipFile(input);
+            try {
+                ZipEntry entry = zip.getEntry(entryName);
+                if (entry == null) {
+                    return null;
+                }
+                InputStream stream = zip.getInputStream(entry);
+                try {
+                    byte[] buffer = new byte[(int) entry.getSize()];
+                    stream.read(buffer);
+                    return buffer;
+                } finally {
+                    stream.close();
+                }
+            } finally {
+                zip.close();
+            }
+        } catch (IOException e)
+        {
+            return null;
+        }
+    }
 //
 //    public static boolean copyAssetFolder(AssetManager assetManager,
 //                                          String fromAssetPath, String toPath) {

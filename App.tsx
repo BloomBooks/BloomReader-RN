@@ -12,12 +12,14 @@ import startupTasks from "./app/util/startupTasks";
 import I18n from "./app/i18n/i18n";
 import DrawerMenu from "./app/components/DrawerMenu/DrawerMenu";
 import NotesScreen from "./app/components/NotesScreen/NotesScreen";
+import ReceiveFromWifiScreen from "./app/components/ReceiveFromWifi/ReceiveFromWifiScreen";
 
 const StackNavigator = createStackNavigator(
   {
     BookList: BookList,
     BookReader: BookReader,
-    NotesScreen: NotesScreen
+    NotesScreen: NotesScreen,
+    ReceiveFromWifiScreen: ReceiveFromWifiScreen
   },
   {
     initialRouteName: "BookList",

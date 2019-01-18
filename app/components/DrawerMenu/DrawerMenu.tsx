@@ -28,7 +28,9 @@ export default class DrawerMenu extends React.PureComponent<
         <DrawerMenuItem
           label={I18n.t("Receive books from computer")}
           iconName="md-wifi"
-          onPress={() => {}}
+          onPress={() => {
+            this.props.navigation.navigate("ReceiveFromWifiScreen");
+          }}
         />
         <DrawerMenuItem
           label={I18n.t("Share Books")}

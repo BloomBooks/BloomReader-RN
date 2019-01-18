@@ -1,23 +1,20 @@
-package org.sil.bloom.reader.WiFi;
+package com.bloomreader;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.media.MediaPlayer;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
-import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
-import android.view.View;
-import android.widget.Button;
-import android.widget.ScrollView;
-import android.widget.TextView;
 
-import org.sil.bloom.reader.BaseActivity;
-import org.sil.bloom.reader.MainActivity;
-import org.sil.bloom.reader.R;
+import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.bridge.ReactContextBaseJavaModule;
+import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -26,42 +23,57 @@ import java.util.ArrayList;
 // the main manifest and defined in styles.xml) and which implements the command to receive
 // Bloom books from Wifi (i.e., from a desktop running Bloom...eventually possibly from
 // another copy of BloomReader). This is launched from a menu option in the main activity.
-public class GetFromWiFiActivity extends BaseActivity {
+public class GetFromWifiModule extends ReactContextBaseJavaModule {
+    private ReactApplicationContext reactContext;
+    private ArrayList<String> newBookPaths = new ArrayList<String>();
+    private ProgressReceiver mProgressReceiver;
 
-    ArrayList<String> newBookPaths = new ArrayList<String>();
-    ProgressReceiver mProgressReceiver;
+    public GetFromWifiModule(ReactApplicationContext reactContext) {
+        super(reactContext);
+        this.reactContext = reactContext;
+    }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_get_from_wi_fi);
+    public String getName() {
+        return "GetFromWifiModule";
+    }
 
+    @ReactMethod
+    public void listen() {
         mProgressReceiver = new ProgressReceiver();
-        LocalBroadcastManager.getInstance(this).registerReceiver(mProgressReceiver,
+        LocalBroadcastManager.getInstance(reactContext).registerReceiver(mProgressReceiver,
                 new IntentFilter(NewBookListenerService.BROADCAST_BOOK_LISTENER_PROGRESS));
 
-        final Button okButton = (Button)findViewById(R.id.wifiOk);
-        okButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                onBackPressed();
-            }
-        });
+        String wifiName = getWifiName(reactContext);
+        if (wifiName == null) {
+            sendProgressMessage(reactContext, "No Wifi Connected");
+        }
+        else {
+            // For some reason the name of the ILC network comes with quotes already around it.
+            // Since we want one lot of quotes but not two, decided to add them if missing.
+            if (!wifiName.startsWith("\""))
+                wifiName = "\"" + wifiName;
+            if (!wifiName.endsWith("\""))
+                wifiName = wifiName + "\"";
+            sendProgressMessage(reactContext, "Looking for ads");  // TODO - Use the Wifi name
+
+            startBookListener();
+        }
     }
 
-    @Override
-    protected void onDestroy() {
-        // Unregister since the activity is about to be closed.
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mProgressReceiver);
-        super.onDestroy();
+    private void sendProgressMessageToView(String messageKey, WritableMap messageLiterals) {
+        WritableMap eventParams = Arguments.createMap();
+        eventParams.putString("messageKey", messageKey);
+        eventParams.putMap("messageLiterals", messageLiterals);
+        reactContext
+                .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                .emit("ProgressMessage", eventParams);
     }
 
-    @Override
-    public void onBackPressed() {
-        // inform the main activity of the books we added.
-        Intent result = new Intent();
-        result.putExtra(MainActivity.NEW_BOOKS, newBookPaths.toArray(new String[0]));
-        setResult(RESULT_OK, result);
-        finish();
+    @ReactMethod
+    public void stopListening() {
+        stopBookListener();
+        LocalBroadcastManager.getInstance(reactContext).unregisterReceiver(mProgressReceiver);
     }
 
     // This is used by various companion classes that want to display stuff in our progress window.
@@ -76,50 +88,9 @@ public class GetFromWiFiActivity extends BaseActivity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            TextView progressView = (TextView) findViewById(R.id.wifi_progress);
-            progressView.append(intent.getStringExtra(NewBookListenerService.BROADCAST_BOOK_LISTENER_PROGRESS_CONTENT));
-            // Scroll to the bottom so the new message is visible
-            // see https://stackoverflow.com/questions/3506696/auto-scrolling-textview-in-android-to-bring-text-into-view
-            // Hints there suggest we might not need a scroll view wrapped around our text view...we can make the
-            // text view itself scrollable. That might be more efficient for a long report.
-            // This is good enough for now.
-            ScrollView progressScroller = (ScrollView) findViewById(R.id.wifi_progress_scroller);
-            progressScroller.fullScroll(View.FOCUS_DOWN);
+            String message = intent.getStringExtra(NewBookListenerService.BROADCAST_BOOK_LISTENER_PROGRESS_CONTENT);
+            sendProgressMessageToView(message, null); // TODO - Send literals
         }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        String wifiName = getWifiName(this);
-        if (wifiName == null)
-        {
-            GetFromWiFiActivity.sendProgressMessage(this, getString(R.string.no_wifi_connected) + "\n\n");
-        }
-        else {
-            // For some reason the name of the ILC network comes with quotes already around it.
-            // Since we want one lot of quotes but not two, decided to add them if missing.
-            if (!wifiName.startsWith("\""))
-                wifiName = "\"" + wifiName;
-            if (!wifiName.endsWith("\""))
-                wifiName = wifiName + "\"";
-            GetFromWiFiActivity.sendProgressMessage(this, String.format(getString(R.string.looking_for_adds), wifiName) + "\n\n");
-
-            startBookListener();
-        }
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        // Enhance: do we want to do something to allow an in-progress transfer to complete?
-        stopBookListener();
-    }
-
-    @Override
-    protected void onNewOrUpdatedBook(String fullPath) {
-        newBookPaths.add(fullPath);
-        playSoundFile(R.raw.bookarrival);
     }
 
     // Get the human-readable name of the WiFi network that the Android is connected to
@@ -137,7 +108,7 @@ public class GetFromWiFiActivity extends BaseActivity {
         }
 
         if (deviceHotspotActive(manager))
-            return getString(R.string.device_hotspot);
+            return "Device Hotspot";
 
         return null;
     }
@@ -156,13 +127,14 @@ public class GetFromWiFiActivity extends BaseActivity {
         }
     }
 
+    // TODO - I don't think we need a service for this. We're doing it in the foreground
     private void startBookListener() {
-        Intent serviceIntent = new Intent(this, NewBookListenerService.class);
-        startService(serviceIntent);
+        Intent serviceIntent = new Intent(reactContext, NewBookListenerService.class);
+        reactContext.startService(serviceIntent);
     }
 
     private void stopBookListener() {
-        Intent serviceIntent = new Intent(this, NewBookListenerService.class);
-        stopService(serviceIntent);
+        Intent serviceIntent = new Intent(reactContext, NewBookListenerService.class);
+        reactContext.stopService(serviceIntent);
     }
 }

@@ -1,10 +1,7 @@
-package org.sil.bloom.reader.WiFi;
+package com.bloomreader;
 
 import android.content.Context;
 import android.net.Uri;
-
-import org.sil.bloom.reader.R;
-import org.sil.bloom.reader.models.BookCollection;
 
 import cz.msebera.android.httpclient.HttpEntity;
 import cz.msebera.android.httpclient.HttpEntityEnclosingRequest;
@@ -14,7 +11,6 @@ import cz.msebera.android.httpclient.HttpResponse;
 import cz.msebera.android.httpclient.entity.StringEntity;
 import cz.msebera.android.httpclient.protocol.HttpContext;
 import cz.msebera.android.httpclient.protocol.HttpRequestHandler;
-import cz.msebera.android.httpclient.util.EntityUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -34,15 +30,15 @@ import java.util.concurrent.TimeoutException;
  * Slightly adapted from a similar file in HearThis Android
  */
 public class AcceptFileHandler implements HttpRequestHandler {
-    Context _parent;
+    private Context _parent;
     public AcceptFileHandler(Context parent)
     {
         _parent = parent;
     }
     @Override
     public void handle(HttpRequest request, HttpResponse response, HttpContext httpContext) throws HttpException, IOException {
-        GetFromWiFiActivity.sendProgressMessage(_parent, _parent.getString(R.string.downloading) + "\n");
-        File baseDir = BookCollection.getLocalBooksDirectory();
+        GetFromWifiModule.sendProgressMessage(_parent, "Downloading");
+        File baseDir = destinationDir();
         Uri uri = Uri.parse(request.getRequestLine().getUri());
         String filePath = uri.getQueryParameter("path");
 
@@ -121,6 +117,12 @@ public class AcceptFileHandler implements HttpRequestHandler {
         response.setEntity(new StringEntity(result));
         if (listener != null)
             listener.receivedFile(filePath, result == "success");
+    }
+
+    private File destinationDir() {
+        File dir = new File(_parent.getCacheDir() + File.separator + "booksFromWifi");
+        dir.mkdir();
+        return dir;
     }
 
     public interface IFileReceivedNotification {
