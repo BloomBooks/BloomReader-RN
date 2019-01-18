@@ -12,6 +12,7 @@ import { DrawerLocker } from "../DrawerMenu/DrawerLocker";
 import * as GetFromWifiModule from "../../native_modules/GetFromWifiModule";
 import ThemeColors from "../../util/ThemeColors";
 import I18n from "../../i18n/i18n";
+import ProgressSpinner from "../shared/ProgressSpinner";
 
 interface IProps {
   navigation: NavigationScreenProp<any, any>;
@@ -41,19 +42,22 @@ export default class ReceiveFromWifiScreen extends React.PureComponent<
 
   render() {
     return (
-      <SafeAreaView style={styles.container}>
-        <ScrollView style={styles.scroll}>
-          <Text style={[styles.text, styles.currentMessageText]}>
-            {this.state.currentProgressMessage}
-          </Text>
-          <Text style={styles.text}>{this.state.progressHistory}</Text>
-        </ScrollView>
-        <View style={styles.btnContainer}>
-          <Button
-            onPress={() => this.props.navigation.navigate("BookList")}
-            title={I18n.t("OK")}
-            color={ThemeColors.red}
-          />
+      <SafeAreaView style={styles.screen}>
+        <ProgressSpinner />
+        <View style={styles.contentsContainer}>
+          <ScrollView style={styles.scroll}>
+            <Text style={[styles.text, styles.currentMessageText]}>
+              {this.state.currentProgressMessage}
+            </Text>
+            <Text style={styles.text}>{this.state.progressHistory}</Text>
+          </ScrollView>
+          <View style={styles.btnContainer}>
+            <Button
+              onPress={() => this.props.navigation.navigate("BookList")}
+              title={I18n.t("OK")}
+              color={ThemeColors.red}
+            />
+          </View>
         </View>
         <NavigationEvents
           onDidFocus={() => {
@@ -83,7 +87,10 @@ export default class ReceiveFromWifiScreen extends React.PureComponent<
 }
 
 const styles = StyleSheet.create({
-  container: {
+  screen: {
+    flex: 1
+  },
+  contentsContainer: {
     flex: 1,
     padding: 12
   },

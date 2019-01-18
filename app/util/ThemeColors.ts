@@ -1,8 +1,9 @@
 enum ThemeColors {
-  red = "#D65649"
+  red = "#D65649",
+  darkRed = "#9C3F36"
 }
 
-export default ThemeColors
+export default ThemeColors;
 
 // Colors from Original App:
 
