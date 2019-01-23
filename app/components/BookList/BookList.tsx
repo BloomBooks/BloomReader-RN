@@ -92,7 +92,7 @@ export default class BookList extends React.PureComponent<IProps, IState> {
         <FlatList
           data={this.state.list}
           keyExtractor={item =>
-            item.isShelf ? (item as Shelf).id : (item as Book).name
+            item.isShelf ? (item as Shelf).id : (item as Book).filename
           }
           renderItem={({ item }) => (
             <TouchableOpacity

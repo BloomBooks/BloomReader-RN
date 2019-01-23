@@ -28,8 +28,11 @@ The .bloomd is a Zip archive with the following contents:
 
 ## Meta Data
 
-The meta data is contained in meta.json. The following properties are consumed by BloomReader. All of them are assumed to exist in the file unless otherwise stated.
+The meta data is contained in meta.json. The following properties are consumed by BloomReader. All of them are assumed to exist in the file.
 
+- title
+- allTitles: JSON string
+   - The JSON string is an object where keys are locales and values are the corresponding titles
 - tags: array of strings
    - each string is in the format "{tagname}:{value}"
    - BR looks for the "bloomshelf" tag which is optional
