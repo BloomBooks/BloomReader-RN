@@ -24,9 +24,14 @@ import {
 import { BookCollection } from "../../models/BookCollection";
 import { BRHeaderButtons, Item } from "../shared/BRHeaderButtons";
 import { AndroidBackHandler } from "react-navigation-backhandler";
+import Icon from "react-native-vector-icons/Ionicons";
+import { DrawerUnlocker } from "../DrawerMenu/DrawerLocker";
 
 export interface IProps {
   navigation: NavigationScreenProp<any, any>;
+  screenProps: {
+    setDrawerLockMode: () => {};
+  };
 }
 
 export interface IState {
@@ -157,7 +162,18 @@ export default class BookList extends React.PureComponent<IProps, IState> {
           )
         }
       : {
-          headerTitle: shelf ? displayName(shelf) : I18n.t("Bloom Reader")
+          headerTitle: shelf ? displayName(shelf) : I18n.t("Bloom Reader"),
+          headerLeft: shelf ? (
+            undefined
+          ) : (
+            <BRHeaderButtons>
+              <Item
+                title="drawer"
+                iconName="md-menu"
+                onPress={navigation.toggleDrawer}
+              />
+            </BRHeaderButtons>
+          )
         };
   };
 
@@ -198,6 +214,9 @@ export default class BookList extends React.PureComponent<IProps, IState> {
             }
             return false; // Default back button behavior
           }}
+        />
+        <DrawerUnlocker
+          setDrawerLockMode={this.props.screenProps.setDrawerLockMode}
         />
       </SafeAreaView>
     );
