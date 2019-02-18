@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Whitelist of directories from which files can be shared with other apps -->
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <files-path name="bloom-books" path="/books" />
+    <cache-path name="bloom-bundles" path="/bundles" />
+    <cache-path name="bloom-apk" path="/apk" />
+</paths>

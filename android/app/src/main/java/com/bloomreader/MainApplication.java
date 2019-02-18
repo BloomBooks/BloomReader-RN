@@ -3,6 +3,8 @@ package com.bloomreader;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import cl.json.RNSharePackage;
+import cl.json.ShareApplication;
 import com.AlexanderZaytsev.RNI18n.RNI18nPackage;
 import com.reactnativecommunity.webview.RNCWebViewPackage;
 import com.rnziparchive.RNZipArchivePackage;
@@ -16,7 +18,7 @@ import com.rnfs.RNFSPackage;
 import java.util.Arrays;
 import java.util.List;
 
-public class MainApplication extends Application implements ReactApplication {
+public class MainApplication extends Application implements ReactApplication, ShareApplication {
 
   private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
     @Override
@@ -28,11 +30,14 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new RNSharePackage(),
             new RNI18nPackage(),
           new RNCWebViewPackage(),
           new RNZipArchivePackage(),
           new RNGestureHandlerPackage(),
           new ImportBooksPackage(),
+          new BloomBundlePackage(),
+          new ShareApkPackage(),
           new RNFSPackage()
       );
     }
@@ -52,5 +57,11 @@ public class MainApplication extends Application implements ReactApplication {
   public void onCreate() {
     super.onCreate();
     SoLoader.init(this, /* native exopackage */ false);
+  }
+
+  @Override
+  public String getFileProviderAuthority() {
+    // The name of the FileProvider defined in the Manifest
+    return BuildConfig.APPLICATION_ID + ".provider";
   }
 }

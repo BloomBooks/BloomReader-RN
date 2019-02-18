@@ -1,9 +1,16 @@
 import { AsyncStorage } from "react-native";
 import RNFS from "react-native-fs";
 import { unzip } from "react-native-zip-archive";
-import { Book, Shelf, BookOrShelf, listForShelf } from "../models/BookOrShelf";
+import {
+  Book,
+  Shelf,
+  BookOrShelf,
+  listForShelf,
+  completeListForShelf
+} from "../models/BookOrShelf";
 import { BookCollection } from "../models/BookCollection";
 import { nameFromPath } from "./FileUtil";
+import * as BloomBundleModule from "../native_modules/BloomBundleModule";
 
 const booksDir = RNFS.DocumentDirectoryPath + "/books";
 const thumbsDir = RNFS.DocumentDirectoryPath + "/thumbs";
@@ -105,6 +112,45 @@ export async function fetchHtml(): Promise<string> {
   return htmlFile ? await RNFS.readFile(htmlFile.path) : "";
 }
 
+export async function bundleShelf(shelf: Shelf): Promise<string> {
+  const collection = await getBookCollection();
+  const booksAndShelves = completeListForShelf(shelf, collection);
+  booksAndShelves.push(shelf);
+  return bundleBooksAndShelves(booksAndShelves);
+}
+
+export async function bundleAll(): Promise<string> {
+  const collection = await getBookCollection();
+  const booksAndShelves: BookOrShelf[] = (collection.books as BookOrShelf[]).concat(
+    collection.shelves
+  );
+  return bundleBooksAndShelves(booksAndShelves);
+}
+
+async function bundleBooksAndShelves(
+  booksAndShelves: BookOrShelf[]
+): Promise<string> {
+  const pathsForBundle: string[] = [];
+  const tmpShelvesPath = RNFS.CachesDirectoryPath + "/shelves";
+  await RNFS.mkdir(tmpShelvesPath);
+  for (let i = 0; i < booksAndShelves.length; ++i) {
+    if (booksAndShelves[i].isShelf)
+      pathsForBundle.push(
+        await makeShelfFile(booksAndShelves[i] as Shelf, tmpShelvesPath)
+      );
+    else pathsForBundle.push(bookPath(booksAndShelves[i] as Book));
+  }
+  const bundlePath = await BloomBundleModule.makeBundle(pathsForBundle);
+  RNFS.unlink(tmpShelvesPath);
+  return bundlePath;
+}
+
+async function makeShelfFile(shelf: Shelf, dirPath: string): Promise<string> {
+  const outPath = `${dirPath}/${shelf.id.replace("/", "-")}.bloomshelf`;
+  await RNFS.writeFile(outPath, JSON.stringify(shelf));
+  return outPath;
+}
+
 export async function deleteItem(item: BookOrShelf): Promise<BookCollection> {
   let collection = await getBookCollection();
   collection = await deleteBookOrShelf(item, collection);
@@ -141,7 +187,7 @@ async function deleteShelf(
   return collection;
 }
 
-function bookPath(book: Book): string {
+export function bookPath(book: Book): string {
   return booksDir + "/" + book.filename;
 }
 

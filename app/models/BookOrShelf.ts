@@ -67,6 +67,21 @@ export function listForShelf(
     );
 }
 
+export function completeListForShelf(
+  shelf: Shelf,
+  collection: BookCollection
+): BookOrShelf[] {
+  const list = listForShelf(shelf, collection);
+  let extendedList: BookOrShelf[] = [];
+  for (let i = 0; i < list.length; ++i) {
+    if (list[i].isShelf)
+      extendedList = extendedList.concat(
+        completeListForShelf(list[i] as Shelf, collection)
+      );
+  }
+  return list.concat(extendedList);
+}
+
 export function sortedListForShelf(
   shelf: Shelf | undefined,
   collection: BookCollection
