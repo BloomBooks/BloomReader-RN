@@ -56,5 +56,6 @@ buck-out/
 *.jsbundle
 
 .vscode
+.jest
 
 android/app/release
