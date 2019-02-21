@@ -197,6 +197,7 @@ export default class BookList extends React.PureComponent<IProps, IState> {
                 title="drawer"
                 iconName="md-menu"
                 onPress={navigation.toggleDrawer}
+                accessibilityLabel={I18n.t("Main Menu")}
               />
             </BRHeaderButtons>
           )

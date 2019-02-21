@@ -57,5 +57,8 @@ buck-out/
 
 .vscode
 .jest
+integration-tests/*.png # Test failure screenshots
+integration-tests/emulators
 
 android/app/release
+
