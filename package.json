@@ -4,9 +4,12 @@
   "private": true,
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
-    "test": "jest",
-    "test-watch": "jest --watch",
-    "tsc": "tsc"
+    "test": "jest --testPathPattern app",
+    "test-watch": "jest --watch --testPathPattern app",
+    "tsc": "tsc",
+    "start-test-emulator": "ANDROID_EMULATOR_HOME=./integration-tests/emulators emulator @BloomReaderTest_1 -no-snapshot-save",
+    "int-test-prep": "concurrently \"yarn appium\" \"react-native run-android\" \"yarn start-test-emulator\" ",
+    "int-test": "jest --testPathPattern integration-tests"
   },
   "dependencies": {
     "react": "16.6.3",
@@ -32,12 +35,16 @@
     "@types/react-native-share": "^1.1.0",
     "@types/react-navigation": "^3.0.1",
     "@types/react-test-renderer": "^16.0.3",
+    "appium": "^1.11.1",
+    "appium-doctor": "^1.9.0",
     "babel-jest": "23.6.0",
+    "concurrently": "^4.1.0",
     "jest": "23.6.0",
     "metro-react-native-babel-preset": "0.51.1",
     "react-devtools-core": "3.5.1",
     "react-test-renderer": "16.6.3",
     "ts-jest": "^23.10.5",
-    "typescript": "^3.2.2"
+    "typescript": "^3.2.2",
+    "webdriverio": "^5.4.19"
   }
 }
