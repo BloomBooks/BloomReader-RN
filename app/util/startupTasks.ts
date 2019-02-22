@@ -1,9 +1,20 @@
 import * as BookStorage from "./BookStorage";
 import RNFS from "react-native-fs";
+import { AsyncStorage } from "react-native";
+import importSampleBooks from "./importSampleBooks";
+
+const appVersion = require("../../package.json").version;
+const lastRunVersionKey = "bloomreader.lastRunVersion";
 
 export default async function startupTasks(): Promise<void> {
-  await BookStorage.createDirectories(); // Make this run only on new-install?
+  await BookStorage.createDirectories();
   cacheCleanup();
+
+  const lastRunVersion = await getLastRunVersion();
+  if (lastRunVersion !== appVersion) {
+    await importSampleBooks();
+  }
+  setLastRunVersion();
 }
 
 // When we share temporary files, we can't clean them up immediately
@@ -19,4 +30,12 @@ async function cacheCleanup(): Promise<void> {
         RNFS.unlink(path);
     }
   }
+}
+
+async function getLastRunVersion() {
+  return AsyncStorage.getItem(lastRunVersionKey);
+}
+
+async function setLastRunVersion() {
+  AsyncStorage.setItem(lastRunVersionKey, appVersion);
 }

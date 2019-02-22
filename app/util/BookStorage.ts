@@ -12,7 +12,7 @@ import { BookCollection } from "../models/BookCollection";
 import { nameFromPath } from "./FileUtil";
 import * as BloomBundleModule from "../native_modules/BloomBundleModule";
 
-const booksDir = RNFS.DocumentDirectoryPath + "/books";
+export const booksDir = RNFS.DocumentDirectoryPath + "/books";
 const thumbsDir = RNFS.DocumentDirectoryPath + "/thumbs";
 const openBookDir = RNFS.DocumentDirectoryPath + "/openBook";
 const keyPrefix = "bloomreader.books.";
