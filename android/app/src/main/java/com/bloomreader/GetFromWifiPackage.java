@@ -9,6 +9,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+    React Package for GetFromWifiModule
+    https://facebook.github.io/react-native/docs/native-modules-android#register-the-module
+ */
+
 public class GetFromWifiPackage implements ReactPackage {
     @Override
     public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {

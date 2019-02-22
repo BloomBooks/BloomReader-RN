@@ -14,6 +14,11 @@ import ThemeColors from "../../util/ThemeColors";
 import I18n from "../../i18n/i18n";
 import ProgressSpinner from "../shared/ProgressSpinner";
 
+/**
+ * Screen that displays progress messages related to receiving books over Wifi from Bloom Desktop.
+ * Navigating here starts the native Wifi receive module, and navigating away stops it.
+ */
+
 interface IProps {
   navigation: NavigationScreenProp<any, any>;
   screenProps: {
