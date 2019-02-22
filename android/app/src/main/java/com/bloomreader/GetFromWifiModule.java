@@ -66,6 +66,8 @@ public class GetFromWifiModule extends ReactContextBaseJavaModule {
         sendProgressMessage(messageKey, null);
     }
 
+    // The messageKey is used by JS I18n to look up the translation
+    // and should exist in the locale json files in app/i18n/locales
     public void sendProgressMessage(String messageKey, WritableMap messageLiterals) {
         WritableMap eventParams = Arguments.createMap();
         eventParams.putString("messageKey", messageKey);
