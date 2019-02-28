@@ -1,3 +1,13 @@
 {
-  "Bloom Reader": "Bloom Reader"
+  "Bloom Reader": "Bloom Reader",
+  "Downloading": "Downloading...",
+  "BloomTooOld": "You need a newer version of Bloom editor to exchange data with this BloomReader",
+  "BloomReaderTooOld": "You need a newer version of BloomReader to exchange data with this sender",
+  "AlreadyHaveThisVersion": "Found %{title}, already have this version.",
+  "FoundNewVersion": "Found new version of %{title} from %{sender}, requesting…",
+  "FoundFile": "Found %{title} from %{sender}, requesting…",
+  "Done": "Done.",
+  "TransferFailed": "Something went wrong. If the source is still available, we'll try again soon.",
+  "LookingForAds": "Looking for book advertisements on WiFi network %{network}...",
+  "NoWifiConnected": "The device does not appear to be connected to a WiFi network."
 }

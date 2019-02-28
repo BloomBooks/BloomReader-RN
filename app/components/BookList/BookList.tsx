@@ -5,12 +5,13 @@ import {
   TouchableNativeFeedback,
   TouchableOpacity,
   FlatList,
-  View
+  View,
+  StatusBar
 } from "react-native";
 import * as BookStorage from "../../util/BookStorage";
 import BookListItem from "./BookListItem";
 import * as ImportBookModule from "../../native_modules/ImportBookModule";
-import { NavigationScreenProp } from "react-navigation";
+import { NavigationScreenProp, NavigationEvents } from "react-navigation";
 import I18n from "../../i18n/i18n";
 import ShelfListItem from "./ShelfListItem";
 import {
@@ -27,6 +28,10 @@ import { AndroidBackHandler } from "react-navigation-backhandler";
 import Icon from "react-native-vector-icons/Ionicons";
 import { DrawerUnlocker } from "../DrawerMenu/DrawerLocker";
 import * as Share from "../../util/Share";
+import * as Progress from "react-native-progress";
+import * as GetFromWifiModule from "../../native_modules/GetFromWifiModule";
+import ThemeColors from "../../util/ThemeColors";
+import ProgressSpinner from "../shared/ProgressSpinner";
 
 export interface IProps {
   navigation: NavigationScreenProp<any, any>;
@@ -39,9 +44,14 @@ export interface IState {
   list: Array<BookOrShelf>;
   collection?: BookCollection;
   selectedItem?: BookOrShelf;
+  fullyLoaded?: boolean;
 }
 
 export default class BookList extends React.PureComponent<IProps, IState> {
+  // The highest BookList on the stack listens for new books.
+  // So we subscribe on navigation didFocus event and unsubscribe on openShelf
+  newBookListener?: GetFromWifiModule.NewBookListener;
+
   constructor(props: IProps) {
     super(props);
     this.state = {
@@ -75,6 +85,11 @@ export default class BookList extends React.PureComponent<IProps, IState> {
     this.setState({ list: sortedListForShelf(this.shelf(), collection) });
   };
 
+  private handleNewBook = async (filename: string) => {
+    const newCollection = await BookStorage.importBookFile(filename);
+    this.updateCollection(newCollection);
+  };
+
   private setSelectedItem = (item: BookOrShelf) => {
     this.setState({ selectedItem: item });
     this.props.navigation.setParams({ selectedItem: item });
@@ -90,12 +105,19 @@ export default class BookList extends React.PureComponent<IProps, IState> {
     if (!collection) {
       // No collection passed in means this is the root BookList
       collection = await BookStorage.getBookCollection();
-      this.setState({ collection: collection });
+      this.setState({
+        collection: collection,
+        list: sortedListForShelf(undefined, collection)
+      });
       // Having a file shared with us results in a new instance of our app,
       // so we can check for imports in componentDidMount()
       this.checkForBooksToImport();
+    } else {
+      this.setState({
+        list: sortedListForShelf(this.shelf(), collection),
+        fullyLoaded: true
+      });
     }
-    this.setState({ list: sortedListForShelf(this.shelf(), collection) });
   }
 
   private async checkForBooksToImport() {
@@ -104,6 +126,7 @@ export default class BookList extends React.PureComponent<IProps, IState> {
       this.updateCollection(updatedCollection);
       if (updatedCollection.book) this.openBook(updatedCollection.book);
     }
+    this.setState({ fullyLoaded: true });
   }
 
   private itemTouch = (item: BookOrShelf) => {
@@ -119,12 +142,14 @@ export default class BookList extends React.PureComponent<IProps, IState> {
       book: book
     });
 
-  private openShelf = (shelf: Shelf) =>
+  private openShelf = (shelf: Shelf) => {
     this.props.navigation.push("BookList", {
       collection: this.collection(),
       updateCollection: this.updateCollection,
       shelf: shelf
     });
+    this.newBookListener && this.newBookListener.stopListening();
+  };
 
   static navigationOptions = ({
     navigation
@@ -181,6 +206,8 @@ export default class BookList extends React.PureComponent<IProps, IState> {
   render() {
     return (
       <SafeAreaView style={{ flex: 1 }}>
+        <StatusBar backgroundColor={ThemeColors.darkRed} />
+        {!this.state.fullyLoaded && <ProgressSpinner />}
         <FlatList
           extraData={this.state}
           data={this.state.list}
@@ -218,6 +245,13 @@ export default class BookList extends React.PureComponent<IProps, IState> {
         />
         <DrawerUnlocker
           setDrawerLockMode={this.props.screenProps.setDrawerLockMode}
+        />
+        <NavigationEvents
+          onDidFocus={() => {
+            this.newBookListener = GetFromWifiModule.listenForNewBooks(
+              this.handleNewBook
+            );
+          }}
         />
       </SafeAreaView>
     );
