@@ -1,4 +1,4 @@
-package com.bloomreader;
+package org.sil.bloom.reader;
 
 import android.content.ContentResolver;
 import android.database.Cursor;
@@ -21,8 +21,8 @@ import org.rauschig.jarchivelib.ArchiverFactory;
 import java.io.File;
 import java.io.IOException;
 
-import static com.bloomreader.IOUtilities.BLOOM_BUNDLE_FILE_EXTENSION;
-import static com.bloomreader.IOUtilities.BOOK_FILE_EXTENSION;
+import static org.sil.bloom.reader.IOUtilities.BLOOM_BUNDLE_FILE_EXTENSION;
+import static org.sil.bloom.reader.IOUtilities.BOOK_FILE_EXTENSION;
 
 
 public class ImportBookModule extends ReactContextBaseJavaModule {

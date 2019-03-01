@@ -1,4 +1,4 @@
-package com.bloomreader;
+package org.sil.bloom.reader;
 
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;

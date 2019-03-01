@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.bloomreader">
+    package="org.sil.bloom.reader">
 
     <!-- Used by RN for debugging -->
     <uses-permission android:name="android.permission.INTERNET" />

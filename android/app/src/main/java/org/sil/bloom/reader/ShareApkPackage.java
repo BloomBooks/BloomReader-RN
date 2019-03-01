@@ -1,4 +1,4 @@
-package com.bloomreader;
+package org.sil.bloom.reader;
 
 import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.NativeModule;
@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class ImportBooksPackage implements ReactPackage {
+public class ShareApkPackage implements ReactPackage {
     @Override
     public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
         return Collections.emptyList();
@@ -18,7 +18,7 @@ public class ImportBooksPackage implements ReactPackage {
     @Override
     public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
         List<NativeModule> modules = new ArrayList<>();
-        modules.add(new ImportBookModule(reactContext));
+        modules.add(new ShareApkModule(reactContext));
         return modules;
     }
 }

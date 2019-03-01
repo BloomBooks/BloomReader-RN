@@ -1,4 +1,4 @@
-package com.bloomreader;
+package org.sil.bloom.reader;
 
 import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.NativeModule;
