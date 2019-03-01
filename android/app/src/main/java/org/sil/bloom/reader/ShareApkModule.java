@@ -1,4 +1,4 @@
-package com.bloomreader;
+package org.sil.bloom.reader;
 
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
