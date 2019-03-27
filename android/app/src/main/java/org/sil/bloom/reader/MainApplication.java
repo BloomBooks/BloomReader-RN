@@ -14,6 +14,7 @@ import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 import com.rnfs.RNFSPackage;
+import android.webkit.WebView;
 
 import java.util.Arrays;
 import java.util.List;
@@ -57,6 +58,8 @@ public class MainApplication extends Application implements ReactApplication, Sh
     @Override
     public void onCreate() {
         super.onCreate();
+        // Allow debugging within WebView (the actual book content).
+        WebView.setWebContentsDebuggingEnabled(true);
         SoLoader.init(this, /* native exopackage */ false);
     }
 

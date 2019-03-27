@@ -107,6 +107,16 @@ export async function getThumbnail(
   };
 }
 
+export async function moveBook(): Promise<string> {
+  const fileList = await RNFS.readDir(openBookDir);
+  const htmlFile = fileList.find(entry => /\.html?$/.test(entry.name));
+  if (!htmlFile || !htmlFile.path) {
+    return "";
+  }
+  await RNFS.moveFile(htmlFile.path, openBookDir + "/openBook.htm");
+  return htmlFile.path;
+}
+
 export async function fetchHtml(): Promise<string> {
   const fileList = await RNFS.readDir(openBookDir);
   const htmlFile = fileList.find(entry => /\.html?$/.test(entry.name));
@@ -191,6 +201,10 @@ async function deleteShelf(
 
 export function bookPath(book: Book): string {
   return booksDir + "/" + book.filename;
+}
+
+export function openBookFolderPath() : string {
+  return openBookDir;
 }
 
 function bookNameFromFilename(filename: string): string {
