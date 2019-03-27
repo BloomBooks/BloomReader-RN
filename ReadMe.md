@@ -11,7 +11,10 @@
 
 3. Make sure the emulator is running, and then run the app.
 
-    `react-native run-android`
+    `npm run start-android`
+
+(That last is a custom script. It copies bloomPlayerControlBundle.js from node-modules to its proper
+place in assets. If you are copying an in-development version of that file manually, just use react-native start-android. If you want to launch your app some other way, you can npm run copyAssets to just copy the file first.)
 
 # Testing
 
