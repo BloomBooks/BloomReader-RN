@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<!--<div>This file is the root content of the WebView that displays an individual book.
+    The webview is invoked in BookReader.tsx after unzipping the book in
+    /data/user/0/org.sil.bloom.reader/files/openBook and renaming the HTML file openBook.htm.
+</div>-->
+<html>
+<head>
+</head>
+<body>
+ <!--This is the root element of the React DOM. The class identifies it to applyToMarkedElements()
+    and the data-url tells the bloom-player where to find the data. -->
+ <div class="bloom-player-controls" data-url="/data/user/0/org.sil.bloom.reader/files/openBook"></div>
+ <script src="bloomPlayerControlBundle.js" type="text/javascript"></script>
+ <script>
+     // This turns the div above into an instance of BloomPlayer looking at the book in the given folder
+     BloomPlayer.BloomPlayerControls.applyToMarkedElements();
+     // Scale the BloomPlayerCore so that, along with the visible controls, it fits in the window.
+     BloomPlayer.BloomPlayerControls.scalePageToWindow();
+</script>
+</body>
+</html>
