@@ -3,7 +3,7 @@
   "version": "2.0.0",
   "private": true,
   "scripts": {
-    "copyAssets": "node -e \"fs.copyFileSync('./node_modules/bloom-player-react/output/bloomPlayerControlBundle.js','./android/app/src/main/assets/bloom-player/bloomPlayerControlBundle.js')\"",
+    "copyAssets": "node ./copyAssets.js",
     "start-android": "npm run copyAssets && react-native run-android",
     "start": "node node_modules/react-native/local-cli/cli.js start",
     "test": "jest --testPathPattern app",
