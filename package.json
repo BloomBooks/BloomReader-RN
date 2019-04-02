@@ -3,6 +3,8 @@
   "version": "2.0.0",
   "private": true,
   "scripts": {
+    "copyAssets": "node -e \"fs.copyFileSync('./node_modules/bloom-player-react/output/bloomPlayerControlBundle.js','./android/app/src/main/assets/bloom-player/bloomPlayerControlBundle.js')\"",
+    "start-android": "npm run copyAssets && react-native run-android",
     "start": "node node_modules/react-native/local-cli/cli.js start",
     "test": "jest --testPathPattern app",
     "test-watch": "jest --watch --testPathPattern app",
@@ -12,6 +14,7 @@
     "int-test": "jest --testPathPattern integration-tests"
   },
   "dependencies": {
+    "bloom-player-react": "^0.5.0",
     "react": "16.6.3",
     "react-native": "0.57.8",
     "react-native-fs": "^2.13.3",
@@ -39,6 +42,7 @@
     "appium-doctor": "^1.9.0",
     "babel-jest": "23.6.0",
     "concurrently": "^4.1.0",
+    "fs": "^0.0.1-security",
     "jest": "23.6.0",
     "metro-react-native-babel-preset": "0.51.1",
     "react-devtools-core": "3.5.1",

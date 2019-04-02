@@ -41,7 +41,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8
   },
   text: {
-    fontSize: 20
+    fontSize: 20,
+    // These properties surprisingly allow the text to wrap.
+    // This not only stops it being clipped, but also stops the
+    // clipped part mysteriously appearing on the left of the
+    // main window when the drawer is hidden.
+    width: 0,
+    flex:1,
+    flexGrow:1
   },
   icon: {
     fontSize: 24,

@@ -62,3 +62,6 @@ integration-tests/emulators
 
 android/app/release
 
+#Copied into source tree by package.json script from node_modules
+*bloomPlayerControlBundle.js
+*bloomPlayerControlBundle.js.map
