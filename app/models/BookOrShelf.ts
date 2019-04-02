@@ -54,6 +54,7 @@ function bookDisplayName(book: Book, language: string): string {
   return name ? name : book.title;
 }
 
+// Only includes direct children of shelf
 export function listForShelf(
   shelf: Shelf | undefined,
   collection: BookCollection
@@ -67,6 +68,7 @@ export function listForShelf(
     );
 }
 
+// Includes contents of sub-shelves
 export function completeListForShelf(
   shelf: Shelf,
   collection: BookCollection

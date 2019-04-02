@@ -193,10 +193,6 @@ export function bookPath(book: Book): string {
   return booksDir + "/" + book.filename;
 }
 
-function bookNameFromFilename(filename: string): string {
-  return filename.replace(/\.bloomd$/, "");
-}
-
 async function readList(key: string): Promise<BookOrShelf[]> {
   const listJson = await AsyncStorage.getItem(key);
   return listJson ? JSON.parse(listJson) : [];
