@@ -13,6 +13,11 @@ import I18n from "./app/i18n/i18n";
 import DrawerMenu from "./app/components/DrawerMenu/DrawerMenu";
 import NotesScreen from "./app/components/NotesScreen/NotesScreen";
 import ReceiveFromWifiScreen from "./app/components/ReceiveFromWifi/ReceiveFromWifiScreen";
+import {
+  BookCollection,
+  emptyBookCollection
+} from "./app/models/BookCollection";
+import * as BookStorage from "./app/util/BookStorage";
 
 const StackNavigator = createStackNavigator(
   {
@@ -49,6 +54,7 @@ const AppContainer = createAppContainer(DrawerNavigator);
 export interface IState {
   loaded: boolean;
   drawerLockMode: "unlocked" | "locked-closed";
+  bookCollection: BookCollection;
 }
 
 export default class App extends React.PureComponent<any, IState> {
@@ -56,13 +62,16 @@ export default class App extends React.PureComponent<any, IState> {
     super(props);
     this.state = {
       loaded: false,
-      drawerLockMode: "unlocked"
+      drawerLockMode: "unlocked",
+      bookCollection: emptyBookCollection()
     };
   }
 
   async componentDidMount() {
     await startupTasks();
     this.setState({ loaded: true });
+    const bookCollection = await BookStorage.getBookCollection();
+    this.setState({ bookCollection });
     //SplashScreen.hide();  // Add this back in with the splash screen
   }
 
@@ -70,6 +79,9 @@ export default class App extends React.PureComponent<any, IState> {
     return this.state.loaded ? (
       <AppContainer
         screenProps={{
+          bookCollection: this.state.bookCollection,
+          setBookCollection: (bookCollection: BookCollection) =>
+            this.setState({ bookCollection }),
           drawerLockMode: this.state.drawerLockMode,
           setDrawerLockMode: (lockMode: "unlocked" | "locked-closed") =>
             this.setState({ drawerLockMode: lockMode })

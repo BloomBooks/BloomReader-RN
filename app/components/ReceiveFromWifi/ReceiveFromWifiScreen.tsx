@@ -13,6 +13,8 @@ import * as GetFromWifiModule from "../../native_modules/GetFromWifiModule";
 import ThemeColors from "../../util/ThemeColors";
 import I18n from "../../i18n/i18n";
 import ProgressSpinner from "../shared/ProgressSpinner";
+import { BookCollection } from "../../models/BookCollection";
+import * as BookStorage from "../../util/BookStorage";
 
 /**
  * Screen that displays progress messages related to receiving books over Wifi from Bloom Desktop.
@@ -23,6 +25,7 @@ interface IProps {
   navigation: NavigationScreenProp<any, any>;
   screenProps: {
     setDrawerLockMode: () => {};
+    setBookCollection: (bc: BookCollection) => void;
   };
 }
 
@@ -36,6 +39,7 @@ export default class ReceiveFromWifiScreen extends React.PureComponent<
   IState
 > {
   progressListener?: GetFromWifiModule.ProgressListener;
+  newBookListener?: GetFromWifiModule.NewBookListener;
 
   constructor(props: IProps) {
     super(props);
@@ -44,6 +48,29 @@ export default class ReceiveFromWifiScreen extends React.PureComponent<
       progressHistory: ""
     };
   }
+
+  private startWifiListener = () => {
+    this.progressListener = GetFromWifiModule.startWifiReceiver(message => {
+      this.setState(prevState => ({
+        currentProgressMessage: message,
+        progressHistory:
+          prevState.currentProgressMessage + "\n\n" + prevState.progressHistory
+      }));
+    });
+    this.newBookListener = GetFromWifiModule.listenForNewBooks(
+      async newBookFilename => {
+        const bookCollection = await BookStorage.importBookFile(
+          newBookFilename
+        );
+        this.props.screenProps.setBookCollection(bookCollection);
+      }
+    );
+  };
+
+  private stopWifiListener = () => {
+    this.newBookListener && this.newBookListener.stopListening();
+    this.progressListener && this.progressListener.stopListening();
+  };
 
   render() {
     return (
@@ -64,23 +91,10 @@ export default class ReceiveFromWifiScreen extends React.PureComponent<
             />
           </View>
         </View>
+
         <NavigationEvents
-          onDidFocus={() => {
-            this.progressListener = GetFromWifiModule.startWifiReceiver(
-              (message: string) => {
-                this.setState(prevState => ({
-                  currentProgressMessage: message,
-                  progressHistory:
-                    prevState.currentProgressMessage +
-                    "\n\n" +
-                    prevState.progressHistory
-                }));
-              }
-            );
-          }}
-          onWillBlur={() => {
-            this.progressListener && this.progressListener.stopListening();
-          }}
+          onDidFocus={this.startWifiListener}
+          onWillBlur={this.stopWifiListener}
         />
 
         <DrawerLocker
