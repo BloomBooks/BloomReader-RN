@@ -54,14 +54,17 @@ export default class BookReader extends React.PureComponent<IProps, IState> {
     return (
       <SafeAreaView style={{ flex: 1 }}>
         {this.state.bookReady && (
-          <WebView source={{ baseUrl: "file:///android_asset/",
-            html: this.webViewHtml() }}
+          <WebView
+            source={{
+              baseUrl: "file:///android_asset/",
+              html: this.webViewHtml()
+            }}
             mixedContentMode="always"
             allowUniversalAccessFromFileURLs={true}
             allowFileAccess={true}
             javaScriptEnabled={true}
-            originWhitelist={['*']}
-            />
+            originWhitelist={["*"]}
+          />
         )}
         <DrawerLocker
           setDrawerLockMode={this.props.screenProps.setDrawerLockMode}
@@ -85,6 +88,6 @@ export default class BookReader extends React.PureComponent<IProps, IState> {
     BloomPlayer.BloomPlayerControls.scalePageToWindow();'
     src='bloom-player/bloomPlayerControlBundle.js' type='text/javascript'></script>
   </body>
-  </html>`
+  </html>`;
   }
 }

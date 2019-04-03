@@ -9,7 +9,7 @@ import {
   completeListForShelf
 } from "../models/BookOrShelf";
 import { BookCollection } from "../models/BookCollection";
-import { nameFromPath } from "./FileUtil";
+import { nameFromPath, rnfsSafeUnlink } from "./FileUtil";
 import * as BloomBundleModule from "../native_modules/BloomBundleModule";
 
 export const booksDir = RNFS.DocumentDirectoryPath + "/books";
@@ -91,7 +91,7 @@ export async function getBookCollection(): Promise<BookCollection> {
 }
 
 export async function openBookForReading(book: Book): Promise<string> {
-  await RNFS.unlink(openBookDir);
+  await rnfsSafeUnlink(openBookDir);
   return await unzip(bookPath(book), openBookDir);
 }
 
@@ -203,7 +203,7 @@ export function bookPath(book: Book): string {
   return booksDir + "/" + book.filename;
 }
 
-export function openBookFolderPath() : string {
+export function openBookFolderPath(): string {
   return openBookDir;
 }
 
