@@ -5,6 +5,7 @@ import DrawerMenuItem from "./DrawerMenuItem";
 import { DrawerItemsProps } from "react-navigation";
 import { Notes } from "../NotesScreen/NotesScreen";
 import * as Share from "../../util/Share";
+import * as ErrorLog from "../../util/ErrorLog";
 
 interface IState {}
 
@@ -87,6 +88,13 @@ export default class DrawerMenu extends React.PureComponent<
               notes: Notes.AboutSIL
             })
           }
+        />
+        <DrawerMenuItem
+          label={I18n.t("Email Error Log")}
+          onPress={() => {
+            ErrorLog.emailLog();
+            this.props.navigation.closeDrawer();
+          }}
         />
       </SafeAreaView>
     );
