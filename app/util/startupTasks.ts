@@ -2,6 +2,7 @@ import * as BookStorage from "./BookStorage";
 import RNFS from "react-native-fs";
 import { AsyncStorage } from "react-native";
 import importSampleBooks from "./importSampleBooks";
+import * as ErrorLog from "./ErrorLog";
 
 const appVersion = require("../../package.json").version;
 const lastRunVersionKey = "bloomreader.lastRunVersion";
@@ -12,6 +13,7 @@ export default async function startupTasks(): Promise<void> {
 
   const lastRunVersion = await getLastRunVersion();
   if (lastRunVersion !== appVersion) {
+    ErrorLog.logNewAppVersion(appVersion);
     await importSampleBooks();
   }
   setLastRunVersion();
