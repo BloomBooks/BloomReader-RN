@@ -3,11 +3,8 @@ package org.sil.bloom.reader;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
-<<<<<<< HEAD
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
-=======
 import com.segment.analytics.reactnative.core.RNAnalyticsPackage;
->>>>>>> Send analytics.
 import cl.json.RNSharePackage;
 import cl.json.ShareApplication;
 import com.AlexanderZaytsev.RNI18n.RNI18nPackage;

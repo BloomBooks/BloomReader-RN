@@ -3,11 +3,8 @@ import RNFS from "react-native-fs";
 import { AsyncStorage } from "react-native";
 import importSampleBooks from "./importSampleBooks";
 import * as ErrorLog from "./ErrorLog";
-<<<<<<< HEAD
 import { BOOK_ITEM_VERSION } from "../models/BookOrShelf";
-=======
 import * as BRAnalytics from "./BRAnalytics";
->>>>>>> Send analytics.
 
 const appVersion = require("../../package.json").version;
 const lastRunVersionKey = "bloomreader.lastRunVersion";

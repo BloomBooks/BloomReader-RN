@@ -11,12 +11,9 @@ import {
 import { BookCollection } from "../models/BookCollection";
 import { nameFromPath, rnfsSafeUnlink } from "./FileUtil";
 import * as BloomBundleModule from "../native_modules/BloomBundleModule";
-<<<<<<< HEAD
 import getFeaturesList from "./getFeaturesList";
 import I18n from "../i18n/i18n";
-=======
 import * as BRAnalytics from "./BRAnalytics";
->>>>>>> Send analytics.
 
 export const booksDir = RNFS.DocumentDirectoryPath + "/books";
 const thumbsDir = RNFS.DocumentDirectoryPath + "/thumbs";
