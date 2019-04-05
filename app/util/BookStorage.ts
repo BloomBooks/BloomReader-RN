@@ -31,7 +31,7 @@ export async function importBookFile(
   const book = await addBookToList(filename, bookList);
   writeList(bookListKey, bookList);
   return {
-    book: book,
+    newBook: book,
     books: bookList,
     shelves: (await readList(shelfListKey)) as Shelf[]
   };

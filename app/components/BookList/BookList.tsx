@@ -37,32 +37,26 @@ export interface IProps {
   navigation: NavigationScreenProp<any, any>;
   screenProps: {
     setDrawerLockMode: () => {};
+    bookCollection: BookCollection;
+    setBookCollection: (bc: BookCollection) => void;
   };
 }
 
 export interface IState {
-  list: Array<BookOrShelf>;
-  collection?: BookCollection;
   selectedItem?: BookOrShelf;
   fullyLoaded?: boolean;
 }
 
 export default class BookList extends React.PureComponent<IProps, IState> {
-  // The highest BookList on the stack listens for new books.
-  // So we subscribe on navigation didFocus event and unsubscribe on openShelf
-  newBookListener?: GetFromWifiModule.NewBookListener;
-
   constructor(props: IProps) {
     super(props);
-    this.state = {
-      list: []
-    };
+    this.state = {};
     props.navigation.setParams({
       clearSelectedItem: this.clearSelectedItem,
       deleteSelectedItem: async () => {
         const newCollection = await BookStorage.deleteItem(this.state
           .selectedItem as BookOrShelf);
-        this.updateCollection(newCollection);
+        this.props.screenProps.setBookCollection(newCollection);
         this.clearSelectedItem();
       },
       shareSelectedItem: () => {
@@ -73,22 +67,8 @@ export default class BookList extends React.PureComponent<IProps, IState> {
   }
 
   // The shelf that we are displaying - undefined for the root BookList
-  private shelf = () => this.props.navigation.getParam("shelf");
-
-  private collection = () =>
-    this.props.navigation.getParam("collection") || this.state.collection;
-
-  updateCollection = (collection: BookCollection) => {
-    this.state.collection
-      ? this.setState({ collection: collection })
-      : this.props.navigation.getParam("updateCollection")(collection);
-    this.setState({ list: sortedListForShelf(this.shelf(), collection) });
-  };
-
-  private handleNewBook = async (filename: string) => {
-    const newCollection = await BookStorage.importBookFile(filename);
-    this.updateCollection(newCollection);
-  };
+  private shelf = (): Shelf | undefined =>
+    this.props.navigation.getParam("shelf");
 
   private setSelectedItem = (item: BookOrShelf) => {
     this.setState({ selectedItem: item });
@@ -101,32 +81,22 @@ export default class BookList extends React.PureComponent<IProps, IState> {
   };
 
   async componentDidMount() {
-    let collection = this.collection();
-    if (!collection) {
-      // No collection passed in means this is the root BookList
-      collection = await BookStorage.getBookCollection();
-      this.setState({
-        collection: collection,
-        list: sortedListForShelf(undefined, collection)
-      });
+    if (this.shelf() === undefined) {
+      // This is the root BookList
+
       // Having a file shared with us results in a new instance of our app,
       // so we can check for imports in componentDidMount()
-      this.checkForBooksToImport();
-    } else {
-      this.setState({
-        list: sortedListForShelf(this.shelf(), collection),
-        fullyLoaded: true
-      });
+      await this.checkForBooksToImport();
     }
+    this.setState({ fullyLoaded: true });
   }
 
   private async checkForBooksToImport() {
     const updatedCollection = await ImportBookModule.checkForBooksToImport();
     if (updatedCollection) {
-      this.updateCollection(updatedCollection);
-      if (updatedCollection.book) this.openBook(updatedCollection.book);
+      this.props.screenProps.setBookCollection(updatedCollection);
+      if (updatedCollection.newBook) this.openBook(updatedCollection.newBook);
     }
-    this.setState({ fullyLoaded: true });
   }
 
   private itemTouch = (item: BookOrShelf) => {
@@ -144,11 +114,8 @@ export default class BookList extends React.PureComponent<IProps, IState> {
 
   private openShelf = (shelf: Shelf) => {
     this.props.navigation.push("BookList", {
-      collection: this.collection(),
-      updateCollection: this.updateCollection,
       shelf: shelf
     });
-    this.newBookListener && this.newBookListener.stopListening();
   };
 
   static navigationOptions = ({
@@ -190,7 +157,7 @@ export default class BookList extends React.PureComponent<IProps, IState> {
       : {
           headerTitle: shelf ? displayName(shelf) : I18n.t("Bloom Reader"),
           headerLeft: shelf ? (
-            undefined
+            undefined // Let ReactNavigation supply the default back arrow
           ) : (
             <BRHeaderButtons>
               <Item
@@ -205,13 +172,18 @@ export default class BookList extends React.PureComponent<IProps, IState> {
   };
 
   render() {
+    const list = sortedListForShelf(
+      this.shelf(),
+      this.props.screenProps.bookCollection
+    );
+
     return (
       <SafeAreaView style={{ flex: 1 }}>
         <StatusBar backgroundColor={ThemeColors.darkRed} />
         {!this.state.fullyLoaded && <ProgressSpinner />}
         <FlatList
           extraData={this.state}
-          data={this.state.list}
+          data={list}
           keyExtractor={item =>
             item.isShelf ? (item as Shelf).id : (item as Book).filename
           }
@@ -246,13 +218,6 @@ export default class BookList extends React.PureComponent<IProps, IState> {
         />
         <DrawerUnlocker
           setDrawerLockMode={this.props.screenProps.setDrawerLockMode}
-        />
-        <NavigationEvents
-          onDidFocus={() => {
-            this.newBookListener = GetFromWifiModule.listenForNewBooks(
-              this.handleNewBook
-            );
-          }}
         />
       </SafeAreaView>
     );
