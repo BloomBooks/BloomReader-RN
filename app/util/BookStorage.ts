@@ -11,6 +11,7 @@ import {
 import { BookCollection } from "../models/BookCollection";
 import { nameFromPath } from "./FileUtil";
 import * as BloomBundleModule from "../native_modules/BloomBundleModule";
+import * as BRAnalytics from "./BRAnalytics";
 
 export const booksDir = RNFS.DocumentDirectoryPath + "/books";
 const thumbsDir = RNFS.DocumentDirectoryPath + "/thumbs";
@@ -25,11 +26,13 @@ export async function createDirectories(): Promise<void> {
 }
 
 export async function importBookFile(
-  filename: string
+  filename: string,
+  importMethod: BRAnalytics.AddedBooksMethod
 ): Promise<BookCollection> {
   const bookList = (await readList(bookListKey)) as Book[];
   const book = await addBookToList(filename, bookList);
   writeList(bookListKey, bookList);
+  BRAnalytics.addedBooks(importMethod, [book.title]);
   return {
     newBook: book,
     books: bookList,
@@ -61,11 +64,13 @@ export async function importBooksDir(
 ): Promise<BookCollection> {
   const collection = await getBookCollection();
   const files = await RNFS.readDir(filepath);
+  const importedTitles: string[] = [];
   for (let i = 0; i < files.length; ++i) {
     const file = files[i];
     if (file.name.endsWith(".bloomd")) {
       await RNFS.moveFile(file.path, `${booksDir}/${file.name}`);
-      await addBookToList(file.name, collection.books);
+      const book = await addBookToList(file.name, collection.books);
+      importedTitles.push(book.title);
     } else if (file.name.endsWith(".bloomshelf")) {
       const shelfInfo = JSON.parse(await RNFS.readFile(file.path));
       addShelfToList(shelfInfo, collection.shelves);
@@ -73,6 +78,7 @@ export async function importBooksDir(
   }
   RNFS.unlink(filepath);
   writeCollection(collection);
+  BRAnalytics.addedBooks("FileIntent", importedTitles);
   return collection;
 }
 
@@ -203,12 +209,8 @@ export function bookPath(book: Book): string {
   return booksDir + "/" + book.filename;
 }
 
-export function openBookFolderPath() : string {
+export function openBookFolderPath(): string {
   return openBookDir;
-}
-
-function bookNameFromFilename(filename: string): string {
-  return filename.replace(/\.bloomd$/, "");
 }
 
 async function readList(key: string): Promise<BookOrShelf[]> {

@@ -2,12 +2,14 @@ import * as BookStorage from "./BookStorage";
 import RNFS from "react-native-fs";
 import { AsyncStorage } from "react-native";
 import importSampleBooks from "./importSampleBooks";
+import * as BRAnalytics from "./BRAnalytics";
 
 const appVersion = require("../../package.json").version;
 const lastRunVersionKey = "bloomreader.lastRunVersion";
 
 export default async function startupTasks(): Promise<void> {
   await BookStorage.createDirectories();
+  await BRAnalytics.setup();
   cacheCleanup();
 
   const lastRunVersion = await getLastRunVersion();

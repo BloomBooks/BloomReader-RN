@@ -14,6 +14,7 @@
     "int-test": "jest --testPathPattern integration-tests"
   },
   "dependencies": {
+    "@segment/analytics-react-native": "^0.0.1-beta.5",
     "bloom-player-react": "^0.5.0",
     "react": "16.6.3",
     "react-native": "0.57.8",
