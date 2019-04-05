@@ -16,7 +16,8 @@ export async function checkForBooksToImport(): Promise<
       return await BookStorage.importBooksDir(importPath);
     else {
       return await BookStorage.importBookFile(
-        FileUtil.nameFromPath(importPath)
+        FileUtil.nameFromPath(importPath),
+        "FileIntent"
       );
     }
   }

@@ -60,7 +60,8 @@ export default class ReceiveFromWifiScreen extends React.PureComponent<
     this.newBookListener = GetFromWifiModule.listenForNewBooks(
       async newBookFilename => {
         const bookCollection = await BookStorage.importBookFile(
-          newBookFilename
+          newBookFilename,
+          "Wifi"
         );
         this.props.screenProps.setBookCollection(bookCollection);
       }

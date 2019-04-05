@@ -3,7 +3,11 @@ package org.sil.bloom.reader;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+<<<<<<< HEAD
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
+=======
+import com.segment.analytics.reactnative.core.RNAnalyticsPackage;
+>>>>>>> Send analytics.
 import cl.json.RNSharePackage;
 import cl.json.ShareApplication;
 import com.AlexanderZaytsev.RNI18n.RNI18nPackage;
@@ -33,6 +37,7 @@ public class MainApplication extends Application implements ReactApplication, Sh
             return Arrays.<ReactPackage>asList(
                 new MainReactPackage(),
                 new SplashScreenReactPackage(),
+                new RNAnalyticsPackage(),
                 new RNSharePackage(),
                 new RNI18nPackage(),
                 new RNCWebViewPackage(),
