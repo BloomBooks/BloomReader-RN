@@ -1159,9 +1159,9 @@
     csstype "^2.2.0"
 
 "@types/react@^16.8.10":
-  version "16.8.10"
-  resolved "https://registry.yarnpkg.com/@types/react/-/react-16.8.10.tgz#1ccb6fde17f71a62ef055382ec68bdc379d4d8d9"
-  integrity sha512-7bUQeZKP4XZH/aB4i7k1i5yuwymDu/hnLMhD9NjVZvQQH7ZUgRN3d6iu8YXzx4sN/tNr0bj8jgguk8hhObzGvA==
+  version "16.8.13"
+  resolved "https://registry.yarnpkg.com/@types/react/-/react-16.8.13.tgz#a82b15aad9ab91c40edca0d6889b7745ae24f053"
+  integrity sha512-otJ4ntMuHGrvm67CdDJMAls4WqotmAmW0g3HmWi9LCjSWXrxoXY/nHXrtmMfvPEEmGFNm6NdgMsJmnfH820Qaw==
   dependencies:
     "@types/prop-types" "*"
     csstype "^2.2.0"
@@ -2029,6 +2029,7 @@ aws4@^1.8.0:
 axios@^0.18.0:
   version "0.18.0"
   resolved "https://registry.yarnpkg.com/axios/-/axios-0.18.0.tgz#32d53e4851efdc0a11993b6cd000789d70c05102"
+  integrity sha1-MtU+SFHv3AoRmTts0AB4nXDAUQI=
   dependencies:
     follow-redirects "^1.3.0"
     is-buffer "^1.1.5"
@@ -2273,10 +2274,10 @@ bl@^1.0.0:
     readable-stream "^2.3.5"
     safe-buffer "^5.1.1"
 
-bloom-player-react@^0.5.0:
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/bloom-player-react/-/bloom-player-react-0.5.0.tgz#5550c6d15a6ae56b0bd4f3a1b5efab0a32fe0744"
-  integrity sha512-a60xJ/DTx4olBvJR2VIPLN59YnSZShEuYt23uDMP3RlMa8r70rREy/uVNvNDjBY42B2jEkQ42UWgv2SdbQQPrg==
+bloom-player@^0.6.1:
+  version "0.6.1"
+  resolved "https://registry.yarnpkg.com/bloom-player/-/bloom-player-0.6.1.tgz#3e2dae442e627bce6d23d7ad689b80db4dbcabdc"
+  integrity sha512-V+ENchn0Cl4yCGsP/jfWYllKpI/+n5frvQ5X+6BJM8qOP3EOCb4e5PEWdZCXe6e+682ruflbMppUkZ5Le6XMrg==
   dependencies:
     "@types/react" "^16.8.10"
     axios "^0.18.0"
@@ -6341,6 +6342,7 @@ preserve@^0.2.0:
 prettier@^1.14.3:
   version "1.16.4"
   resolved "https://registry.yarnpkg.com/prettier/-/prettier-1.16.4.tgz#73e37e73e018ad2db9c76742e2647e21790c9717"
+  integrity sha512-ZzWuos7TI5CKUeQAtFd6Zhm2s6EpAD/ZLApIhsF9pRvRtM1RFo61dM/4MSRUA0SuLugA/zgrZD8m0BaY46Og7g==
 
 pretty-format@^23.4.1, pretty-format@^23.6.0:
   version "23.6.0"
@@ -6502,6 +6504,7 @@ react-devtools-core@3.5.1, react-devtools-core@^3.4.2:
 react-dom@^16.8.5:
   version "16.8.6"
   resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-16.8.6.tgz#71d6303f631e8b0097f56165ef608f051ff6e10f"
+  integrity sha512-1nL7PIq9LTL3fthPqwkvr2zY7phIPjYrT0jp4HjyEQrEROnw4dG41VVwi/wfoCneoleqrNX7iAD+pXebJZwrwA==
   dependencies:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"
@@ -6706,6 +6709,7 @@ react-proxy@^1.1.7:
 react-slick@^0.23.2:
   version "0.23.2"
   resolved "https://registry.yarnpkg.com/react-slick/-/react-slick-0.23.2.tgz#8d8bdbc77a6678e8ad36f50c32578c7c0f1c54f6"
+  integrity sha512-fM6DXX7+22eOcYE9cgaXUfioZL/Zw6fwS6aPMDBt0kLHl4H4fFNEbp4JsJQdEWMLUNFtUytNcvd9KRml22Tp5w==
   dependencies:
     classnames "^2.2.5"
     enquire.js "^2.1.6"
@@ -6746,6 +6750,7 @@ react@16.6.3:
 react@^16.8.5:
   version "16.8.6"
   resolved "https://registry.yarnpkg.com/react/-/react-16.8.6.tgz#ad6c3a9614fd3a4e9ef51117f54d888da01f2bbe"
+  integrity sha512-pC0uMkhLaHm11ZSJULfOBqV4tIZkx87ZLvbbQYunNixAAvjnC+snJCg0XQXn9VIsttVsbZP/H/ewzgsd5fxKXw==
   dependencies:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"
@@ -7333,6 +7338,7 @@ slash@^1.0.0:
 slick-carousel@^1.8.1:
   version "1.8.1"
   resolved "https://registry.yarnpkg.com/slick-carousel/-/slick-carousel-1.8.1.tgz#a4bfb29014887bb66ce528b90bd0cda262cc8f8d"
+  integrity sha512-XB9Ftrf2EEKfzoQXt3Nitrt/IPbT+f1fgqBdoxO3W/+JYvtEOW6EgxnWfr9GH6nmULv7Y2tPmEX3koxThVmebA==
 
 slide@^1.1.5:
   version "1.1.6"
@@ -7521,6 +7527,7 @@ strict-uri-encode@^2.0.0:
 string-convert@^0.2.0:
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/string-convert/-/string-convert-0.2.1.tgz#6982cc3049fbb4cd85f8b24568b9d9bf39eeff97"
+  integrity sha1-aYLMMEn7tM2F+LJFaLnZvznu/5c=
 
 string-length@^2.0.0:
   version "2.0.0"
@@ -7611,6 +7618,7 @@ strip-json-comments@~2.0.1:
 style-scoped@^0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/style-scoped/-/style-scoped-0.1.0.tgz#d4519787a37fc8dd630d86cf9c894ef42b52727e"
+  integrity sha512-mpS+kGQMPrdl4CPEpGFuInTTKPDch+78pNB6DnN7LzRf6TotF+TkViPItNFWsyAAze+hux+WKwdzmROwiuHOZA==
 
 supports-color@^2.0.0:
   version "2.0.0"

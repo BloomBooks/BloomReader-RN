@@ -14,7 +14,7 @@
     "int-test": "jest --testPathPattern integration-tests"
   },
   "dependencies": {
-    "bloom-player-react": "^0.5.0",
+    "bloom-player": "^0.6.1",
     "react": "16.6.3",
     "react-native": "0.57.8",
     "react-native-email": "^1.0.2",

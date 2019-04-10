@@ -56,8 +56,7 @@ export default class BookReader extends React.PureComponent<IProps, IState> {
         {this.state.bookReady && (
           <WebView
             source={{
-              baseUrl: "file:///android_asset/",
-              html: this.webViewHtml()
+              uri: `file:///android_asset/bloom-player/webView.htm?url=${bookUrl}`
             }}
             mixedContentMode="always"
             allowUniversalAccessFromFileURLs={true}
@@ -71,23 +70,5 @@ export default class BookReader extends React.PureComponent<IProps, IState> {
         />
       </SafeAreaView>
     );
-  }
-
-  // The HTML that is the top level content of the webview that hosts the book
-  // content display.
-  webViewHtml(): string {
-    return `<!DOCTYPE html>\
-    <html>
-  <head>
-  </head>
-  <body>
-   <!--This is the root element of the React DOM. The class identifies it to applyToMarkedElements()
-      and the data-url tells the bloom-player where to find the data. -->
-   <div class='bloom-player-controls' data-url='${BookStorage.openBookFolderPath()}'>Didn't get converted</div>
-   <script onload='BloomPlayer.BloomPlayerControls.applyToMarkedElements();
-    BloomPlayer.BloomPlayerControls.scalePageToWindow();'
-    src='bloom-player/bloomPlayerControlBundle.js' type='text/javascript'></script>
-  </body>
-  </html>`;
   }
 }
