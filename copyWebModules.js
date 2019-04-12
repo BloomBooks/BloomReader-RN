@@ -5,8 +5,8 @@ const bloomPlayerAssetFolderPath = "./android/app/src/main/assets/bloom-player";
 mkdirSafe(bloomPlayerAssetFolderPath);
 
 fs.copyFileSync(
-  "./node_modules/bloom-player-react/output/bloomPlayerControlBundle.js",
-  `${bloomPlayerAssetFolderPath}/bloomPlayerControlBundle.js`
+  "./node_modules/bloom-player/dist/bloomPlayer.js",
+  `${bloomPlayerAssetFolderPath}/bloomPlayer.js`
 );
 
 function mkdirSafe(path) {
