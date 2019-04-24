@@ -1,5 +1,5 @@
 enum ThemeColors {
-  red = "#D65649",
+  bloomRed = "#D65649",
   darkRed = "#9C3F36"
 }
 

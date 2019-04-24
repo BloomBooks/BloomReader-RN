@@ -32,7 +32,7 @@ const StackNavigator = createStackNavigator(
     defaultNavigationOptions: {
       title: I18n.t("Bloom Reader"),
       headerStyle: {
-        backgroundColor: ThemeColors.red
+        backgroundColor: ThemeColors.bloomRed
       },
       headerTintColor: "white",
       headerTruncatedBackTitle: ""

@@ -87,7 +87,7 @@ export default class ReceiveFromWifiScreen extends React.PureComponent<
             <Button
               onPress={() => this.props.navigation.navigate("BookList")}
               title={I18n.t("OK")}
-              color={ThemeColors.red}
+              color={ThemeColors.bloomRed}
             />
           </View>
         </View>

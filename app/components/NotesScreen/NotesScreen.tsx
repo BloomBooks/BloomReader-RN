@@ -78,6 +78,6 @@ const styles = StyleSheet.create({
     fontSize: 16
   },
   link: {
-    color: ThemeColors.red
+    color: ThemeColors.bloomRed
   }
 });
