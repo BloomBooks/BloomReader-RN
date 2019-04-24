@@ -4,7 +4,7 @@
     <!-- Used by RN for debugging -->
     <uses-permission android:name="android.permission.INTERNET" />
 
-    <!-- Used by RN for debugging - need to remove from production-->
+    <!-- Used by RN for debugging - removed in release builds by android/app/release/AndroidManifest.xml -->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
 
     <!-- Get name of Wifi network for receiving books -->
