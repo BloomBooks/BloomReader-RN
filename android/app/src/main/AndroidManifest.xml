@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.sil.bloom.reader">
-    
-    <!-- Used by RN for debugging -->
+
+    <!-- Used for Analytics and by RN for getting JS bundle in dev builds -->
     <uses-permission android:name="android.permission.INTERNET" />
 
     <!-- Used by RN for debugging - removed in release builds by android/app/release/AndroidManifest.xml -->

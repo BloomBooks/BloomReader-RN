@@ -120,6 +120,27 @@ android {
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
+        debug {
+            applicationIdSuffix ".debug"
+        }
+    }
+
+    flavorDimensions 'default'
+
+    productFlavors {
+        alpha {
+            applicationIdSuffix '.alpha'
+            versionNameSuffix '-alpha'
+            dimension 'default'
+        }
+        beta {
+            applicationIdSuffix '.beta'
+            versionNameSuffix '-beta'
+            dimension 'default'
+        }
+        production {
+            dimension 'default'
+        }
     }
     // applicationVariants are e.g. debug, release
     applicationVariants.all { variant ->
