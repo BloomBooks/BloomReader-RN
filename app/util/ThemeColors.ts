@@ -1,6 +1,8 @@
 enum ThemeColors {
   bloomRed = "#D65649",
-  darkRed = "#9C3F36"
+  darkRed = "#9C3F36",
+  lightGray = "#DDD",
+  speakerIcon = "#4E4E4E80"
 }
 
 export default ThemeColors;
