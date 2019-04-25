@@ -1,4 +1,4 @@
-import { AsyncStorage } from "react-native";
+import { AsyncStorage, ToastAndroid } from "react-native";
 import RNFS from "react-native-fs";
 import { unzip } from "react-native-zip-archive";
 import {
@@ -11,6 +11,8 @@ import {
 import { BookCollection } from "../models/BookCollection";
 import { nameFromPath, rnfsSafeUnlink } from "./FileUtil";
 import * as BloomBundleModule from "../native_modules/BloomBundleModule";
+import getFeaturesList from "./getFeaturesList";
+import I18n from "../i18n/i18n";
 
 export const booksDir = RNFS.DocumentDirectoryPath + "/books";
 const thumbsDir = RNFS.DocumentDirectoryPath + "/thumbs";
@@ -41,6 +43,7 @@ async function addBookToList(filename: string, list: Book[]): Promise<Book> {
   const tmpBookPath = await extractBookToTmp(filename);
   const thumbPath = await saveThumbnail(tmpBookPath);
   const metaData = JSON.parse(await RNFS.readFile(`${tmpBookPath}/meta.json`));
+  const bookFeatures = await getFeaturesList(metaData, tmpBookPath);
   RNFS.unlink(tmpBookPath);
   const existingBookIndex = list.findIndex(book => book.filename == filename);
   if (existingBookIndex >= 0) list.splice(existingBookIndex, 1);
@@ -49,11 +52,24 @@ async function addBookToList(filename: string, list: Book[]): Promise<Book> {
     title: metaData.title,
     allTitles: JSON.parse(metaData.allTitles.replace(/\n/g, " ")), // Remove newlines to avoid JSON parse error
     tags: metaData.tags,
+    features: bookFeatures,
     thumbPath: thumbPath,
     modifiedAt: Date.now()
   };
   list.push(book);
   return book;
+}
+
+export async function updateBookListFormat(): Promise<void> {
+  // This can take some time, let the user know what we're up to
+  ToastAndroid.show(I18n.t("UpdatingBookCollectionFormat"), ToastAndroid.SHORT);
+
+  const oldBookList = (await readList(bookListKey)) as Book[];
+  const newBookList: Book[] = [];
+  for (let i = 0; i < oldBookList.length; ++i) {
+    await addBookToList(oldBookList[i].filename, newBookList);
+  }
+  await writeList(bookListKey, newBookList);
 }
 
 export async function importBooksDir(
@@ -117,8 +133,8 @@ export async function moveBook(): Promise<string> {
   return htmlFile.path;
 }
 
-export async function fetchHtml(): Promise<string> {
-  const fileList = await RNFS.readDir(openBookDir);
+export async function fetchHtml(bookDir = openBookDir): Promise<string> {
+  const fileList = await RNFS.readDir(bookDir);
   const htmlFile = fileList.find(entry => /\.html?$/.test(entry.name));
   return htmlFile ? await RNFS.readFile(htmlFile.path) : "";
 }

@@ -3,9 +3,11 @@ import RNFS from "react-native-fs";
 import { AsyncStorage } from "react-native";
 import importSampleBooks from "./importSampleBooks";
 import * as ErrorLog from "./ErrorLog";
+import { BOOK_ITEM_VERSION } from "../models/BookOrShelf";
 
 const appVersion = require("../../package.json").version;
 const lastRunVersionKey = "bloomreader.lastRunVersion";
+const bookItemVersionKey = "bloomreader.bookItemVersion";
 
 export default async function startupTasks(): Promise<void> {
   await BookStorage.createDirectories();
@@ -16,7 +18,13 @@ export default async function startupTasks(): Promise<void> {
     ErrorLog.logNewAppVersion(appVersion);
     await importSampleBooks();
   }
-  setLastRunVersion();
+
+  const existingBookItemVersion = await getExistingBookItemVersion();
+  if (lastRunVersion !== null && existingBookItemVersion != BOOK_ITEM_VERSION) {
+    await BookStorage.updateBookListFormat();
+  }
+
+  setVersions();
 }
 
 // When we share temporary files, we can't clean them up immediately
@@ -34,10 +42,17 @@ async function cacheCleanup(): Promise<void> {
   }
 }
 
-async function getLastRunVersion() {
+async function getLastRunVersion(): Promise<string | null> {
   return AsyncStorage.getItem(lastRunVersionKey);
 }
 
-async function setLastRunVersion() {
-  AsyncStorage.setItem(lastRunVersionKey, appVersion);
+async function getExistingBookItemVersion(): Promise<string | null> {
+  return AsyncStorage.getItem(bookItemVersionKey);
+}
+
+async function setVersions(): Promise<void> {
+  AsyncStorage.multiSet([
+    [lastRunVersionKey, appVersion],
+    [bookItemVersionKey, BOOK_ITEM_VERSION]
+  ]);
 }

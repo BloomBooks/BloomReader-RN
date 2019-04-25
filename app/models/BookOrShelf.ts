@@ -1,15 +1,21 @@
 import { currentLang } from "../i18n/i18n";
 import { BookCollection } from "./BookCollection";
 
+// Used by startupTasks() to determine if BookStorage.updateBookListFormat()
+// needs to be run
+export const BOOK_ITEM_VERSION = "1";
+
 export interface BookOrShelf {
   isShelf?: boolean;
   tags: string[];
 }
 
+// If you update this interface, increment BOOK_ITEM_VERSION
 export interface Book extends BookOrShelf {
   filename: string; // Used as the unique identifier
   title: string;
   allTitles: { [localeName: string]: string };
+  features: BookFeatures[];
   thumbPath?: string;
   modifiedAt: number; // millis UTC
 }
@@ -18,6 +24,16 @@ export interface Shelf extends BookOrShelf {
   id: string; // Used as the unique identifier
   label: Array<{ [localeName: string]: string }>;
   color: string;
+}
+
+// If you update this interface, increment BOOK_ITEM_VERSION
+export enum BookFeatures {
+  audio = "audio",
+  imageDescriptions = "image descriptions",
+  motion = "motion",
+  signLanguage = "sign language",
+  quizzes = "quizzes",
+  otherInteractiveActivities = "other interactive activities"
 }
 
 export function goesOnShelf(
