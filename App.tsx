@@ -18,6 +18,7 @@ import {
   emptyBookCollection
 } from "./app/models/BookCollection";
 import * as BookStorage from "./app/util/BookStorage";
+import SplashScreen from "react-native-splash-screen";
 
 const StackNavigator = createStackNavigator(
   {
@@ -31,7 +32,7 @@ const StackNavigator = createStackNavigator(
     defaultNavigationOptions: {
       title: I18n.t("Bloom Reader"),
       headerStyle: {
-        backgroundColor: ThemeColors.red
+        backgroundColor: ThemeColors.bloomRed
       },
       headerTintColor: "white",
       headerTruncatedBackTitle: ""
@@ -72,7 +73,7 @@ export default class App extends React.PureComponent<any, IState> {
     this.setState({ loaded: true });
     const bookCollection = await BookStorage.getBookCollection();
     this.setState({ bookCollection });
-    //SplashScreen.hide();  // Add this back in with the splash screen
+    SplashScreen.hide();
   }
 
   render() {
@@ -88,7 +89,8 @@ export default class App extends React.PureComponent<any, IState> {
         }}
       />
     ) : (
-      <Text>Loading..</Text>
+      // The Splash Screen is displayed until state.loaded is set
+      <Text> </Text>
     );
   }
 }
