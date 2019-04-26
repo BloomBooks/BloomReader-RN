@@ -1,23 +1,19 @@
 import React from "react";
 import {
   SafeAreaView,
-  Text,
-  TouchableNativeFeedback,
   TouchableOpacity,
   FlatList,
-  View,
   StatusBar
 } from "react-native";
 import * as BookStorage from "../../util/BookStorage";
 import BookListItem from "./BookListItem";
 import * as ImportBookModule from "../../native_modules/ImportBookModule";
-import { NavigationScreenProp, NavigationEvents } from "react-navigation";
+import { NavigationScreenProp } from "react-navigation";
 import I18n from "../../i18n/i18n";
 import ShelfListItem from "./ShelfListItem";
 import {
   Book,
   Shelf,
-  goesOnShelf,
   displayName,
   BookOrShelf,
   sortedListForShelf
@@ -25,13 +21,11 @@ import {
 import { BookCollection } from "../../models/BookCollection";
 import { BRHeaderButtons, Item } from "../shared/BRHeaderButtons";
 import { AndroidBackHandler } from "react-navigation-backhandler";
-import Icon from "react-native-vector-icons/Ionicons";
 import { DrawerUnlocker } from "../DrawerMenu/DrawerLocker";
 import * as Share from "../../util/Share";
-import * as Progress from "react-native-progress";
-import * as GetFromWifiModule from "../../native_modules/GetFromWifiModule";
 import ThemeColors from "../../util/ThemeColors";
 import ProgressSpinner from "../shared/ProgressSpinner";
+import * as BRAnalytics from "../../util/BRAnalytics";
 
 export interface IProps {
   navigation: NavigationScreenProp<any, any>;
@@ -81,12 +75,16 @@ export default class BookList extends React.PureComponent<IProps, IState> {
   };
 
   async componentDidMount() {
-    if (this.shelf() === undefined) {
+    const shelf = this.shelf();
+    if (shelf === undefined) {
       // This is the root BookList
 
       // Having a file shared with us results in a new instance of our app,
       // so we can check for imports in componentDidMount()
       await this.checkForBooksToImport();
+      BRAnalytics.screenView("Main");
+    } else {
+      BRAnalytics.screenView("Shelf", displayName(shelf));
     }
     this.setState({ fullyLoaded: true });
   }
