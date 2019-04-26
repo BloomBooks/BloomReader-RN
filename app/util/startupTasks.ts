@@ -1,14 +1,13 @@
-import * as BookStorage from "./BookStorage";
+import * as BookStorage from "../storage/BookStorage";
 import RNFS from "react-native-fs";
 import { AsyncStorage } from "react-native";
-import importSampleBooks from "./importSampleBooks";
 import * as ErrorLog from "./ErrorLog";
-import { BOOK_ITEM_VERSION } from "../models/BookOrShelf";
 import * as BRAnalytics from "./BRAnalytics";
+import { updateBookListFormatIfNeeded } from "../storage/BookCollection";
 
-const appVersion = require("../../package.json").version;
-const lastRunVersionKey = "bloomreader.lastRunVersion";
-const bookItemVersionKey = "bloomreader.bookItemVersion";
+const APP_VERSION = require("../../package.json").version;
+const LAST_RUN_VERSION_KEY = "bloomreader.lastRunVersion";
+const COLLECTION_FORMAT_VERSION = "bloomreader.bookItemVersion";
 
 export default async function startupTasks(): Promise<void> {
   await BookStorage.createDirectories();
@@ -16,14 +15,13 @@ export default async function startupTasks(): Promise<void> {
   cacheCleanup();
 
   const lastRunVersion = await getLastRunVersion();
-  if (lastRunVersion !== appVersion) {
-    ErrorLog.logNewAppVersion(appVersion);
-    await importSampleBooks();
-  }
-
-  const existingBookItemVersion = await getExistingBookItemVersion();
-  if (lastRunVersion !== null && existingBookItemVersion != BOOK_ITEM_VERSION) {
-    await BookStorage.updateBookListFormat();
+  if (lastRunVersion !== APP_VERSION) {
+    ErrorLog.logNewAppVersion(APP_VERSION);
+    if (lastRunVersion !== null)
+      await updateBookListFormatIfNeeded(
+        await getExistingCollectionFormatVersion()
+      );
+    await BookStorage.importSampleBooks();
   }
 
   setVersions();
@@ -45,16 +43,16 @@ async function cacheCleanup(): Promise<void> {
 }
 
 async function getLastRunVersion(): Promise<string | null> {
-  return AsyncStorage.getItem(lastRunVersionKey);
+  return AsyncStorage.getItem(LAST_RUN_VERSION_KEY);
 }
 
-async function getExistingBookItemVersion(): Promise<string | null> {
-  return AsyncStorage.getItem(bookItemVersionKey);
+async function getExistingCollectionFormatVersion(): Promise<string | null> {
+  return AsyncStorage.getItem(COLLECTION_FORMAT_VERSION);
 }
 
 async function setVersions(): Promise<void> {
   AsyncStorage.multiSet([
-    [lastRunVersionKey, appVersion],
-    [bookItemVersionKey, BOOK_ITEM_VERSION]
+    [LAST_RUN_VERSION_KEY, APP_VERSION],
+    [COLLECTION_FORMAT_VERSION, COLLECTION_FORMAT_VERSION]
   ]);
 }

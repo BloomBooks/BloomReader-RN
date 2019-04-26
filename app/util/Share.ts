@@ -1,15 +1,34 @@
-import { BookOrShelf, Book, Shelf } from "../models/BookOrShelf";
-import * as BookStorage from "./BookStorage";
+import {
+  BookOrShelf,
+  Book,
+  Shelf,
+  recursiveListForShelf,
+  isShelf
+} from "../models/BookOrShelf";
+import * as BookStorage from "../storage/BookStorage";
 import Share from "react-native-share";
 import * as ShareApkModule from "../native_modules/ShareApkModule";
+import {
+  BookCollection,
+  syncCollectionAndFetch
+} from "../storage/BookCollection";
+import { makeBundle } from "../native_modules/BloomBundleModule";
+import { nameFromPath } from "./FileUtil";
 
-export async function share(item: BookOrShelf): Promise<void> {
-  if (item.isShelf) shareShelfBundle(item as Shelf);
-  else shareBook(item as Book);
+export async function share(
+  item: BookOrShelf,
+  collection: BookCollection
+): Promise<void> {
+  if (isShelf(item)) shareShelfBundle(item, collection);
+  else shareBook(item);
 }
 
 export async function shareAll(): Promise<void> {
-  const bundlePath = await BookStorage.bundleAll();
+  const collection = await syncCollectionAndFetch();
+  const itemsToShare = (collection.books as BookOrShelf[]).concat(
+    collection.shelves
+  );
+  const bundlePath = await makeBundle(itemsToShare);
   shareBundle(bundlePath);
 }
 
@@ -22,8 +41,12 @@ export async function shareApp(): Promise<void> {
   });
 }
 
-async function shareShelfBundle(shelf: Shelf): Promise<void> {
-  const bundlePath = await BookStorage.bundleShelf(shelf);
+async function shareShelfBundle(
+  shelf: Shelf,
+  collection: BookCollection
+): Promise<void> {
+  const itemsToShare = recursiveListForShelf(shelf, collection);
+  const bundlePath = await makeBundle(itemsToShare);
   shareBundle(bundlePath);
 }
 
@@ -36,10 +59,9 @@ function shareBundle(bundlePath: string): void {
 }
 
 function shareBook(book: Book): void {
-  const path = BookStorage.bookPath(book);
   Share.open({
-    url: `file://${path}`,
+    url: `file://${book.filepath}`,
     type: "application/*", // This gets us a better selection of apps to share with than "application/bloom" and seems to work just the same
-    subject: book.filename
+    subject: nameFromPath(book.filepath)
   });
 }

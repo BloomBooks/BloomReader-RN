@@ -1,6 +1,6 @@
 import React from "react";
 import { SafeAreaView, Text } from "react-native";
-import * as BookStorage from "../../util/BookStorage";
+import * as BookStorage from "../../storage/BookStorage";
 import { WebView } from "react-native-webview";
 import { NavigationScreenProp } from "react-navigation";
 import { DrawerLocker } from "../DrawerMenu/DrawerLocker";

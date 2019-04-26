@@ -1,4 +1,4 @@
-import RNFS from "react-native-fs";
+import RNFS, { ReadDirItem } from "react-native-fs";
 import * as ErrorLog from "./ErrorLog";
 import { PermissionsAndroid } from "react-native";
 
@@ -35,4 +35,21 @@ export async function readExternalBloomDir(): Promise<string> {
   } else {
     throw "External Storage Permission Refused";
   }
+}
+
+export function isBookFile(file: ReadDirItem): boolean {
+  return file.name.toLowerCase().endsWith(".bloomd");
+}
+
+export function isShelfFile(file: ReadDirItem): boolean {
+  return file.name.toLowerCase().endsWith(".bloomshelf");
+}
+
+// Turns a filepath into something that can be used as a filename
+export function nameifyPath(filepath: string): string {
+  return filepath.replace(/[/:]/g, "--");
+}
+
+export function extension(filepath: string): string {
+  return filepath.slice(filepath.lastIndexOf(".") + 1).toLocaleLowerCase();
 }

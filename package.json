@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "copyWebModules": "node ./copyWebModules.js",
-    "start-android": "npm run copyWebModules && react-native run-android",
+    "start-android": "npm run copyWebModules && react-native run-android --variant=alphaDebug --main-activity=SplashActivity --appIdSuffix=alpha.debug",
     "start": "node node_modules/react-native/local-cli/cli.js start",
     "test": "jest --testPathPattern app",
     "test-watch": "jest --watch --testPathPattern app",
