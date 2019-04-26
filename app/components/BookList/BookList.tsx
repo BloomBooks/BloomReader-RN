@@ -5,7 +5,6 @@ import {
   FlatList,
   StatusBar
 } from "react-native";
-import * as BookStorage from "../../util/BookStorage";
 import BookListItem from "./BookListItem";
 import * as ImportBookModule from "../../native_modules/ImportBookModule";
 import { NavigationScreenProp } from "react-navigation";
@@ -16,9 +15,13 @@ import {
   Shelf,
   displayName,
   BookOrShelf,
-  sortedListForShelf
+  sortedListForShelf,
+  isShelf
 } from "../../models/BookOrShelf";
-import { BookCollection } from "../../models/BookCollection";
+import {
+  BookCollection,
+  deleteBookOrShelf
+} from "../../storage/BookCollection";
 import { BRHeaderButtons, Item } from "../shared/BRHeaderButtons";
 import { AndroidBackHandler } from "react-navigation-backhandler";
 import { DrawerUnlocker } from "../DrawerMenu/DrawerLocker";
@@ -48,14 +51,19 @@ export default class BookList extends React.PureComponent<IProps, IState> {
     props.navigation.setParams({
       clearSelectedItem: this.clearSelectedItem,
       deleteSelectedItem: async () => {
-        const newCollection = await BookStorage.deleteItem(this.state
+        const newCollection = await deleteBookOrShelf(this.state
           .selectedItem as BookOrShelf);
         this.props.screenProps.setBookCollection(newCollection);
         this.clearSelectedItem();
       },
       shareSelectedItem: () => {
-        Share.share(this.state.selectedItem as BookOrShelf);
-        this.clearSelectedItem();
+        if (this.state.selectedItem) {
+          Share.share(
+            this.state.selectedItem,
+            this.props.screenProps.bookCollection
+          );
+          this.clearSelectedItem();
+        }
       }
     });
   }
@@ -99,10 +107,7 @@ export default class BookList extends React.PureComponent<IProps, IState> {
 
   private itemTouch = (item: BookOrShelf) => {
     if (this.state.selectedItem) this.clearSelectedItem();
-    else
-      item.isShelf
-        ? this.openShelf(item as Shelf)
-        : this.openBook(item as Book);
+    else isShelf(item) ? this.openShelf(item) : this.openBook(item);
   };
 
   private openBook = (book: Book) =>
@@ -182,22 +187,20 @@ export default class BookList extends React.PureComponent<IProps, IState> {
         <FlatList
           extraData={this.state}
           data={list}
-          keyExtractor={item =>
-            item.isShelf ? (item as Shelf).id : (item as Book).filename
-          }
+          keyExtractor={item => (isShelf(item) ? item.id : item.filepath)}
           renderItem={({ item }) => (
             <TouchableOpacity
               onPress={() => this.itemTouch(item)}
               onLongPress={() => this.setSelectedItem(item)}
             >
-              {item.isShelf ? (
+              {isShelf(item) ? (
                 <ShelfListItem
-                  shelf={item as Shelf}
+                  shelf={item}
                   isSelected={this.state.selectedItem == item}
                 />
               ) : (
                 <BookListItem
-                  book={item as Book}
+                  book={item}
                   isSelected={this.state.selectedItem == item}
                 />
               )}

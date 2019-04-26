@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Image, Text, StyleSheet } from "react-native";
 import { Book, displayName, BookFeatures } from "../../models/BookOrShelf";
-import * as BookStorage from "../../util/BookStorage";
+import * as BookStorage from "../../storage/BookStorage";
 import Icon from "react-native-vector-icons/Ionicons";
 import ThemeColors from "../../util/ThemeColors";
 

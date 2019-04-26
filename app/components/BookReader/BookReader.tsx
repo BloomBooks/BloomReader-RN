@@ -1,7 +1,7 @@
 import React from "react";
 import { SafeAreaView, Text, NativeSyntheticEvent } from "react-native";
-import * as BookStorage from "../../util/BookStorage";
 import { WebView, WebViewMessage } from "react-native-webview";
+import * as BookStorage from "../../storage/BookStorage";
 import { NavigationScreenProp } from "react-navigation";
 import { DrawerLocker } from "../DrawerMenu/DrawerLocker";
 import * as BRAnalytics from "../../util/BRAnalytics";
