@@ -1,5 +1,6 @@
 import { currentLang } from "../i18n/i18n";
 import { BookCollection } from "../storage/BookCollection";
+import { nameFromPath } from "../util/FileUtil";
 
 // If you update this interface, increment COLLECTION_FORMAT_VERSION in BookCollection.ts
 export interface Book {
@@ -18,6 +19,7 @@ export interface Shelf {
   label: Array<{ [localeName: string]: string }>;
   color: string;
   filepath: string;
+  modifiedAt: number;
   tags: string[];
 }
 
@@ -76,13 +78,14 @@ export function listForShelf(
   shelf: Shelf | undefined,
   collection: BookCollection
 ): BookOrShelf[] {
-  return (collection.shelves as BookOrShelf[])
+  const list = (collection.shelves as BookOrShelf[])
     .filter(subShelf => goesOnShelf(subShelf, shelf, collection.shelves))
     .concat(
       collection.books.filter(book =>
         goesOnShelf(book, shelf, collection.shelves)
       )
     );
+  return removeDuplicateBooks(list);
 }
 
 // Includes contents of sub-shelves
@@ -108,5 +111,30 @@ export function sortedListForShelf(
 ): BookOrShelf[] {
   return listForShelf(shelf, collection).sort((a, b) =>
     displayName(a).localeCompare(displayName(b))
+  );
+}
+
+// The book collection is sourced from multiple directories, and there may
+// be duplicates between them. Only show the newest of two books with the same
+// filename
+function removeDuplicateBooks(items: BookOrShelf[]): BookOrShelf[] {
+  return items.reduce(
+    (items, item) => {
+      if (!isShelf(item)) {
+        const duplicateIndex = items.findIndex(
+          i => nameFromPath(i.filepath) == nameFromPath(item.filepath)
+        );
+        if (duplicateIndex >= 0) {
+          const duplicate = items[duplicateIndex];
+          const winner =
+            item.modifiedAt > duplicate.modifiedAt ? item : duplicate;
+          items[duplicateIndex] = winner;
+          return items;
+        }
+      }
+      items.push(item);
+      return items;
+    },
+    [] as BookOrShelf[]
   );
 }

@@ -16,7 +16,7 @@ import ReceiveFromWifiScreen from "./app/components/ReceiveFromWifi/ReceiveFromW
 import {
   BookCollection,
   emptyBookCollection,
-  syncCollectionAndFetch
+  getBookCollection
 } from "./app/storage/BookCollection";
 import SplashScreen from "react-native-splash-screen";
 
@@ -71,7 +71,7 @@ export default class App extends React.PureComponent<any, IState> {
   async componentDidMount() {
     await startupTasks();
     this.setState({ loaded: true });
-    const bookCollection = await syncCollectionAndFetch();
+    const bookCollection = await getBookCollection();
     this.setState({ bookCollection });
     SplashScreen.hide();
   }

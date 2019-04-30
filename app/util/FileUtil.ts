@@ -1,6 +1,7 @@
 import RNFS, { ReadDirItem } from "react-native-fs";
 import * as ErrorLog from "./ErrorLog";
 import { PermissionsAndroid } from "react-native";
+import SingletonPromise from "../util/SingletonPromise";
 
 const externalBloomDirPath = RNFS.ExternalStorageDirectoryPath + "/Bloom";
 
@@ -21,16 +22,25 @@ export async function rnfsSafeUnlink(path: string): Promise<void> {
   }
 }
 
+// PermissionsAndroid module can't handle overlapping requests
+// and that would be annoying for the user, so we use a SingletonPromise
+// to give the same answer to all requests
+const singletonPromise = new SingletonPromise<string>(requestStoragePermission);
+
+export async function readExternalBloomDir(): Promise<string> {
+  return singletonPromise.getPromise();
+}
+
 // Using the external storage (including the traditional Bloom folder)
 // requires user permission at runtime.
 // This method checks for permission (requesting it if necessary) and
 // if permission is granted, returns the path to the folder
 // otherwise it throws "External Storage Permission Refused"
-export async function readExternalBloomDir(): Promise<string> {
-  const granted = await PermissionsAndroid.request(
+async function requestStoragePermission(): Promise<string> {
+  const result = await PermissionsAndroid.request(
     PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE
   );
-  if (granted) {
+  if (result == PermissionsAndroid.RESULTS.GRANTED) {
     return externalBloomDirPath;
   } else {
     throw "External Storage Permission Refused";
