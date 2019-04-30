@@ -1,4 +1,4 @@
-import RNFS from "react-native-fs";
+import RNFS, { ReadDirItem } from "react-native-fs";
 import { unzip } from "react-native-zip-archive";
 import { Book, Shelf, BookOrShelf, isShelf } from "../models/BookOrShelf";
 import { BookCollection, importBookToCollection } from "./BookCollection";
@@ -8,9 +8,11 @@ import {
   nameifyPath,
   isBookFile,
   isShelfFile,
-  extension
+  extension,
+  readExternalBloomDir
 } from "../util/FileUtil";
 import getFeaturesList from "../util/getFeaturesList";
+import { logError } from "../util/ErrorLog";
 
 const PRIVATE_BOOKS_DIR = RNFS.DocumentDirectoryPath + "/books";
 const THUMBS_DIR = RNFS.DocumentDirectoryPath + "/thumbs";
@@ -44,30 +46,43 @@ export async function importBookFile(filepath: string): Promise<Book> {
   const thumbPath = await saveThumbnail(tmpBookPath, filepath);
   const metaData = JSON.parse(await RNFS.readFile(`${tmpBookPath}/meta.json`));
   const bookFeatures = await getFeaturesList(metaData, tmpBookPath);
-  const timestamp = (await RNFS.stat(filepath)).mtime;
+  const modifiedAt = (await RNFS.stat(filepath)).mtime.valueOf(); // mtime is actually a Date object
   RNFS.unlink(tmpBookPath);
   const book = {
-    filepath: filepath,
+    filepath,
     title: metaData.title,
     allTitles: JSON.parse(metaData.allTitles.replace(/\n/g, " ")), // Remove newlines to avoid JSON parse error
     tags: metaData.tags,
     features: bookFeatures,
-    thumbPath: thumbPath,
-    modifiedAt: timestamp
+    thumbPath,
+    modifiedAt
   };
   return book;
 }
 
 // Parses shelf file and return Shelf based on contents
-async function importShelfFile(filepath: string): Promise<Shelf> {
+export async function importShelfFile(filepath: string): Promise<Shelf> {
   const fileContents = JSON.parse(
     await RNFS.readFile(filepath)
   ) as ShelfFileContents;
-  return { ...fileContents, filepath: filepath };
+  const modifiedAt = (await RNFS.stat(filepath)).mtime.valueOf(); // mtime is actually a Date object
+  return { ...fileContents, filepath, modifiedAt };
+}
+
+export function privateStorageDirs() {
+  return [PRIVATE_BOOKS_DIR];
 }
 
 async function storageDirs() {
-  return [PRIVATE_BOOKS_DIR]; // Will add other dirs here
+  const dirs = privateStorageDirs();
+  try {
+    const oldBloomDirPath = await readExternalBloomDir();
+    dirs.push(oldBloomDirPath);
+  } catch (err) {
+    // Permission refused
+    logError({ logMessage: err });
+  }
+  return dirs;
 }
 
 // Moves book and shelf files to private books dir
@@ -87,6 +102,18 @@ export async function importBooksDir(srcDir: string): Promise<BookCollection> {
   }
   RNFS.unlink(srcDir);
   return { books, shelves };
+}
+
+export async function getPublicDirFiles(): Promise<ReadDirItem[]> {
+  const dirPaths = (await storageDirs()).filter(
+    path => path != PRIVATE_BOOKS_DIR
+  );
+  let files: ReadDirItem[] = [];
+  for (let i = 0; i < dirPaths.length; ++i) {
+    if (await RNFS.exists(dirPaths[i]))
+      files = files.concat(await RNFS.readDir(dirPaths[i]));
+  }
+  return files;
 }
 
 export async function openBookForReading(book: Book): Promise<string> {

@@ -20,7 +20,8 @@ import {
 } from "../../models/BookOrShelf";
 import {
   BookCollection,
-  deleteBookOrShelf
+  deleteBookOrShelf,
+  syncCollectionAndFetch
 } from "../../storage/BookCollection";
 import { BRHeaderButtons, Item } from "../shared/BRHeaderButtons";
 import { AndroidBackHandler } from "react-navigation-backhandler";
@@ -86,6 +87,10 @@ export default class BookList extends React.PureComponent<IProps, IState> {
     const shelf = this.shelf();
     if (shelf === undefined) {
       // This is the root BookList
+
+      // Sync collection with actual contents of public book folders
+      const updatedCollection = await syncCollectionAndFetch();
+      this.props.screenProps.setBookCollection(updatedCollection);
 
       // Having a file shared with us results in a new instance of our app,
       // so we can check for imports in componentDidMount()

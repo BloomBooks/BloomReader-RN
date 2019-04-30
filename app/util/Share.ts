@@ -5,13 +5,9 @@ import {
   recursiveListForShelf,
   isShelf
 } from "../models/BookOrShelf";
-import * as BookStorage from "../storage/BookStorage";
 import Share from "react-native-share";
 import * as ShareApkModule from "../native_modules/ShareApkModule";
-import {
-  BookCollection,
-  syncCollectionAndFetch
-} from "../storage/BookCollection";
+import { BookCollection, getBookCollection } from "../storage/BookCollection";
 import { makeBundle } from "../native_modules/BloomBundleModule";
 import { nameFromPath } from "./FileUtil";
 
@@ -24,7 +20,7 @@ export async function share(
 }
 
 export async function shareAll(): Promise<void> {
-  const collection = await syncCollectionAndFetch();
+  const collection = await getBookCollection();
   const itemsToShare = (collection.books as BookOrShelf[]).concat(
     collection.shelves
   );
