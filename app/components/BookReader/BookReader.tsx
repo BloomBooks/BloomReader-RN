@@ -1,10 +1,11 @@
 import React from "react";
-import { SafeAreaView, Text } from "react-native";
+import { SafeAreaView, Text, NativeSyntheticEvent } from "react-native";
 import * as BookStorage from "../../util/BookStorage";
-import { WebView } from "react-native-webview";
+import { WebView, WebViewMessage } from "react-native-webview";
 import { NavigationScreenProp } from "react-navigation";
 import { DrawerLocker } from "../DrawerMenu/DrawerLocker";
-
+import * as BRAnalytics from "../../util/BRAnalytics";
+import * as ErrorLog from "../../util/ErrorLog";
 export interface IProps {
   navigation: NavigationScreenProp<any, any>;
   screenProps: {
@@ -62,7 +63,9 @@ export default class BookReader extends React.PureComponent<IProps, IState> {
             allowUniversalAccessFromFileURLs={true}
             allowFileAccess={true}
             javaScriptEnabled={true}
+            domStorageEnabled={true}
             originWhitelist={["*"]}
+            onMessage={event => this.onMessageReceived(event)}
           />
         )}
         <DrawerLocker
@@ -70,5 +73,64 @@ export default class BookReader extends React.PureComponent<IProps, IState> {
         />
       </SafeAreaView>
     );
+  }
+
+  onMessageReceived(event: NativeSyntheticEvent<WebViewMessage>) {
+    try {
+      if (!event.nativeEvent || !event.nativeEvent.data) {
+        // At startup we get a completely spurious
+        // message, the source of which I have not been able to track down.
+        // However, since it doesn't have any data format we expect, we can easily ignore it.
+        return;
+      }
+
+      const data = JSON.parse(event.nativeEvent.data);
+      if (data.messageType === "sendAnalytics") {
+        this.onAnalyticsEvent(data);
+      } else {
+        ErrorLog.logError(
+          "BookReader.onMessageReceived() does not understand the messageType on this event: " +
+            event
+        );
+      }
+      // Next step: should also handle message type storePageData. The data object will also
+      // have a key and a value, both strings. We need to store them somewhere that will
+      // (at least) survive rotating the phone, and ideally closing and re-opening the book;
+      // but it should NOT survive downloading a new version of the book. Whether there's some
+      // other way to get rid of it (for testing, or for a new reader) remains to be decided.
+      // Once the data is stored, it needs to become part of the reader startup to give it
+      // back to the reader using window.sendMessage(). BloomPlayer is listening for a message
+      // with messageType restorePageData and pageData an object whose fields are the key/value
+      // pairs passed to storePageData. See the event listener in boom-player's externalContext
+      // file.
+    } catch (e) {
+      ErrorLog.logError(
+        "BookReader.onMessageReceived() does not understand this event: " + e
+      );
+    }
+  }
+
+  // Handle an anlytics event. data is the result of parsing the json received
+  // in the message. It should have properties event and params, the analytics
+  // event to track and the params to send.
+  onAnalyticsEvent(data: any) {
+    try {
+      const eventName = data.event;
+      const params = data.params;
+      if (eventName === "comprehension") {
+        // special case gets converted to match legacy comprehension question analytics
+        BRAnalytics.track("Questions correct", {
+          questionCount: params.possiblePoints,
+          rightFirstTime: params.actualPoints,
+          percentRight: params.percentRight,
+          title: this.book().title
+        });
+      } else {
+        params.title = this.book().title;
+        BRAnalytics.track(eventName, params);
+      }
+    } catch (ex) {
+      ErrorLog.logError("BookReader.onAnalyticsEvent error: " + ex);
+    }
   }
 }

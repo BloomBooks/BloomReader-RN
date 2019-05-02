@@ -1102,9 +1102,9 @@
     react-native-screens "^1.0.0 || ^1.0.0-alpha"
 
 "@segment/analytics-react-native@^0.0.1-beta.5":
-  version "0.0.1-beta.5"
-  resolved "https://registry.yarnpkg.com/@segment/analytics-react-native/-/analytics-react-native-0.0.1-beta.5.tgz#c0d091cdc1b8238b22abff20402653c546317271"
-  integrity sha512-la4L6lTJLDfO9GMxYGnDMA+au/QjkL649LinycerJ+7/fBv35Zgz4YZc/pQsOlNyEeRwCtJ4HeuEDdjeOuvIfg==
+  version "0.0.1-test-publish-ci.1"
+  resolved "https://registry.yarnpkg.com/@segment/analytics-react-native/-/analytics-react-native-0.0.1-test-publish-ci.1.tgz#4862ed5d1417e77f60643b29e5104b35fba8830d"
+  integrity sha512-+6BhHpB6Z+dPtfAR+QJYtGr5pGcYoodY/OBIeFuk7cHERQsiyVcVy+644wSltQYf/Fy5htG8RAO2UvDc1z3gcw==
 
 "@types/i18n-js@*":
   version "3.0.1"
@@ -2279,14 +2279,14 @@ bl@^1.0.0:
     readable-stream "^2.3.5"
     safe-buffer "^5.1.1"
 
-bloom-player@^0.6.1:
-  version "0.6.1"
-  resolved "https://registry.yarnpkg.com/bloom-player/-/bloom-player-0.6.1.tgz#3e2dae442e627bce6d23d7ad689b80db4dbcabdc"
-  integrity sha512-V+ENchn0Cl4yCGsP/jfWYllKpI/+n5frvQ5X+6BJM8qOP3EOCb4e5PEWdZCXe6e+682ruflbMppUkZ5Le6XMrg==
+bloom-player@^0.6.3:
+  version "0.6.3"
+  resolved "https://registry.yarnpkg.com/bloom-player/-/bloom-player-0.6.3.tgz#d90f7ef12f1575e2d71807e58c10cd6c503c1967"
+  integrity sha512-oWwae+9pLTNodwW+pPgx+ZdZ3bOVolJmPpOLmRI2IefVpu9dT+5JNe5dp4WevwhqisSX0sZx2GFKSEjzcEJKCA==
   dependencies:
     "@types/react" "^16.8.10"
     axios "^0.18.0"
-    jquery "^3.3.1"
+    jquery "^3.4.1"
     react "^16.8.5"
     react-dom "^16.8.5"
     react-slick "^0.23.2"
@@ -4830,7 +4830,7 @@ jpeg-js@^0.3.4:
   resolved "https://registry.yarnpkg.com/jpeg-js/-/jpeg-js-0.3.4.tgz#dc2ba501ee3d58b7bb893c5d1fab47294917e7e7"
   integrity sha512-6IzjQxvnlT8UlklNmDXIJMWxijULjqGrzgqc0OG7YadZdvm7KPQ1j0ehmQQHckgEWOfgpptzcnWgESovxudpTA==
 
-jquery@^3.3.1:
+jquery@^3.4.1:
   version "3.4.1"
   resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.4.1.tgz#714f1f8d9dde4bdfa55764ba37ef214630d80ef2"
   integrity sha512-36+AdBzCL+y6qjw5Tx7HgzeGCzC81MDDgaUP8ld2zhx58HdqXGoBd+tHdrBMiyjGQs0Hxs/MLZTu/eHNJJuWPw==
