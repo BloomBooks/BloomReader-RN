@@ -1102,9 +1102,9 @@
     react-native-screens "^1.0.0 || ^1.0.0-alpha"
 
 "@segment/analytics-react-native@^0.0.1-beta.5":
-  version "0.0.1-beta.5"
-  resolved "https://registry.yarnpkg.com/@segment/analytics-react-native/-/analytics-react-native-0.0.1-beta.5.tgz#c0d091cdc1b8238b22abff20402653c546317271"
-  integrity sha512-la4L6lTJLDfO9GMxYGnDMA+au/QjkL649LinycerJ+7/fBv35Zgz4YZc/pQsOlNyEeRwCtJ4HeuEDdjeOuvIfg==
+  version "0.0.1-test-publish-ci.1"
+  resolved "https://registry.yarnpkg.com/@segment/analytics-react-native/-/analytics-react-native-0.0.1-test-publish-ci.1.tgz#4862ed5d1417e77f60643b29e5104b35fba8830d"
+  integrity sha512-+6BhHpB6Z+dPtfAR+QJYtGr5pGcYoodY/OBIeFuk7cHERQsiyVcVy+644wSltQYf/Fy5htG8RAO2UvDc1z3gcw==
 
 "@types/i18n-js@*":
   version "3.0.1"

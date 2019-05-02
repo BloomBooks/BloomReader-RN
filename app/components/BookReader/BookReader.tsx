@@ -1,9 +1,10 @@
 import React from "react";
-import { SafeAreaView, Text } from "react-native";
+import { SafeAreaView, Text, NativeSyntheticEvent } from "react-native";
 import * as BookStorage from "../../util/BookStorage";
-import { WebView } from "react-native-webview";
+import { WebView, WebViewMessage } from "react-native-webview";
 import { NavigationScreenProp } from "react-navigation";
 import { DrawerLocker } from "../DrawerMenu/DrawerLocker";
+import Analytics from "@segment/analytics-react-native";
 
 export interface IProps {
   navigation: NavigationScreenProp<any, any>;
@@ -63,6 +64,7 @@ export default class BookReader extends React.PureComponent<IProps, IState> {
             allowFileAccess={true}
             javaScriptEnabled={true}
             originWhitelist={["*"]}
+            onMessage={event => this.onAnalyticsEvent(event)}
           />
         )}
         <DrawerLocker
@@ -71,4 +73,25 @@ export default class BookReader extends React.PureComponent<IProps, IState> {
       </SafeAreaView>
     );
   }
+
+  onAnalyticsEvent(event: NativeSyntheticEvent<WebViewMessage>) {
+    console.log(event);
+    try {
+      // One reason for the try...catch is that at startup we get a completely spurious
+      // message, the source of which I have not been able to track down.
+      // However, since it doesn't have at all the data format we expect, the try...catch
+      // happily ignores it. But in any case, it's not worth crashing over a failure
+      // to send analytics.
+      const data = JSON.parse(event.nativeEvent.data);
+      const eventName = data.event;
+      const params = data.params;
+      params.title = this.book().title;
+      Analytics.track(eventName, params);
+    } catch(ex) {
+      console.log(ex);
+    }
+
+  }
 }
+
+

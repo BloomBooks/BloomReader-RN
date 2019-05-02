@@ -9,6 +9,21 @@ fs.copyFileSync(
   `${bloomPlayerAssetFolderPath}/bloomPlayer.js`
 );
 
+fs.copyFileSync(
+  "./node_modules/bloom-player/dist/right_answer.mp3",
+  `${bloomPlayerAssetFolderPath}/right_answer.mp3`
+);
+
+fs.copyFileSync(
+  "./node_modules/bloom-player/dist/wrong_answer.mp3",
+  `${bloomPlayerAssetFolderPath}/wrong_answer.mp3`
+);
+
+fs.copyFileSync(
+  "./node_modules/bloom-player/dist/simpleComprehensionQuiz.js",
+  `${bloomPlayerAssetFolderPath}/simpleComprehensionQuiz.js`
+);
+
 function mkdirSafe(path) {
   if (!fs.existsSync(path)) fs.mkdirSync(path);
 }
