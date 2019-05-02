@@ -10,6 +10,7 @@ module.exports = {
   cacheDirectory: ".jest/cache",
   transformIgnorePatterns: [
     "node_modules/(?!(react-native|react-navigation|react-native-safe-area-view|react-native-i18n|react-native-email)/)"
-  ]
+  ],
+  "testResultsProcessor": "jest-teamcity-reporter"
   // setupFiles: ["./__mocks__/react-native.js"]  // May need this in the future
 };
