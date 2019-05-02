@@ -112,16 +112,16 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode versionMajor * 100000 + versionMinor * 1000 + versionPatch
         versionName "${versionMajor}.${versionMinor}.${versionPatch}"
-//        ndk {
-//            abiFilters "armeabi-v7a", "x86"
-//        }
+        ndk {
+            abiFilters "armeabi-v7a", "x86"
+        }
     }
     splits {
         abi {
             reset()
             enable enableSeparateBuildPerCPUArchitecture
-            universalApk true  // If true, also generate a universal APK
-//            include "armeabi-v7a", "x86"
+            universalApk false  // If true, also generate a universal APK
+            include "armeabi-v7a", "x86"
         }
     }
     signingConfigs {
@@ -163,18 +163,18 @@ android {
         }
     }
     // applicationVariants are e.g. debug, release
-//    applicationVariants.all { variant ->
-//        variant.outputs.each { output ->
-//            // For each separate APK per architecture, set a unique version code as described here:
-//            // http://tools.android.com/tech-docs/new-build-system/user-guide/apk-splits
-//            def versionCodes = ["armeabi-v7a":1, "x86":2]
-//            def abi = output.getFilter(OutputFile.ABI)
-//            if (abi != null) {  // null for the universal-debug, universal-release variants
-//                output.versionCodeOverride =
-//                        versionCodes.get(abi) * 1048576 + defaultConfig.versionCode
-//            }
-//        }
-//    }
+    applicationVariants.all { variant ->
+        variant.outputs.each { output ->
+            // For each separate APK per architecture, set a unique version code as described here:
+            // http://tools.android.com/tech-docs/new-build-system/user-guide/apk-splits
+            def versionCodes = ["armeabi-v7a":1, "x86":2]
+            def abi = output.getFilter(OutputFile.ABI)
+            if (abi != null) {  // null for the universal-debug, universal-release variants
+                output.versionCodeOverride =
+                        versionCodes.get(abi) * 1048576 + defaultConfig.versionCode
+            }
+        }
+    }
 }
 
 dependencies {
