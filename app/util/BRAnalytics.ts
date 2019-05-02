@@ -62,7 +62,7 @@ async function getIdentityFromFile(): Promise<DeviceIdParams | null> {
   try {
     const dirPath = await readExternalBloomDir();
     const idFilePath = `${dirPath}/deviceId.json`;
-    const idFileExists = RNFS.exists(idFilePath);
+    const idFileExists = await RNFS.exists(idFilePath);
     if (idFileExists) {
       const idJson = await RNFS.readFile(idFilePath);
       const idParams = JSON.parse(idJson);
