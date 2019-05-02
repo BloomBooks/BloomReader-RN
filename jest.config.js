@@ -9,7 +9,7 @@ module.exports = {
   testPathIgnorePatterns: ["\\.snap$", "<rootDir>/node_modules/"],
   cacheDirectory: ".jest/cache",
   transformIgnorePatterns: [
-    "node_modules/(?!(react-native|react-navigation|react-native-safe-area-view|react-native-i18n)/)"
+    "node_modules/(?!(react-native|react-navigation|react-native-safe-area-view|react-native-i18n|react-native-email)/)"
   ]
   // setupFiles: ["./__mocks__/react-native.js"]  // May need this in the future
 };
