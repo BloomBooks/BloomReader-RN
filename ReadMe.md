@@ -1,17 +1,22 @@
 # Development
 
 1. Install dependencies, set up the Android environment and set up an Android emulator according to the React Native documentation:
-    - [React Native Dependencies](https://facebook.github.io/react-native/docs/getting-started#installing-dependencies-3)
-    - [Android development environment](https://facebook.github.io/react-native/docs/getting-started#android-development-environment)
-    - [Set up emulator](https://facebook.github.io/react-native/docs/getting-started#preparing-the-android-device)
+
+   - [React Native Dependencies](https://facebook.github.io/react-native/docs/getting-started#installing-dependencies-3)
+   - [Android development environment](https://facebook.github.io/react-native/docs/getting-started#android-development-environment)
+   - [Set up emulator](https://facebook.github.io/react-native/docs/getting-started#preparing-the-android-device)
 
 2. Install BloomReader dependencies.
 
-    `yarn install`
+   `yarn install`
 
-3. Make sure the emulator is running, and then run the app.
+3. Make sure the emulator is running, e.g.
 
-    `npm run start-android`
+   `%ANDROID_HOME%/emulator/emulator -avd Pixel_2_API_28`
+
+4. and then run the app.
+
+   `yarn start-android`
 
 (That last is a custom script. It copies bloomPlayerControlBundle.js from node-modules to its proper
 place in assets. If you are copying an in-development version of that file manually, just use react-native start-android. If you want to launch your app some other way, you can npm run copyAssets to just copy the file first.)
@@ -32,19 +37,19 @@ or
 
 2. Check your configuration.
 
-    `yarn run appium-doctor --android`
+   `yarn run appium-doctor --android`
 
 3. [Download](https://drive.google.com/drive/folders/1K0RsdmvvNHvlVeDpAiNY48cjOKw6hwI1?usp=sharing) BloomReaderTest_X.zip and place the contents in `integration-tests/emulators/avd/`
 
 4. Setup for testing.
 
-    `yarn int-test-prep`
+   `yarn int-test-prep`
 
-    This builds the APK, starts the React Native packager, starts the emulator and starts the Appium server.
+   This builds the APK, starts the React Native packager, starts the emulator and starts the Appium server.
 
 5. Run the integration tests.
 
-    `yarn int-test`
+   `yarn int-test`
 
 ### Writing tests
 
@@ -57,4 +62,3 @@ The emulator loads from a snapshot, so the state of the device before all tests 
 ### Test Emulator Version
 
 If you run `yarn int-test-prep` and get this error : `emulator: ERROR: Unknown AVD name [BloomReaderTest_{X}]`, then you need to download a new version of the test emulator from the link in step 3.
-
