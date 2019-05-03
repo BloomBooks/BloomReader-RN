@@ -1,5 +1,6 @@
 package org.sil.bloom.reader;
 
+import android.annotation.TargetApi;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
@@ -16,6 +17,8 @@ import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 import com.rnfs.RNFSPackage;
+
+import android.os.Build;
 import android.webkit.WebView;
 
 import java.util.Arrays;
@@ -62,9 +65,19 @@ public class MainApplication extends Application implements ReactApplication, Sh
     @Override
     public void onCreate() {
         super.onCreate();
+
+        if (Build.VERSION.SDK_INT >= 19)
+            AdditionalSetupForApi19();
+
+        SoLoader.init(this, /* native exopackage */ false);
+    }
+
+    // Note, TargetApi annotation only affects linting,
+    // so we must only call this method based on a conditional check at the caller.
+    @TargetApi(19)
+    private void AdditionalSetupForApi19() {
         // Allow debugging within WebView (the actual book content).
         WebView.setWebContentsDebuggingEnabled(true);
-        SoLoader.init(this, /* native exopackage */ false);
     }
 
     @Override
