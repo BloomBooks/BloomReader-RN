@@ -43,22 +43,29 @@
 
 
             <!--
+                In reworking these filters for BL-6941, this answer seemed the clearest to follow:
+                https://stackoverflow.com/questions/1733195/android-intent-filter-for-a-particular-file-extension?#answer-31028507
                 We have three intent filters to detect when another app is trying to send us a bloom
                 file. Principally this is aimed at being able to open Bloom files from File Manager
                 apps. The parameters included in the intent depend on the File Manager sending it,
                 so we need a variety of filters to support as many sending apps as possible.
-                 - The first filter checks the file extension on intents where a MIME type
-                is not set.
-                 - The second filter checks the file extensions where a MIME type is set.
-                Both are necessary because the sending app may or may not choose to
+                 - The first filter checks the file extension on intents where a MIME
+                type is not set.
+                 - The second filter checks the file extensions where a MIME type is
+                set. Both are necessary because the sending app may or may not choose to
                 include the MIME type. The MIME type is set to */* because the MIME
-                type in the intent may be incorrect since our filetype is a unique one.
+                type in the intent may be incorrect since our file type is a unique one.
                 Since we're still filtering by file extension, this is ok.
                  - The third filter will catch an intent if the MIME type is correct
-                but the file extension is not what we expected. This should be an
-                unusual case.
+                but the file extension is not what we expected. This should be an unusual case.
+                 - The fourth filter (currently commented out) catches all 'content' scheme intents with defined MIME-type and
+                then the MainActivity code will check the original filename against the correct
+                extensions. The original filename is not available to the intent on the surface and
+                takes a bit of digging around to find.
             -->
-            <!-- Matches intents by file extension when no MIME type is set -->
+            <!--
+                Matches intents by file extension when no MIME type is set.
+            -->
             <intent-filter
                 android:icon="@drawable/book"
                 android:label="@string/app_name">
@@ -67,14 +74,44 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <category android:name="android.intent.category.DEFAULT" />
 
-                <data android:scheme="content" />
                 <data android:scheme="file" />
+                <data android:scheme="content" />
                 <data android:host="*" />
-                <data android:pathPattern=".*bloomd" />
-                <data android:pathPattern=".*bloombundle" />
+                <!--
+                    Work around Android's ugly primitive PatternMatcher implementation that can't
+                    cope with matching the first character (period or 'b' or whatever!) early in
+                    the path unless it's explicitly matched.
+                    See https://stackoverflow.com/questions/3400072/pathpattern-to-match-file-extension-does-not-work-if-a-period-exists-elsewhere-i/8599921
+                    Also work around a file transfer bug that appends ".enc" to the end of the filename.
+                -->
+                <data android:pathPattern=".*\\.bloomd" />
+                <data android:pathPattern=".*\\.bloomd.enc" />
+                <data android:pathPattern=".*\\.bloombundle" />
+                <data android:pathPattern=".*\\.bloombundle.enc" />
+                <data android:pathPattern=".*\\..*\\.bloomd" />
+                <data android:pathPattern=".*\\..*\\.bloomd.enc" />
+                <data android:pathPattern=".*\\..*\\.bloombundle" />
+                <data android:pathPattern=".*\\..*\\.bloombundle.enc" />
+                <data android:pathPattern=".*\\..*\\..*\\.bloomd" />
+                <data android:pathPattern=".*\\..*\\..*\\.bloomd.enc" />
+                <data android:pathPattern=".*\\..*\\..*\\.bloombundle" />
+                <data android:pathPattern=".*\\..*\\..*\\.bloombundle.enc" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.bloomd" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.bloomd.enc" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.bloombundle" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.bloombundle.enc" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.bloomd" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.bloomd.enc" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.bloombundle" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.bloombundle.enc" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\.bloomd" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\.bloomd.enc" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\.bloombundle" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\.bloombundle.enc" />
             </intent-filter>
-
-            <!-- Match intents by file extension when a MIME type is set -->
+            <!--
+                Match intents by file extension when a MIME type is set.
+            -->
             <intent-filter
                 android:icon="@drawable/book"
                 android:label="@string/app_name">
@@ -82,17 +119,48 @@
 
                 <category android:name="android.intent.category.BROWSABLE" />
                 <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:scheme="file" />
+                <data android:scheme="content" />
+                <data android:host="*" />
 
                 <data android:mimeType="*/*" />
-
-                <data android:scheme="content" />
-                <data android:scheme="file" />
-                <data android:host="*" />
-                <data android:pathPattern=".*bloomd" />
-                <data android:pathPattern=".*bloombundle" />
+                <!--
+                    Work around Android's ugly primitive PatternMatcher implementation that can't
+                    cope with matching the first character (period or 'b' or whatever!) early in
+                    the path unless it's explicitly matched.
+                    See https://stackoverflow.com/questions/3400072/pathpattern-to-match-file-extension-does-not-work-if-a-period-exists-elsewhere-i/8599921
+                    Also work around a file transfer bug that appends ".enc" to the end of the filename.
+                -->
+                <data android:pathPattern=".*\\.bloomd" />
+                <data android:pathPattern=".*\\.bloomd.enc" />
+                <data android:pathPattern=".*\\.bloombundle" />
+                <data android:pathPattern=".*\\.bloombundle.enc" />
+                <data android:pathPattern=".*\\..*\\.bloomd" />
+                <data android:pathPattern=".*\\..*\\.bloomd.enc" />
+                <data android:pathPattern=".*\\..*\\.bloombundle" />
+                <data android:pathPattern=".*\\..*\\.bloombundle.enc" />
+                <data android:pathPattern=".*\\..*\\..*\\.bloomd" />
+                <data android:pathPattern=".*\\..*\\..*\\.bloomd.enc" />
+                <data android:pathPattern=".*\\..*\\..*\\.bloombundle" />
+                <data android:pathPattern=".*\\..*\\..*\\.bloombundle.enc" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.bloomd" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.bloomd.enc" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.bloombundle" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.bloombundle.enc" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.bloomd" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.bloomd.enc" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.bloombundle" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.bloombundle.enc" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\.bloomd" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\.bloomd.enc" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\.bloombundle" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\.bloombundle.enc" />
             </intent-filter>
 
-            <!-- Match intents by MIME type in case the file extension gets lost -->
+            <!--
+                Match intents by MIME type in case the file extension gets lost.
+            -->
             <intent-filter
                 android:icon="@drawable/book"
                 android:label="@string/app_name">
@@ -101,20 +169,66 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <category android:name="android.intent.category.DEFAULT" />
 
-                <data android:scheme="content" />
                 <data android:scheme="file" />
+                <data android:scheme="content" />
                 <!-- Sometimes the MIME type we get is not exactly what we set - hence the variety of options -->
+                <!-- As of May 2019, we don't actually know of any case where these 6 bloom-specific mime types get used,
+                     but I'm too paranoid to remove them. Comments added with these originally referred to
+                     their need in opening from email. -->
                 <data android:mimeType="application/vnd.bloom" />
                 <data android:mimeType="application/bloom" />
                 <data android:mimeType="application/vnd.bloomd" />
                 <data android:mimeType="application/bloomd" />
                 <data android:mimeType="application/vnd.bloombundle" />
                 <data android:mimeType="application/bloombundle" />
+
+                <!-- This is unfortunate, but some apps (e.g. Gmail) just don't seem to include the file name in the path,
+                     so pathPattern matching is completely useless. Adding this means Bloom Reader will offer to open
+                     all files with application/octet-stream (which is what Gmail sends for our files as of May 2019),
+                     but we decided that is better than not offering to open any. -->
+                <data android:mimeType="application/octet-stream" />
+                <!-- I'm also adding application/zip in case there is an unknown app which uses that mime type. -->
+                <data android:mimeType="application/zip" />
             </intent-filter>
+            <!--
+                BR currently needs to match 'content' requests irrespective of file extension
+                and then check the extension in the code [MainActivity.processIntentData()].
+                Normally we would want to only match particular MIME-types that our code knows about,
+                but then we don't catch the Samsung default file manager (My Files), which defines
+                MIME-type as empty string, which is only matchable with the most generic filter! The
+                other 3 filters all use both 'file' and 'content' scheme, but I don't want to put
+                'file' in this filter to keep from catching more than we absolutely have to.
+
+                The Samsung "My Files" app can establish a connection between .bloomd files and
+                Bloom Reader if the .bloomd file is on the device before Bloom Reader is installed.
+                Clicking on the file, then choosing "Search" from the popup warning dialog and
+                installing Bloom Reader establishes the connection.  This connection appears to
+                persist if Bloom Reader is then uninstalled and reinstalled.
+                I don't know if it can establish a connection to both .bloomd and .bloombundle
+                files, but possibly uninstalling it after getting the connection to one would allow
+                the user to reinstall and get a connection to the other without losing the first.
+            -->
+            <!-- This filter opens up Bloom Reader to offering to handle all sorts of files!  This
+                 is probably more confusing to more users than the workaround described above.
+                 See https://issues.bloomlibrary.org/youtrack/issue/BL-7045.
+            -->
+            <!--intent-filter
+                android:icon="@drawable/book"
+                android:label="@string/app_name">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:scheme="content" />
+                <data android:host="*" />
+
+                <data android:mimeType="*/*" />
+            </intent-filter-->
 
         </activity>
-        <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" /> 
-        
+        <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
+
         <!-- Enables us to share files with other apps from specified directories -->
         <provider
             android:authorities="${applicationId}.provider"
