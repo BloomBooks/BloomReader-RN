@@ -103,3 +103,10 @@ export async function addedBooks(
     titles
   });
 }
+
+// This doesn't add any functionality to Analytics.track,
+// but maintains a convention that all analytics goes through
+// this BRAnalytics API.
+export async function track(event: string, params: any) {
+  Analytics.track(event, params);
+}
