@@ -10,16 +10,28 @@
 
    `yarn install`
 
-3. Make sure the emulator is running, e.g.
+3. Connect a device or run the emulator.
 
-   `%ANDROID_HOME%/emulator/emulator -avd Pixel_2_API_28`
+   If you don't have any [Android emulator avds set up](https://developer.android.com/studio/run/managing-avds), do that, and name one of them `default`. If you have an avd you have named `default`, do
 
-4. and then run the app.
+   `yarn emulator`
+
+   Otherwise, see the list of avds you have set up with
+
+   `yarn list-avds`
+
+   and then
+
+   `%ANDROID_HOME%/emulator/emulator -avd nameOfTheAVDIWant`
+
+   If you haven't done it already, you'll probably want to enable Hot Reloading. Do this in the emulator by pressing ctrl+m, then choose Hot Reloading. If you are using a physical device, try shaking it to get the same options.
+
+4. Build and run the app:
 
    `yarn start-android`
 
-(That last is a custom script. It copies bloomPlayerControlBundle.js from node-modules to its proper
-place in assets. If you are copying an in-development version of that file manually, just use react-native start-android. If you want to launch your app some other way, you can npm run copyAssets to just copy the file first.)
+   (That last copies bloomPlayerControlBundle.js from node-modules to its proper
+   place in assets. If you are copying an in-development version of that file manually, instead use `react-native start-android`. If you want to launch your app some other way, you can `yarn copyWebModules` to just copy the file first.)
 
 # Testing
 
