@@ -2280,7 +2280,7 @@ bl@^1.0.0:
     readable-stream "^2.3.5"
     safe-buffer "^5.1.1"
 
-bloom-player@^0.6.4:
+bloom-player@^0.6.6:
   version "0.6.6"
   resolved "https://registry.yarnpkg.com/bloom-player/-/bloom-player-0.6.6.tgz#98bcfd934b669305a35789bae05c50c5c7463518"
   integrity sha512-lH2EdNHqDo8ZuhMeHVjXAzFn352GZOxSwPNBkR4zeLB5LUv0RC2zwK3EvL9exPDGmoLkxlv/OVn75jSjSYGaIA==

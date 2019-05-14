@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "@segment/analytics-react-native": "^0.0.1-beta.5",
-    "bloom-player": "^0.6.4",
+    "bloom-player": "^0.6.6",
     "react": "16.6.3",
     "react-native": "0.57.8",
     "react-native-email": "^1.0.2",
