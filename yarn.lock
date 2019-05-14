@@ -2281,9 +2281,9 @@ bl@^1.0.0:
     safe-buffer "^5.1.1"
 
 bloom-player@^0.6.4:
-  version "0.6.4"
-  resolved "https://registry.yarnpkg.com/bloom-player/-/bloom-player-0.6.4.tgz#1d6353037cd91696322e4a8b4b92ef5797fbafac"
-  integrity sha512-EaeI40rEzG2D2+wkRxtYXZmDzss0C5cgpTrTeOuAE4B7Drshj/XEWdD+2TFhTnJZj08sBUUNd6+EKtUmffekYw==
+  version "0.6.6"
+  resolved "https://registry.yarnpkg.com/bloom-player/-/bloom-player-0.6.6.tgz#98bcfd934b669305a35789bae05c50c5c7463518"
+  integrity sha512-lH2EdNHqDo8ZuhMeHVjXAzFn352GZOxSwPNBkR4zeLB5LUv0RC2zwK3EvL9exPDGmoLkxlv/OVn75jSjSYGaIA==
   dependencies:
     "@types/react" "^16.8.10"
     axios "^0.18.0"
