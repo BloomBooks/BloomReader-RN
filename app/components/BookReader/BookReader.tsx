@@ -1,5 +1,5 @@
 import React from "react";
-import { SafeAreaView, Text, NativeSyntheticEvent } from "react-native";
+import { SafeAreaView, NativeSyntheticEvent } from "react-native";
 import { WebView, WebViewMessage } from "react-native-webview";
 import * as BookStorage from "../../storage/BookStorage";
 import { NavigationScreenProp } from "react-navigation";
@@ -88,10 +88,11 @@ export default class BookReader extends React.PureComponent<IProps, IState> {
       if (data.messageType === "sendAnalytics") {
         this.onAnalyticsEvent(data);
       } else {
-        ErrorLog.logError(
-          "BookReader.onMessageReceived() does not understand the messageType on this event: " +
+        ErrorLog.logError({
+          logMessage:
+            "BookReader.onMessageReceived() does not understand the messageType on this event: " +
             event
-        );
+        });
       }
       // Next step: should also handle message type storePageData. The data object will also
       // have a key and a value, both strings. We need to store them somewhere that will
@@ -104,9 +105,10 @@ export default class BookReader extends React.PureComponent<IProps, IState> {
       // pairs passed to storePageData. See the event listener in boom-player's externalContext
       // file.
     } catch (e) {
-      ErrorLog.logError(
-        "BookReader.onMessageReceived() does not understand this event: " + e
-      );
+      ErrorLog.logError({
+        logMessage:
+          "BookReader.onMessageReceived() does not understand this event: " + e
+      });
     }
   }
 
@@ -130,7 +132,9 @@ export default class BookReader extends React.PureComponent<IProps, IState> {
         BRAnalytics.track(eventName, params);
       }
     } catch (ex) {
-      ErrorLog.logError("BookReader.onAnalyticsEvent error: " + ex);
+      ErrorLog.logError({
+        logMessage: "BookReader.onAnalyticsEvent error: " + ex
+      });
     }
   }
 }

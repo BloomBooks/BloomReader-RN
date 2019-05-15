@@ -9,7 +9,7 @@ import {
 import { BookCollection } from "./BookCollection";
 import I18n from "../i18n/i18n";
 import * as BRAnalytics from "../util/BRAnalytics";
-import * as BookStorage from "./BookStorage";
+import * as BookStorage from "../storage/BookStorage";
 import { ReadDirItem } from "react-native-fs";
 import { isBookFile, isShelfFile } from "../util/FileUtil";
 
@@ -142,7 +142,7 @@ async function syncPublicDirs(
 ): Promise<BookCollection> {
   const files = await BookStorage.getPublicDirFiles();
   collection = removeMissingFilesFromCollection(collection, files);
-  collection = await addNewOrUpatedFilesToCollection(collection, files);
+  collection = await addNewOrUpdatedFilesToCollection(collection, files);
   return collection;
 }
 
@@ -162,7 +162,7 @@ function removeMissingFilesFromCollection(
   };
 }
 
-async function addNewOrUpatedFilesToCollection(
+async function addNewOrUpdatedFilesToCollection(
   collection: BookCollection,
   files: ReadDirItem[]
 ): Promise<BookCollection> {

@@ -12,7 +12,11 @@ export function nameFromPath(path: string): string {
 export async function rnfsSafeUnlink(path: string): Promise<void> {
   try {
     const exists = await RNFS.exists(path);
-    if (exists) RNFS.unlink(path);
+    if (exists) {
+      await RNFS.unlink(path);
+      if (await RNFS.exists(path))
+        throw `Tried to delete ${path}, but it's still there!`;
+    }
   } catch (err) {
     ErrorLog.logError({
       logMessage: `[rnfsSafeUnlink] Error deleting file: ${path}\n${JSON.stringify(
@@ -37,10 +41,12 @@ export async function readExternalBloomDir(): Promise<string> {
 // if permission is granted, returns the path to the folder
 // otherwise it throws "External Storage Permission Refused"
 async function requestStoragePermission(): Promise<string> {
-  const result = await PermissionsAndroid.request(
-    PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE
-  );
-  if (result == PermissionsAndroid.RESULTS.GRANTED) {
+  const permissions = [
+    PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+    PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
+  ];
+  const result = await PermissionsAndroid.requestMultiple(permissions);
+  if (result[permissions[0]] == PermissionsAndroid.RESULTS.GRANTED) {
     return externalBloomDirPath;
   } else {
     throw "External Storage Permission Refused";

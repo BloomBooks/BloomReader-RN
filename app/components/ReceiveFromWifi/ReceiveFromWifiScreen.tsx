@@ -16,7 +16,7 @@ import ProgressSpinner from "../shared/ProgressSpinner";
 import {
   BookCollection,
   importBookToCollection
-} from "../../storage/BookCollection";
+} from "../../models/BookCollection";
 import * as BookStorage from "../../storage/BookStorage";
 
 /**
