@@ -17,7 +17,7 @@ import {
   BookCollection,
   emptyBookCollection,
   getBookCollection
-} from "./app/storage/BookCollection";
+} from "./app/models/BookCollection";
 import SplashScreen from "react-native-splash-screen";
 
 const StackNavigator = createStackNavigator(

@@ -4,4 +4,6 @@
     <files-path name="bloom-books" path="/books" />
     <cache-path name="bloom-bundles" path="/bundles" />
     <cache-path name="bloom-apk" path="/apk" />
+    <external-path name="bloom-classic" path="/Bloom" />
+    <external-files-path name="bloom-external" path="/" />
 </paths>

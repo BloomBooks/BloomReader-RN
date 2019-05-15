@@ -1,5 +1,5 @@
 import { currentLang } from "../i18n/i18n";
-import { BookCollection } from "../storage/BookCollection";
+import { BookCollection } from "./BookCollection";
 import { nameFromPath } from "../util/FileUtil";
 
 // If you update this interface, increment COLLECTION_FORMAT_VERSION in BookCollection.ts

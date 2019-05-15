@@ -7,9 +7,11 @@ import {
 } from "../models/BookOrShelf";
 import Share from "react-native-share";
 import * as ShareApkModule from "../native_modules/ShareApkModule";
-import { BookCollection, getBookCollection } from "../storage/BookCollection";
+import { BookCollection, getBookCollection } from "../models/BookCollection";
 import { makeBundle } from "../native_modules/BloomBundleModule";
 import { nameFromPath } from "./FileUtil";
+import { logError } from "./ErrorLog";
+import I18n from "../i18n/i18n";
 
 export async function share(
   item: BookOrShelf,
@@ -30,7 +32,7 @@ export async function shareAll(): Promise<void> {
 
 export async function shareApp(): Promise<void> {
   const apkPath = await ShareApkModule.getShareableApkPath();
-  Share.open({
+  shareFile({
     url: `file://${apkPath}`,
     type: "application/*",
     subject: "Bloom Reader.apk"
@@ -47,7 +49,7 @@ async function shareShelfBundle(
 }
 
 function shareBundle(bundlePath: string): void {
-  Share.open({
+  shareFile({
     url: `file://${bundlePath}`,
     type: "application/*", // This gets us a better selection of apps to share with than "application/bloom" and seems to work just the same
     subject: "My Bloom Books.bloombundle"
@@ -55,9 +57,22 @@ function shareBundle(bundlePath: string): void {
 }
 
 function shareBook(book: Book): void {
-  Share.open({
+  shareFile({
     url: `file://${book.filepath}`,
     type: "application/*", // This gets us a better selection of apps to share with than "application/bloom" and seems to work just the same
     subject: nameFromPath(book.filepath)
   });
+}
+
+// More options are available, but the interfaces aren't exported
+// so I just listed the ones we're using
+async function shareFile(opts: { url: string; type: string; subject: string }) {
+  try {
+    await Share.open(opts);
+  } catch (err) {
+    logError({
+      logMessage: `Error sharing file: "${opts.url}"\n${JSON.stringify(err)}`,
+      toastMessage: I18n.t("CannotShare")
+    });
+  }
 }

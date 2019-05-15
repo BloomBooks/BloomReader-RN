@@ -22,7 +22,7 @@ import {
   BookCollection,
   deleteBookOrShelf,
   syncCollectionAndFetch
-} from "../../storage/BookCollection";
+} from "../../models/BookCollection";
 import { BRHeaderButtons, Item } from "../shared/BRHeaderButtons";
 import { AndroidBackHandler } from "react-navigation-backhandler";
 import { DrawerUnlocker } from "../DrawerMenu/DrawerLocker";

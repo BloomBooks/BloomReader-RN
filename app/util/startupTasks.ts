@@ -3,7 +3,7 @@ import RNFS from "react-native-fs";
 import { AsyncStorage } from "react-native";
 import * as ErrorLog from "./ErrorLog";
 import * as BRAnalytics from "./BRAnalytics";
-import { updateBookListFormatIfNeeded } from "../storage/BookCollection";
+import { updateBookListFormatIfNeeded } from "../models/BookCollection";
 
 const APP_VERSION = require("../../package.json").version;
 const LAST_RUN_VERSION_KEY = "bloomreader.lastRunVersion";

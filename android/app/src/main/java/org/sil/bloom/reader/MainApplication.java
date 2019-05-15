@@ -47,7 +47,8 @@ public class MainApplication extends Application implements ReactApplication, Sh
                 new ImportBooksPackage(),
                 new BloomBundlePackage(),
                 new ShareApkPackage(),
-                new GetFromWifiPackage()
+                new GetFromWifiPackage(),
+                new AndroidExternalStorageDirsPackage()
             );
         }
 

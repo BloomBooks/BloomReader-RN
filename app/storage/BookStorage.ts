@@ -1,7 +1,10 @@
 import RNFS, { ReadDirItem } from "react-native-fs";
 import { unzip } from "react-native-zip-archive";
 import { Book, Shelf, BookOrShelf, isShelf } from "../models/BookOrShelf";
-import { BookCollection, importBookToCollection } from "./BookCollection";
+import {
+  BookCollection,
+  importBookToCollection
+} from "../models/BookCollection";
 import {
   nameFromPath,
   rnfsSafeUnlink,
@@ -13,6 +16,7 @@ import {
 } from "../util/FileUtil";
 import getFeaturesList from "../util/getFeaturesList";
 import { logError } from "../util/ErrorLog";
+import { androidExternalStorageDirs } from "../native_modules/AndroidExternalStorageDirsModule";
 
 const PRIVATE_BOOKS_DIR = RNFS.DocumentDirectoryPath + "/books";
 const THUMBS_DIR = RNFS.DocumentDirectoryPath + "/thumbs";
@@ -74,7 +78,8 @@ export function privateStorageDirs() {
 }
 
 async function storageDirs() {
-  const dirs = privateStorageDirs();
+  let dirs = privateStorageDirs();
+  dirs = dirs.concat(await androidExternalStorageDirs());
   try {
     const oldBloomDirPath = await readExternalBloomDir();
     dirs.push(oldBloomDirPath);

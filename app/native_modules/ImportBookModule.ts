@@ -5,7 +5,7 @@ import {
   BookCollectionWithNewBook,
   importBookDirToCollection,
   importBookToCollection
-} from "../storage/BookCollection";
+} from "../models/BookCollection";
 
 const ImportBooksModule = NativeModules.ImportBooksModule;
 

@@ -9,7 +9,7 @@ import {
 import { BookCollection } from "./BookCollection";
 import I18n from "../i18n/i18n";
 import * as BRAnalytics from "../util/BRAnalytics";
-import * as BookStorage from "./BookStorage";
+import * as BookStorage from "../storage/BookStorage";
 import { ReadDirItem } from "react-native-fs";
 import { isBookFile, isShelfFile } from "../util/FileUtil";
 

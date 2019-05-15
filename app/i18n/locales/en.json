@@ -10,5 +10,6 @@
   "TransferFailed": "Something went wrong. If the source is still available, we'll try again soon.",
   "LookingForAds": "Looking for book advertisements on WiFi network %{network}...",
   "NoWifiConnected": "The device does not appear to be connected to a WiFi network.",
-  "UpdatingBookCollectionFormat": "Updating the format of your book collection..."
+  "UpdatingBookCollectionFormat": "Updating the format of your book collection...",
+  "CannotShare": "Sorry, can't share this file."
 }
