@@ -29,6 +29,19 @@
             "request": "attach",
             "sourceMaps": true,
             "outDir": "${workspaceRoot}/.vscode/.react"
+        },
+        {
+            "name": "Debug Jest Tests",
+            "type": "node",
+            "request": "launch",
+            "runtimeArgs": [
+                "--inspect-brk",
+                "${workspaceRoot}/node_modules/jest/bin/jest.js",
+                "--runInBand"
+            ],
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "port": 9229
         }
     ]
 }

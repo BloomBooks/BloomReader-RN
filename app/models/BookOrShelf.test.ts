@@ -1,5 +1,6 @@
 import {
   displayName,
+  isShelf,
   goesOnShelf,
   listForShelf,
   recursiveListForShelf
@@ -82,18 +83,18 @@ test("book goesOnShelf if shelf is undefined and book's shelf does not exist", (
 });
 
 const twoRootBooks = [1, 2].map(num =>
-  bookFactory({ filename: `/br/book-${num}` })
+  bookFactory({ filepath: `/br/book-${num}` })
 );
 const childShelfofShelf1 = shelfFactory({
   id: "childShelf",
   tags: ["bookshelf:shelf-1"]
 });
 const twoShelf1Books = [1, 2].map(num =>
-  bookFactory({ filename: `/br/s1-book-${num}`, tags: ["bookshelf:shelf-1"] })
+  bookFactory({ filepath: `/br/s1-book-${num}`, tags: ["bookshelf:shelf-1"] })
 );
 const twoChildShelfBooks = [1, 2].map(num =>
   bookFactory({
-    filename: `/br/cs-book-${num}`,
+    filepath: `/br/cs-book-${num}`,
     tags: ["bookshelf:childShelf"]
   })
 );
@@ -128,4 +129,14 @@ test("completeListForShelf includes subshelf contents", () => {
     ...twoShelf1Books,
     ...twoChildShelfBooks
   ]);
+});
+
+test("isShelf false for book", () => {
+  const book = twoRootBooks[0];
+  expect(isShelf(book)).toEqual(false);
+});
+
+test("isShelf true for shelf", () => {
+  const shelf = childShelfofShelf1;
+  expect(isShelf(shelf)).toEqual(true);
 });
