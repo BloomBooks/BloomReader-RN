@@ -2,7 +2,7 @@ import { Book, Shelf } from "../models/BookOrShelf";
 
 export function bookFactory(bookParams: any): Book {
   const emptyBook = {
-    filename: "/br/mock.bloomd",
+    filepath: "/br/mock.bloomd",
     title: "Mock Book",
     allTitles: {},
     modifiedAt: 1,
@@ -14,6 +14,7 @@ export function bookFactory(bookParams: any): Book {
 export function shelfFactory(shelfParams: any): Shelf {
   const emptyShelf = {
     isShelf: true,
+    filepath: "/br/mock.bloomshelf",
     id: "mock/shelf",
     label: [{ en: "Mock Shelf" }],
     color: "ffffff",
