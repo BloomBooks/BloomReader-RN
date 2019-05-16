@@ -1,4 +1,4 @@
-import { AsyncStorage, ToastAndroid } from "react-native";
+import { ToastAndroid } from "react-native";
 import RNFS from "react-native-fs";
 import { unzip } from "react-native-zip-archive";
 import {
@@ -14,6 +14,7 @@ import * as BloomBundleModule from "../native_modules/BloomBundleModule";
 import getFeaturesList from "./getFeaturesList";
 import I18n from "../i18n/i18n";
 import * as BRAnalytics from "./BRAnalytics";
+import AsyncStorage from "@react-native-community/async-storage";
 
 export const booksDir = RNFS.DocumentDirectoryPath + "/books";
 const thumbsDir = RNFS.DocumentDirectoryPath + "/thumbs";

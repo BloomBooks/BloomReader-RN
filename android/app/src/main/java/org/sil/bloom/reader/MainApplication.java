@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
 import com.segment.analytics.reactnative.core.RNAnalyticsPackage;
 import cl.json.RNSharePackage;
@@ -36,6 +37,7 @@ public class MainApplication extends Application implements ReactApplication, Sh
         protected List<ReactPackage> getPackages() {
             return Arrays.<ReactPackage>asList(
                 new MainReactPackage(),
+                new AsyncStoragePackage(),
                 new SplashScreenReactPackage(),
                 new RNAnalyticsPackage(),
                 new RNSharePackage(),

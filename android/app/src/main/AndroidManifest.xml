@@ -5,9 +5,6 @@
     <!-- Used for Analytics and by RN for getting JS bundle in dev builds -->
     <uses-permission android:name="android.permission.INTERNET" />
 
-    <!-- Used by RN for debugging - removed in release builds by android/app/release/AndroidManifest.xml -->
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
-
     <!-- Get name of Wifi network for receiving books -->
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 

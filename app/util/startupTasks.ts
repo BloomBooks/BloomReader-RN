@@ -1,6 +1,6 @@
 import * as BookStorage from "./BookStorage";
 import RNFS from "react-native-fs";
-import { AsyncStorage } from "react-native";
+import AsyncStorage from "@react-native-community/async-storage";
 import importSampleBooks from "./importSampleBooks";
 import * as ErrorLog from "./ErrorLog";
 import { BOOK_ITEM_VERSION } from "../models/BookOrShelf";
