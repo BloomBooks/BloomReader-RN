@@ -1,5 +1,5 @@
 import Analytics from "@segment/analytics-react-native";
-import { AsyncStorage } from "react-native";
+import AsyncStorage from "@react-native-community/async-storage";
 import { readExternalBloomDir } from "./FileUtil";
 import RNFS from "react-native-fs";
 import { logError } from "./ErrorLog";
