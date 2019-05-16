@@ -13,8 +13,11 @@ import * as GetFromWifiModule from "../../native_modules/GetFromWifiModule";
 import ThemeColors from "../../util/ThemeColors";
 import I18n from "../../i18n/i18n";
 import ProgressSpinner from "../shared/ProgressSpinner";
-import { BookCollection } from "../../models/BookCollection";
-import * as BookStorage from "../../util/BookStorage";
+import {
+  BookCollection,
+  importBookToCollection
+} from "../../models/BookCollection";
+import * as BookStorage from "../../storage/BookStorage";
 
 /**
  * Screen that displays progress messages related to receiving books over Wifi from Bloom Desktop.
@@ -59,7 +62,7 @@ export default class ReceiveFromWifiScreen extends React.PureComponent<
     });
     this.newBookListener = GetFromWifiModule.listenForNewBooks(
       async newBookFilename => {
-        const bookCollection = await BookStorage.importBookFile(
+        const bookCollection = await importBookToCollection(
           newBookFilename,
           "Wifi"
         );

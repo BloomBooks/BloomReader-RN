@@ -15,9 +15,9 @@ import NotesScreen from "./app/components/NotesScreen/NotesScreen";
 import ReceiveFromWifiScreen from "./app/components/ReceiveFromWifi/ReceiveFromWifiScreen";
 import {
   BookCollection,
-  emptyBookCollection
+  emptyBookCollection,
+  getBookCollection
 } from "./app/models/BookCollection";
-import * as BookStorage from "./app/util/BookStorage";
 import SplashScreen from "react-native-splash-screen";
 
 const StackNavigator = createStackNavigator(
@@ -71,7 +71,7 @@ export default class App extends React.PureComponent<any, IState> {
   async componentDidMount() {
     await startupTasks();
     this.setState({ loaded: true });
-    const bookCollection = await BookStorage.getBookCollection();
+    const bookCollection = await getBookCollection();
     this.setState({ bookCollection });
     SplashScreen.hide();
   }

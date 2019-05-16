@@ -2,7 +2,7 @@ import {
   displayName,
   goesOnShelf,
   listForShelf,
-  completeListForShelf
+  recursiveListForShelf
 } from "./BookOrShelf";
 import I18n from "../i18n/i18n";
 import { bookFactory, shelfFactory } from "../test/testHelper";
@@ -123,7 +123,7 @@ test("listForShelf lists root books and shelves for undefined", () => {
 
 test("completeListForShelf includes subshelf contents", () => {
   const theThreeShelves = threeShelves();
-  expect(completeListForShelf(theThreeShelves[0], bookCollection)).toEqual([
+  expect(recursiveListForShelf(theThreeShelves[0], bookCollection)).toEqual([
     childShelfofShelf1,
     ...twoShelf1Books,
     ...twoChildShelfBooks

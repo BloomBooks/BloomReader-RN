@@ -1,6 +1,6 @@
 import { BookFeatures } from "../models/BookOrShelf";
 import RNFS from "react-native-fs";
-import { fetchHtml } from "./BookStorage";
+import { fetchHtml } from "../storage/BookStorage";
 
 interface MetaData {
   features?: BookFeatures[];

@@ -1,32 +1,35 @@
 import { currentLang } from "../i18n/i18n";
 import { BookCollection } from "./BookCollection";
+import { nameFromPath } from "../util/FileUtil";
 
-// Used by startupTasks() to determine if BookStorage.updateBookListFormat()
-// needs to be run
-export const BOOK_ITEM_VERSION = "1";
-
-export interface BookOrShelf {
-  isShelf?: boolean;
-  tags: string[];
-}
-
-// If you update this interface, increment BOOK_ITEM_VERSION
-export interface Book extends BookOrShelf {
-  filename: string; // Used as the unique identifier
+// If you update this interface, increment COLLECTION_FORMAT_VERSION in BookCollection.ts
+export interface Book {
+  filepath: string; // Used as the unique identifier
   title: string;
   allTitles: { [localeName: string]: string };
   features: BookFeatures[];
   thumbPath?: string;
-  modifiedAt: number; // millis UTC
+  modifiedAt: number;
+  tags: string[];
 }
 
-export interface Shelf extends BookOrShelf {
+// If you update this interface, increment COLLECTION_FORMAT_VERSION in BookCollection.ts
+export interface Shelf {
   id: string; // Used as the unique identifier
   label: Array<{ [localeName: string]: string }>;
   color: string;
+  filepath: string;
+  modifiedAt: number;
+  tags: string[];
 }
 
-// If you update this interface, increment BOOK_ITEM_VERSION
+export type BookOrShelf = Book | Shelf;
+
+export function isShelf(bookOrShelf: BookOrShelf): bookOrShelf is Shelf {
+  return !!(<Shelf>bookOrShelf).id;
+}
+
+// If you update this interface, increment COLLECTION_FORMAT_VERSION in BookCollection.ts
 export enum BookFeatures {
   audio = "audio",
   imageDescriptions = "image descriptions",
@@ -55,9 +58,9 @@ function getParentShelfId(tags: string[]): string | null {
 
 export function displayName(bookOrShelf: BookOrShelf): string {
   const language = currentLang();
-  return bookOrShelf.isShelf
-    ? shelfDisplayName(bookOrShelf as Shelf, language)
-    : bookDisplayName(bookOrShelf as Book, language);
+  return isShelf(bookOrShelf)
+    ? shelfDisplayName(bookOrShelf, language)
+    : bookDisplayName(bookOrShelf, language);
 }
 
 function shelfDisplayName(shelf: Shelf, language: string): string {
@@ -75,26 +78,28 @@ export function listForShelf(
   shelf: Shelf | undefined,
   collection: BookCollection
 ): BookOrShelf[] {
-  return (collection.shelves as BookOrShelf[])
+  const list = (collection.shelves as BookOrShelf[])
     .filter(subShelf => goesOnShelf(subShelf, shelf, collection.shelves))
     .concat(
       collection.books.filter(book =>
         goesOnShelf(book, shelf, collection.shelves)
       )
     );
+  return removeDuplicateBooks(list);
 }
 
 // Includes contents of sub-shelves
-export function completeListForShelf(
+export function recursiveListForShelf(
   shelf: Shelf,
   collection: BookCollection
 ): BookOrShelf[] {
   const list = listForShelf(shelf, collection);
   let extendedList: BookOrShelf[] = [];
   for (let i = 0; i < list.length; ++i) {
-    if (list[i].isShelf)
+    const item = list[i];
+    if (isShelf(item))
       extendedList = extendedList.concat(
-        completeListForShelf(list[i] as Shelf, collection)
+        recursiveListForShelf(item, collection)
       );
   }
   return list.concat(extendedList);
@@ -106,5 +111,30 @@ export function sortedListForShelf(
 ): BookOrShelf[] {
   return listForShelf(shelf, collection).sort((a, b) =>
     displayName(a).localeCompare(displayName(b))
+  );
+}
+
+// The book collection is sourced from multiple directories, and there may
+// be duplicates between them. Only show the newest of two books with the same
+// filename
+function removeDuplicateBooks(items: BookOrShelf[]): BookOrShelf[] {
+  return items.reduce(
+    (items, item) => {
+      if (!isShelf(item)) {
+        const duplicateIndex = items.findIndex(
+          i => nameFromPath(i.filepath) == nameFromPath(item.filepath)
+        );
+        if (duplicateIndex >= 0) {
+          const duplicate = items[duplicateIndex];
+          const winner =
+            item.modifiedAt > duplicate.modifiedAt ? item : duplicate;
+          items[duplicateIndex] = winner;
+          return items;
+        }
+      }
+      items.push(item);
+      return items;
+    },
+    [] as BookOrShelf[]
   );
 }
