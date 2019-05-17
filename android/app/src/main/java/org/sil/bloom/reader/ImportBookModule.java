@@ -12,11 +12,7 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
-import com.facebook.react.modules.core.DeviceEventManagerModule;
 
-import org.rauschig.jarchivelib.ArchiveFormat;
-import org.rauschig.jarchivelib.Archiver;
-import org.rauschig.jarchivelib.ArchiverFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -103,16 +99,10 @@ public class ImportBookModule extends ReactContextBaseJavaModule {
     }
 
     private String importBloomBundle(Uri uri, String filename) throws IOException {
-        String bundlePath = context.getCacheDir() + File.separator + filename;
-        Log.d("ImportBook", "Copying " + filename + " to " + bundlePath);
-        IOUtilities.copyFile(context, uri, bundlePath);
-
-        Log.d("ImportBook", "Extracting " + filename);
-        File bundle = new File(bundlePath);
-        File extractDirectory = new File(bundlePath + "_files");
-        Archiver archiver = ArchiverFactory.createArchiver(ArchiveFormat.TAR);
-        archiver.extract(bundle, extractDirectory);
-        bundle.delete();
-        return extractDirectory.getPath();
+        String extractPath = context.getCacheDir() + File.separator + filename + "_FILES";
+        Log.d("ImportBook", "Extracting " + filename + " to " + extractPath);
+        new File(extractPath).mkdir();
+        IOUtilities.extractBloomBundle(context, uri, extractPath);
+        return extractPath;
     }
 }
