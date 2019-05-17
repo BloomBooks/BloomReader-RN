@@ -74,18 +74,18 @@ function bookDisplayName(book: Book, language: string): string {
 }
 
 // Only includes direct children of shelf
-export function listForShelf(
+export function collectionForShelf(
   shelf: Shelf | undefined,
   collection: BookCollection
-): BookOrShelf[] {
-  const list = (collection.shelves as BookOrShelf[])
-    .filter(subShelf => goesOnShelf(subShelf, shelf, collection.shelves))
-    .concat(
-      collection.books.filter(book =>
-        goesOnShelf(book, shelf, collection.shelves)
-      )
-    );
-  return removeDuplicateBooks(list);
+): BookCollection {
+  return {
+    shelves: collection.shelves.filter(subShelf =>
+      goesOnShelf(subShelf, shelf, collection.shelves)
+    ),
+    books: collection.books.filter(book =>
+      goesOnShelf(book, shelf, collection.shelves)
+    )
+  };
 }
 
 // Includes contents of sub-shelves
@@ -93,23 +93,24 @@ export function recursiveListForShelf(
   shelf: Shelf,
   collection: BookCollection
 ): BookOrShelf[] {
-  const list = listForShelf(shelf, collection);
-  let extendedList: BookOrShelf[] = [];
-  for (let i = 0; i < list.length; ++i) {
-    const item = list[i];
-    if (isShelf(item))
-      extendedList = extendedList.concat(
-        recursiveListForShelf(item, collection)
-      );
-  }
-  return list.concat(extendedList);
+  const shelfCollection = collectionForShelf(shelf, collection);
+  let extendedList = shelfCollection.shelves.reduce(
+    (list, shelf) => list.concat(recursiveListForShelf(shelf, collection)),
+    [] as BookOrShelf[]
+  );
+  return [shelf, ...shelfCollection.books, ...extendedList];
 }
 
 export function sortedListForShelf(
   shelf: Shelf | undefined,
   collection: BookCollection
 ): BookOrShelf[] {
-  return listForShelf(shelf, collection).sort((a, b) =>
+  const shelfCollection = collectionForShelf(shelf, collection);
+  const list = (shelfCollection.shelves as BookOrShelf[]).concat(
+    shelfCollection.books
+  );
+  const prunedList = removeDuplicateBooks(list);
+  return prunedList.sort((a, b) =>
     displayName(a).localeCompare(displayName(b))
   );
 }

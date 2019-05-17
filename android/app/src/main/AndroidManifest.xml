@@ -24,12 +24,6 @@
         android:allowBackup="false"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity"
-            android:label="@string/app_name"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
-            android:windowSoftInputMode="adjustResize">
-        </activity>
-        <activity
             android:name=".SplashActivity"
             android:label="@string/app_name"
             android:theme="@style/SplashTheme">
@@ -37,7 +31,12 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
+        </activity>
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/app_name"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:windowSoftInputMode="adjustResize">
 
             <!--
                 In reworking these filters for BL-6941, this answer seemed the clearest to follow:

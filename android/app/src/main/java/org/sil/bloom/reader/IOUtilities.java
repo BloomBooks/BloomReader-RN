@@ -1,48 +1,15 @@
 package org.sil.bloom.reader;
 
-//import android.content.Context;
-//import android.content.res.AssetManager;
-//import android.net.Uri;
-//import android.os.Build;
-//import android.os.Environment;
-//import android.util.Log;
-//import android.widget.Toast;
-//
-//import org.apache.commons.compress.archivers.ArchiveEntry;
-//import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
-//import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
-//import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
-//import org.apache.commons.io.IOUtils;
-//import org.sil.bloom.reader.models.BookCollection;
-//import org.sil.bloom.reader.models.BookOrShelf;
-//import org.sil.bloom.reader.models.ExtStorageUnavailableException;
-//
-//import java.io.BufferedInputStream;
-//import java.io.File;
-//import java.io.FileDescriptor;
-//import java.io.FileInputStream;
-//import java.io.FileNotFoundException;
-//import java.io.FileOutputStream;
-//import java.io.FileWriter;
-//import java.io.FilenameFilter;
-//import java.io.IOException;
-//import java.io.InputStream;
-//import java.io.OutputStream;
-//import java.nio.charset.StandardCharsets;
-//import java.text.SimpleDateFormat;
-//import java.util.Date;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-import java.util.zip.ZipInputStream;
-import java.util.zip.ZipOutputStream;
-//
-//import static org.sil.bloom.reader.models.BookCollection.getLocalBooksDirectory;
 
 
 import android.content.Context;
 import android.net.Uri;
 
+import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 import org.apache.commons.compress.utils.IOUtils;
 
@@ -322,31 +289,31 @@ public class IOUtilities {
 //        //zip(getLocalBooksDirectory().getAbsolutePath(), filter, destinationPath);
 //    }
 //
-//    public static String extractTarEntry(TarArchiveInputStream tarInput, String targetPath) throws IOException {
-//        ArchiveEntry entry = tarInput.getCurrentEntry();
-//        File destPath=new File(targetPath,entry.getName());
-//        if (!entry.isDirectory()) {
-//            FileOutputStream fout=new FileOutputStream(destPath);
-//            try{
-//                final byte[] buffer=new byte[8192];
-//                int n=0;
-//                while (-1 != (n=tarInput.read(buffer))) {
-//                    fout.write(buffer,0,n);
-//                }
-//                fout.close();
-//            }
-//            catch (IOException e) {
-//                fout.close();
-//                destPath.delete();
-//                tarInput.close();
-//                throw e;
-//            }
-//        }
-//        else {
-//            destPath.mkdir();
-//        }
-//        return destPath.getPath();
-//    }
+    public static String extractTarEntry(TarArchiveInputStream tarInput, String targetPath) throws IOException {
+        ArchiveEntry entry = tarInput.getCurrentEntry();
+        File destPath=new File(targetPath,entry.getName());
+        if (!entry.isDirectory()) {
+            FileOutputStream fout=new FileOutputStream(destPath);
+            try{
+                final byte[] buffer=new byte[8192];
+                int n=0;
+                while (-1 != (n=tarInput.read(buffer))) {
+                    fout.write(buffer,0,n);
+                }
+                fout.close();
+            }
+            catch (IOException e) {
+                fout.close();
+                destPath.delete();
+                tarInput.close();
+                throw e;
+            }
+        }
+        else {
+            destPath.mkdir();
+        }
+        return destPath.getPath();
+    }
 //
 //    public static File nonRemovablePublicStorageRoot(Context context) {
 //        return publicStorageRoot(context, false);
@@ -400,5 +367,23 @@ public class IOUtilities {
                 path.lastIndexOf(':'))
                 + 1;
         return path.substring(start);
+    }
+
+    public static void extractBloomBundle(Context context, Uri bloomBundleUri, String targetDirectoryPath) throws IOException {
+        TarArchiveInputStream tarInput = null;
+        try {
+            InputStream fs = context.getContentResolver().openInputStream(bloomBundleUri);
+            tarInput = new TarArchiveInputStream(fs);
+            ArchiveEntry entry = null;
+            while ((entry = tarInput.getNextEntry()) != null) {
+                extractTarEntry(tarInput, targetDirectoryPath);
+            }
+            tarInput.close();
+            return;
+        } catch (IOException e) {
+            if (tarInput != null)
+                tarInput.close();
+            throw e;
+        }
     }
 }

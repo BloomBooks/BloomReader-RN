@@ -2,8 +2,8 @@ import {
   displayName,
   isShelf,
   goesOnShelf,
-  listForShelf,
-  recursiveListForShelf
+  recursiveListForShelf,
+  sortedListForShelf
 } from "./BookOrShelf";
 import I18n from "../i18n/i18n";
 import { bookFactory, shelfFactory } from "../test/testHelper";
@@ -102,31 +102,32 @@ const bookCollection = {
   books: [...twoRootBooks, ...twoShelf1Books, ...twoChildShelfBooks],
   shelves: [...threeShelves(), childShelfofShelf1]
 };
-test("listForShelf lists books and shelves on that shelf", () => {
+test("sortedListForShelf lists books and shelves on that shelf", () => {
   const theThreeShelves = threeShelves();
-  expect(listForShelf(theThreeShelves[0], bookCollection)).toEqual([
-    childShelfofShelf1,
-    ...twoShelf1Books
+  expect(sortedListForShelf(theThreeShelves[0], bookCollection)).toEqual([
+    ...twoShelf1Books,
+    childShelfofShelf1
   ]);
-  expect(listForShelf(childShelfofShelf1, bookCollection)).toEqual(
+  expect(sortedListForShelf(childShelfofShelf1, bookCollection)).toEqual(
     twoChildShelfBooks
   );
-  expect(listForShelf(theThreeShelves[2], bookCollection)).toEqual([]);
+  expect(sortedListForShelf(theThreeShelves[2], bookCollection)).toEqual([]);
 });
 
 test("listForShelf lists root books and shelves for undefined", () => {
   const theThreeShelves = threeShelves();
-  expect(listForShelf(undefined, bookCollection)).toEqual([
-    ...theThreeShelves,
-    ...twoRootBooks
+  expect(sortedListForShelf(undefined, bookCollection)).toEqual([
+    ...twoRootBooks,
+    ...theThreeShelves
   ]);
 });
 
 test("completeListForShelf includes subshelf contents", () => {
   const theThreeShelves = threeShelves();
   expect(recursiveListForShelf(theThreeShelves[0], bookCollection)).toEqual([
-    childShelfofShelf1,
+    theThreeShelves[0],
     ...twoShelf1Books,
+    childShelfofShelf1,
     ...twoChildShelfBooks
   ]);
 });
