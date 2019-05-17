@@ -1,4 +1,4 @@
-import { AsyncStorage, ToastAndroid } from "react-native";
+import { ToastAndroid } from "react-native";
 import {
   Book,
   Shelf,
@@ -12,6 +12,7 @@ import * as BRAnalytics from "../util/BRAnalytics";
 import * as BookStorage from "../storage/BookStorage";
 import { ReadDirItem } from "react-native-fs";
 import { isBookFile, isShelfFile } from "../util/FileUtil";
+import AsyncStorage from "@react-native-community/async-storage";
 
 const KEY_PREFIX = "bloomreader.books.";
 const BOOK_LIST_KEY = KEY_PREFIX + "books";

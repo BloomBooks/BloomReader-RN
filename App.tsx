@@ -69,6 +69,7 @@ export default class App extends React.PureComponent<any, IState> {
   }
 
   async componentDidMount() {
+    // SplashScreen.hide(); // Uncomment when debugging issues opening the app
     await startupTasks();
     this.setState({ loaded: true });
     const bookCollection = await getBookCollection();

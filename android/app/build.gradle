@@ -107,7 +107,11 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 
     defaultConfig {
         applicationId "org.sil.bloom.reader"
@@ -115,16 +119,13 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode versionMajor * 100000 + versionMinor * 1000 + versionPatch
         versionName "${versionMajor}.${versionMinor}.${versionPatch}"
-        ndk {
-            abiFilters "armeabi-v7a", "x86"
-        }
     }
     splits {
         abi {
             reset()
             enable enableSeparateBuildPerCPUArchitecture
             universalApk false  // If true, also generate a universal APK
-            include "armeabi-v7a", "x86"
+            include "armeabi-v7a", "x86", "arm64-v8a", "x86_64"
         }
     }
     signingConfigs {
@@ -170,7 +171,7 @@ android {
         variant.outputs.each { output ->
             // For each separate APK per architecture, set a unique version code as described here:
             // http://tools.android.com/tech-docs/new-build-system/user-guide/apk-splits
-            def versionCodes = ["armeabi-v7a":1, "x86":2]
+            def versionCodes = ["armeabi-v7a":1, "x86":2, "arm64-v8a": 3, "x86_64": 4]
             def abi = output.getFilter(OutputFile.ABI)
             if (abi != null) {  // null for the universal-debug, universal-release variants
                 output.versionCodeOverride =
@@ -200,14 +201,15 @@ play {
 }
 
 dependencies {
-    compile project(':react-native-splash-screen')
-    compile project(':@segment_analytics-react-native')
-    compile project(':react-native-share')
-    compile project(':react-native-i18n')
-    compile project(':react-native-webview')
-    compile project(':react-native-zip-archive')
-    compile project(':react-native-gesture-handler')
-    compile project(':react-native-fs')
+    implementation project(':@react-native-community_async-storage')
+    implementation project(':react-native-splash-screen')
+    implementation project(':@segment_analytics-react-native')
+    implementation project(':react-native-share')
+    implementation project(':react-native-i18n')
+    implementation project(':react-native-webview')
+    implementation project(':react-native-zip-archive')
+    implementation project(':react-native-gesture-handler')
+    implementation project(':react-native-fs')
 
     implementation 'org.rauschig:jarchivelib:0.7.1'
     // Supports the WiFi module's 'server' used to receive books from Bloom desktop
