@@ -1,5 +1,5 @@
 import React from "react";
-import { SafeAreaView, NativeSyntheticEvent } from "react-native";
+import { SafeAreaView, NativeSyntheticEvent, StatusBar } from "react-native";
 import { WebView, WebViewMessage } from "react-native-webview";
 import * as BookStorage from "../../storage/BookStorage";
 import { NavigationScreenProp } from "react-navigation";
@@ -37,6 +37,11 @@ export default class BookReader extends React.PureComponent<IProps, IState> {
     this.setState({ bookReady: true });
   }
 
+  // Hide the header bar
+  static navigationOptions = () => ({
+    header: null
+  });
+
   // The source here loads in the bloom-player-react code to display the book
   // in the indicated folder. Since the player code lives in a file in the
   // assets folder, we have to specify a baseUrl that contains it.
@@ -54,6 +59,7 @@ export default class BookReader extends React.PureComponent<IProps, IState> {
     const bookUrl = BookStorage.openBookFolderPath();
     return (
       <SafeAreaView style={{ flex: 1 }}>
+        <StatusBar hidden={true} />
         {this.state.bookReady && (
           <WebView
             source={{
