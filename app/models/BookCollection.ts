@@ -3,8 +3,8 @@ import {
   Book,
   Shelf,
   BookOrShelf,
-  listForShelf,
-  isShelf
+  isShelf,
+  recursiveListForShelf
 } from "../models/BookOrShelf";
 import { BookCollection } from "./BookCollection";
 import I18n from "../i18n/i18n";
@@ -66,7 +66,7 @@ export async function importBookDirToCollection(
   const newCollection = addToCollection(collection, newItems);
   writeCollection(newCollection);
   BRAnalytics.addedBooks("FileIntent", newItems.books.map(b => b.title));
-  return collection;
+  return newCollection;
 }
 
 export async function updateBookListFormatIfNeeded(
@@ -89,13 +89,13 @@ export async function deleteBookOrShelf(
   bookOrShelf: BookOrShelf
 ): Promise<BookCollection> {
   const collection = await getBookCollection();
-  const deletedItems = deleteItem(bookOrShelf, collection);
-  BookStorage.deleteBooksAndShelves(deletedItems);
+  const toDelete = itemsToDelete(bookOrShelf, collection);
+  BookStorage.deleteBooksAndShelves(toDelete);
   collection.books = collection.books.filter(
-    b => !deletedItems.some(item => item.filepath == b.filepath)
+    b => !toDelete.some(item => item.filepath == b.filepath)
   );
   collection.shelves = collection.shelves.filter(
-    s => !deletedItems.some(item => isShelf(item) && item.id == s.id)
+    s => !toDelete.some(item => isShelf(item) && item.id == s.id)
   );
   writeCollection(collection);
   return collection;
@@ -122,20 +122,12 @@ function addToCollection(
   return { books, shelves };
 }
 
-function deleteItem(
+function itemsToDelete(
   item: BookOrShelf,
-  collection: BookCollection,
-  deletedItems: BookOrShelf[] = []
+  collection: BookCollection
 ): BookOrShelf[] {
-  deletedItems.push(item);
-  if (isShelf(item)) {
-    const shelfItems = listForShelf(item, collection);
-    deletedItems = shelfItems.reduce(
-      (deletedItems, item) => deleteItem(item, collection, deletedItems),
-      deletedItems
-    );
-  }
-  return deletedItems;
+  if (isShelf(item)) return recursiveListForShelf(item, collection);
+  else return [item];
 }
 
 async function syncPublicDirs(

@@ -1,6 +1,5 @@
 import { NativeModules } from "react-native";
 import RNFS from "react-native-fs";
-import * as FileUtil from "../util/FileUtil";
 import {
   BookCollectionWithNewBook,
   importBookDirToCollection,
@@ -18,10 +17,7 @@ export async function checkForBooksToImport(): Promise<
     if (statResult.isDirectory())
       return await importBookDirToCollection(importPath);
     else {
-      return await importBookToCollection(
-        FileUtil.nameFromPath(importPath),
-        "FileIntent"
-      );
+      return await importBookToCollection(importPath, "FileIntent");
     }
   }
 }
