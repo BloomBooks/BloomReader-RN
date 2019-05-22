@@ -6,6 +6,7 @@ import { NavigationScreenProp } from "react-navigation";
 import { DrawerLocker } from "../DrawerMenu/DrawerLocker";
 import * as BRAnalytics from "../../util/BRAnalytics";
 import * as ErrorLog from "../../util/ErrorLog";
+import { getBookViewerTranslationPairs } from "../../i18n/i18n";
 export interface IProps {
   navigation: NavigationScreenProp<any, any>;
   screenProps: {
@@ -22,6 +23,7 @@ export default class BookReader extends React.PureComponent<IProps, IState> {
   state: IState = {};
 
   private book = () => this.props.navigation.getParam("book");
+  private webview: WebView | null = null;
 
   async componentDidMount() {
     const bookPath = await BookStorage.openBookForReading(this.book());
@@ -62,6 +64,7 @@ export default class BookReader extends React.PureComponent<IProps, IState> {
         <StatusBar hidden={true} />
         {this.state.bookReady && (
           <WebView
+            ref={ref => (this.webview = ref)}
             source={{
               uri: `file:///android_asset/bloom-player/webView.htm?url=${bookUrl}`
             }}
@@ -72,6 +75,7 @@ export default class BookReader extends React.PureComponent<IProps, IState> {
             domStorageEnabled={true}
             originWhitelist={["*"]}
             onMessage={event => this.onMessageReceived(event)}
+            onLoad={() => this.sendInitializationDataToBookViewer()}
           />
         )}
         <DrawerLocker
@@ -93,6 +97,10 @@ export default class BookReader extends React.PureComponent<IProps, IState> {
       const data = JSON.parse(event.nativeEvent.data);
       if (data.messageType === "sendAnalytics") {
         this.onAnalyticsEvent(data);
+      } else if (data.messageType === "logError") {
+        ErrorLog.logError({
+          logMessage: data.message
+        });
       } else {
         ErrorLog.logError({
           logMessage:
@@ -141,6 +149,16 @@ export default class BookReader extends React.PureComponent<IProps, IState> {
       ErrorLog.logError({
         logMessage: "BookReader.onAnalyticsEvent error: " + ex
       });
+    }
+  }
+
+  sendInitializationDataToBookViewer(): void {
+    if (this.webview) {
+      const initializationData = JSON.stringify({
+        messageType: "initializationData",
+        l10nData: getBookViewerTranslationPairs()
+      });
+      this.webview.postMessage(initializationData);
     }
   }
 }
