@@ -2568,10 +2568,10 @@ bl@^1.0.0:
     readable-stream "^2.3.5"
     safe-buffer "^5.1.1"
 
-bloom-player@^0.6.8:
-  version "0.6.8"
-  resolved "https://registry.yarnpkg.com/bloom-player/-/bloom-player-0.6.8.tgz#c12f290c14f535a5460e7a0180e5432278b7f2dd"
-  integrity sha512-GIVnHP8z1c5NSQjwCM70PriNPfBz3PsXkg9sCqIRRs+VZsNh6PpmDhEgcAvL/9u8xuM4k3XLZiEEghGi83+VSA==
+bloom-player@^0.9.0:
+  version "0.9.0"
+  resolved "https://registry.yarnpkg.com/bloom-player/-/bloom-player-0.9.0.tgz#fd0bc949e17d76d6ed75ed7e351edc0da18fa7fb"
+  integrity sha512-b8oSDWcjEOVFA+0myddLCeoSU/eVMGpFw7kVNpfB0GRIMpNJOS3VmG7ZzBqiI4ZIpmoiHh1MpQYT2xwcZXV20w==
   dependencies:
     "@types/react" "^16.8.10"
     axios "^0.18.0"
