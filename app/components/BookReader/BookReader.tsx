@@ -108,6 +108,9 @@ export default class BookReader extends React.PureComponent<IProps, IState> {
             event
         });
       }
+      if (data.messageType === "backButtonClicked") {
+        this.props.navigation.goBack();
+      }
       // Next step: should also handle message type storePageData. The data object will also
       // have a key and a value, both strings. We need to store them somewhere that will
       // (at least) survive rotating the phone, and ideally closing and re-opening the book;
@@ -121,7 +124,8 @@ export default class BookReader extends React.PureComponent<IProps, IState> {
     } catch (e) {
       ErrorLog.logError({
         logMessage:
-          "BookReader.onMessageReceived() does not understand this event: " + e
+          "BookReader.onMessageReceived() does not understand this event: " +
+          event
       });
     }
   }
