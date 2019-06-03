@@ -6,7 +6,7 @@ mkdirSafe(bloomPlayerAssetFolderPath);
 
 fs.copyFileSync(
   "./node_modules/bloom-player/dist/bloomPlayer.js",
-  `${bloomPlayerAssetFolderPath}/bloomPlayer.js`
+  `${bloomPlayerAssetFolderPath}/bloomPlayer.min.js`
 );
 
 fs.copyFileSync(
