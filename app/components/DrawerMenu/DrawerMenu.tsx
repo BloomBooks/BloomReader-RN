@@ -51,11 +51,6 @@ export default class DrawerMenu extends React.PureComponent<
             this.props.navigation.closeDrawer();
           }}
         />
-        <DrawerMenuItem
-          label={I18n.t("Find Bloom books on this device")}
-          iconSource={require("../../assets/bookshelf.png")}
-          onPress={() => {}}
-        />
         <View style={{ borderBottomWidth: 1, borderBottomColor: "gray" }} />
         <DrawerMenuItem
           label={I18n.t("Release Notes")}
