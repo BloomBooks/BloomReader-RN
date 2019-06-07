@@ -11,7 +11,5 @@
   "LookingForAds": "Looking for book advertisements on WiFi network %{network}...",
   "NoWifiConnected": "The device does not appear to be connected to a WiFi network.",
   "UpdatingBookCollectionFormat": "Updating the format of your book collection...",
-  "CannotShare": "Sorry, can't share this file.",
-
-  "BookViewer_Quiz_CheckYourUnderstanding": "Check Your Understanding"
+  "CannotShare": "Sorry, can't share this file."
 }
