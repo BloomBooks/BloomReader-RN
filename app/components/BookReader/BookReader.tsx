@@ -97,6 +97,10 @@ export default class BookReader extends React.PureComponent<IProps, IState> {
         ErrorLog.logError({
           logMessage: data.message
         });
+      } else if (data.messageType == "requestCapabilities") {
+        this.webview!.postMessage(
+          JSON.stringify({ messageType: "capabilities", canGoBack: true })
+        );
       } else {
         ErrorLog.logError({
           logMessage:
@@ -121,7 +125,7 @@ export default class BookReader extends React.PureComponent<IProps, IState> {
       ErrorLog.logError({
         logMessage:
           "BookReader.onMessageReceived() does not understand this event: " +
-          event
+          event.nativeEvent.data
       });
     }
   }
