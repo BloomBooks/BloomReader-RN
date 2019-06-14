@@ -18,6 +18,7 @@ import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 import com.rnfs.RNFSPackage;
+import com.apsl.versionnumber.RNVersionNumberPackage;
 
 import android.os.Build;
 import android.webkit.WebView;
@@ -36,21 +37,22 @@ public class MainApplication extends Application implements ReactApplication, Sh
         @Override
         protected List<ReactPackage> getPackages() {
             return Arrays.<ReactPackage>asList(
-                new MainReactPackage(),
-                new AsyncStoragePackage(),
-                new SplashScreenReactPackage(),
-                new RNAnalyticsPackage(),
-                new RNSharePackage(),
-                new RNI18nPackage(),
-                new RNCWebViewPackage(),
-                new RNZipArchivePackage(),
-                new RNGestureHandlerPackage(),
-                new RNFSPackage(),
-                new ImportBooksPackage(),
-                new BloomBundlePackage(),
-                new ShareApkPackage(),
-                new GetFromWifiPackage(),
-                new AndroidExternalStorageDirsPackage()
+                    new MainReactPackage(),
+                    new AsyncStoragePackage(),
+                    new SplashScreenReactPackage(),
+                    new RNAnalyticsPackage(),
+                    new RNSharePackage(),
+                    new RNI18nPackage(),
+                    new RNCWebViewPackage(),
+                    new RNZipArchivePackage(),
+                    new RNGestureHandlerPackage(),
+                    new RNFSPackage(),
+                    new ImportBooksPackage(),
+                    new BloomBundlePackage(),
+                    new ShareApkPackage(),
+                    new GetFromWifiPackage(),
+                    new AndroidExternalStorageDirsPackage(),
+                    new RNVersionNumberPackage()
             );
         }
 
