@@ -2666,10 +2666,10 @@ bl@^1.0.0:
     readable-stream "^2.3.5"
     safe-buffer "^5.1.1"
 
-bloom-player@latest:
-  version "0.9.1"
-  resolved "https://registry.yarnpkg.com/bloom-player/-/bloom-player-0.9.1.tgz#2528b12bb36c75e9a5bac66e0f757d9fa763bbd3"
-  integrity sha512-WGS280N4Xl87jRjXU7Afaxg3XoZ7oZ/GfUnY3KrwdMP9kMWNRKtmpGTLQCBVsoo53NgupLIgKr4SI+vGVwwHpw==
+bloom-player@*:
+  version "0.9.5"
+  resolved "https://registry.yarnpkg.com/bloom-player/-/bloom-player-0.9.5.tgz#71cdd0f54982ae1149dddb4a9a431cf700ded8bc"
+  integrity sha512-VciRJ8vu+21oe22XuXdT1WvWc3g1aE09FB8SHNUPk9uDi7coTIWDuIhcmgss1+8/ZJW+BNC5fiwIDtHkx9h25A==
   dependencies:
     "@material-ui/core" "^4.0.1"
     "@material-ui/icons" "^4.0.1"
