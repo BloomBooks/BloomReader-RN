@@ -31,11 +31,11 @@ export function isShelf(bookOrShelf: BookOrShelf): bookOrShelf is Shelf {
 
 // If you update this interface, increment COLLECTION_FORMAT_VERSION in BookCollection.ts
 export enum BookFeatures {
-  talkingBook = "talkingBook"
+  talkingBook = "talkingBook",
+  blind = "blind",
+  signLanguage = "signLanguage",
+  motion = "motion"
   // Other possible unverified elements of meta.json.features:
-  // imageDescriptions = "image descriptions",
-  // motion = "motion",
-  // signLanguage = "sign language",
   // quizzes = "quizzes",
   // otherInteractiveActivities = "other interactive activities"
 }

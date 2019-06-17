@@ -59,7 +59,9 @@ export async function importBookFile(filepath: string): Promise<Book> {
     tags: metaData.tags,
     features: bookFeatures,
     thumbPath,
-    modifiedAt
+    modifiedAt,
+    brandingProjectName: metaData.brandingProjectName,
+    bloomdVersion: metaData.bloomdVersion ? metaData.bloomdVersion : 0
   };
   return book;
 }

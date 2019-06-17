@@ -20,6 +20,7 @@ export default async function getFeaturesList(
 
   const features = [];
   if (await hasAudio(tmpBookPath)) features.push(BookFeatures.talkingBook);
+  // Note: in this case, more features may be added after BloomPlayer parses the HTML
 
   return features;
 }
@@ -29,6 +30,7 @@ async function hasAudio(tmpBookPath: string): Promise<boolean> {
   const audioDirExists = await RNFS.exists(audioDirPath);
   const hasAudioFiles =
     audioDirExists && (await RNFS.readdir(audioDirPath)).length > 0;
+  // review: do we need this somewhat expensive further check? I don't think Bloom publishes audio that isn't used.
   const html = await fetchHtml(tmpBookPath);
   const hasAudioSentences = html.includes("audio-sentence");
   return hasAudioFiles && hasAudioSentences;
