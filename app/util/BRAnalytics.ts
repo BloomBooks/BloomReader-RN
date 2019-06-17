@@ -110,3 +110,28 @@ export async function addedBooks(
 export async function track(event: string, params: any) {
   Analytics.track(event, params);
 }
+
+export async function reportPagesRead(args: {
+  title: string; // file name of book
+  audioPages: number; // of pages with audio that the user has displayed
+  nonAudioPages: number; // of non-audio pages user has displayed
+  totalNumberedPages: number; // total number of pages in the book that are numbered
+  lastNumberedPageRead: boolean; // true if user read all the way to last page
+  questionCount: number; // total number of comprehension questions in book
+  contentLang: string; // book's primary language
+  features: string;
+  brandingProjectName?: string; // bloom enterprise branding that book is part of, if any
+}) {
+  track("Pages Read", args);
+}
+
+export async function reportLoadBook(args: {
+  title: string; // file name of book
+  totalNumberedPages: number; // total number of pages in the book that are numbered
+  questionCount: number; // total number of comprehension questions in book
+  contentLang: string; // book's primary language
+  features: string;
+  brandingProjectName?: string; // bloom enterprise branding that book is part of, if any
+}) {
+  track("BookOrShelf opened", args);
+}
