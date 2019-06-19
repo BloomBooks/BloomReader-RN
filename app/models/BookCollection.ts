@@ -17,7 +17,7 @@ import AsyncStorage from "@react-native-community/async-storage";
 const KEY_PREFIX = "bloomreader.books.";
 const BOOK_LIST_KEY = KEY_PREFIX + "books";
 const SHELF_LIST_KEY = KEY_PREFIX + "shelves";
-export const COLLECTION_FORMAT_VERSION = "3";
+export const COLLECTION_FORMAT_VERSION = "4";
 
 export interface BookCollection {
   books: Book[];

@@ -43,7 +43,7 @@ export default class BookListItem extends React.PureComponent<IProps, IState> {
         )}
         <View style={styles.titleContainer}>
           <Text style={styles.title}>{displayName(book)}</Text>
-          {this.props.book.features.includes(BookFeatures.audio) && (
+          {this.props.book.features.includes(BookFeatures.talkingBook) && (
             <Icon name="md-volume-high" color={ThemeColors.speakerIcon} />
           )}
         </View>

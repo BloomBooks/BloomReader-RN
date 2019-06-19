@@ -3,6 +3,7 @@ import RNFS from "react-native-fs";
 import { fetchHtml } from "../storage/BookStorage";
 
 interface MetaData {
+  bloomdVersion?: number;
   features?: BookFeatures[];
 }
 
@@ -10,10 +11,15 @@ export default async function getFeaturesList(
   metaData: MetaData,
   tmpBookPath: string
 ): Promise<BookFeatures[]> {
-  if (metaData.features) return metaData.features;
+  if (
+    metaData.features &&
+    metaData.bloomdVersion &&
+    metaData.bloomdVersion >= 1
+  )
+    return metaData.features;
 
   const features = [];
-  if (await hasAudio(tmpBookPath)) features.push(BookFeatures.audio);
+  if (await hasAudio(tmpBookPath)) features.push(BookFeatures.talkingBook);
 
   return features;
 }
