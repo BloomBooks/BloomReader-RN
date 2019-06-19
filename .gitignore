@@ -63,11 +63,6 @@ integration-tests/emulators
 android/app/release
 
 #Copied into source tree by package.json script from node_modules
-*bloomPlayer.js
-*bloomPlayer.js.map
-*bloomPlayer.min.js
-*bloomPlayer.js.min.map
-*right_answer.mp3
-*wrong_answer.mp3
-*simpleComprehensionQuiz.js
+android/app/src/main/assets/bloom-player
+
 *.orig

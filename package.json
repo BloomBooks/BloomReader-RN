@@ -51,7 +51,6 @@
     "appium-doctor": "^1.9.0",
     "babel-jest": "^24.8.0",
     "concurrently": "^4.1.0",
-    "fs": "^0.0.1-security",
     "jest": "^24.8.0",
     "jest-teamcity-reporter": "^0.9.0",
     "metro-react-native-babel-preset": "^0.54.0",
