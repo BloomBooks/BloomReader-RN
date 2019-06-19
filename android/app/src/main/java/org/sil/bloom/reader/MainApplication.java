@@ -31,29 +31,17 @@ public class MainApplication extends Application implements ReactApplication, Sh
     private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
         @Override
         public boolean getUseDeveloperSupport() {
-      return BuildConfig.DEBUG;
-    }
+            return BuildConfig.DEBUG;
+        }
 
         @Override
         protected List<ReactPackage> getPackages() {
-            return Arrays.<ReactPackage>asList(
-                    new MainReactPackage(),
-                    new AsyncStoragePackage(),
-                    new SplashScreenReactPackage(),
-                    new RNAnalyticsPackage(),
-                    new RNSharePackage(),
-                    new RNI18nPackage(),
-                    new RNCWebViewPackage(),
-                    new RNZipArchivePackage(),
-                    new RNGestureHandlerPackage(),
-                    new RNFSPackage(),
-                    new ImportBooksPackage(),
-                    new BloomBundlePackage(),
-                    new ShareApkPackage(),
-                    new GetFromWifiPackage(),
-                    new AndroidExternalStorageDirsPackage(),
-                    new RNVersionNumberPackage()
-            );
+            return Arrays.<ReactPackage>asList(new MainReactPackage(), new AsyncStoragePackage(),
+                    new SplashScreenReactPackage(), new RNAnalyticsPackage(), new RNSharePackage(), new RNI18nPackage(),
+                    new RNCWebViewPackage(), new RNZipArchivePackage(), new RNGestureHandlerPackage(),
+                    new RNFSPackage(), new ImportBooksPackage(), new BloomBundlePackage(), new ShareApkPackage(),
+                    new GetFromWifiPackage(), new AndroidExternalStorageDirsPackage(), new RNVersionNumberPackage(),
+                    new GetInstallerInfoPackage());
         }
 
         @Override

@@ -17,10 +17,12 @@ export default async function startupTasks(): Promise<void> {
   const lastRunVersion = await getLastRunVersion();
   if (lastRunVersion !== APP_VERSION) {
     ErrorLog.logNewAppVersion(APP_VERSION);
-    if (lastRunVersion !== null)
+    if (lastRunVersion !== null) {
+      BRAnalytics.reportInstallationSource();
       await updateBookListFormatIfNeeded(
         await getExistingCollectionFormatVersion()
       );
+    }
     await BookStorage.importSampleBooks();
   }
 
