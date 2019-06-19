@@ -63,7 +63,7 @@ export default class BookReader extends React.PureComponent<IProps, IState> {
         {this.state.bookReady && (
           <WebView
             source={{
-              uri: `file:///android_asset/bloom-player/webView.htm?url=${bookUrl}`
+              uri: `file:///android_asset/bloom-player/bloomplayer.htm?url=${bookUrl}`
             }}
             mixedContentMode="always"
             allowUniversalAccessFromFileURLs={true}
