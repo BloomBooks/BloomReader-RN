@@ -66,3 +66,6 @@ android/app/release
 android/app/src/main/assets/bloom-player
 
 *.orig
+
+#build intermediates/outputs?
+android/app/bin/
