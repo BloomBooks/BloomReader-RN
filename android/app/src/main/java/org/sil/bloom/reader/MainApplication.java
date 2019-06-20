@@ -52,7 +52,8 @@ public class MainApplication extends Application implements ReactApplication, Sh
                     new ShareApkPackage(),
                     new GetFromWifiPackage(),
                     new AndroidExternalStorageDirsPackage(),
-                    new RNVersionNumberPackage()
+                    new RNVersionNumberPackage(),
+					new GetInstallerInfoPackage()
             );
         }
 

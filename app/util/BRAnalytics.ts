@@ -3,6 +3,7 @@ import AsyncStorage from "@react-native-community/async-storage";
 import { readExternalBloomDir } from "./FileUtil";
 import RNFS from "react-native-fs";
 import { logError } from "./ErrorLog";
+import { NativeModules } from "react-native";
 
 const storageDeviceIdKey = "bloomreader.analytics.deviceId";
 const storageDeviceGroupKey = "bloomreader.analytics.deviceGroup";
@@ -137,4 +138,15 @@ export async function reportLoadBook(args: {
   brandingProjectName?: string; // bloom enterprise branding that book is part of, if any
 }) {
   track("BookOrShelf opened", args);
+}
+
+export async function reportInstallationSource() {
+  NativeModules.GetInstallerInfoModule.requestInstallerName(
+    (installer: string) => {
+      track("Install Attributed", {
+        provider: "getInstallerPackageName",
+        installer
+      });
+    }
+  );
 }
