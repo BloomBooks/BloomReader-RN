@@ -70,6 +70,11 @@ export default class BookReader extends React.PureComponent<IProps, IState> {
   // a single BookOrShelf opened event.
   private onWillBlur() {
     // app is going to close or pause
+    if (this.audioPages === 0 && this.nonAudioPages === 0) {
+      // no point in reporting nothing was read.
+      // (This can happen if no page turns between pauses.)
+      return;
+    }
     var book = this.book();
     var args = {
       title: book.title,
@@ -86,6 +91,8 @@ export default class BookReader extends React.PureComponent<IProps, IState> {
       delete args.brandingProjectName;
     }
     BRAnalytics.reportPagesRead(args);
+    // Reset so we don't report the same page flips multiple times if resumed.
+    this.audioPages = this.nonAudioPages = 0;
   }
 
   async componentWillUnmount() {
