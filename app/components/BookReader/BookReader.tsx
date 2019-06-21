@@ -216,7 +216,7 @@ export default class BookReader extends React.PureComponent<IProps, IState> {
   onPageShown(data: any) {
     this.lastNumberedPageWasRead =
       this.lastNumberedPageWasRead || data.lastNumberedPageWasRead;
-    if (data.pageHasAudio) {
+    if (data.audioWillPlay) {
       this.audioPages++;
     } else {
       this.nonAudioPages++;
