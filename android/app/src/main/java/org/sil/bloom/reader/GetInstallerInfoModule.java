@@ -34,7 +34,7 @@ public class GetInstallerInfoModule extends ReactContextBaseJavaModule {
         String installer = this.reactContext.getPackageManager()
                 .getInstallerPackageName(this.reactContext.getPackageName());
         if (TextUtils.isEmpty(installer))
-            return; // in this case, it's fine just not to call it if we don't have any info
+            installer = "unknown"; // we want a report even if it's to say we don't know.
         callback.invoke(installer);
     }
 }
