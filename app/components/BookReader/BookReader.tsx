@@ -41,8 +41,14 @@ export default class BookReader extends React.PureComponent<IProps, IState> {
 
   // values in this group are derived from the pageShown event (from the player)
   private audioPages = 0; // number of audio pages user has displayed
-  private nonAudioPages = 0; // number of non-audio pages user has displayed
+  private totalPagesShown = 0; // number of pages of all kinds user has displayed
+  private videoPages = 0; // number of video pages user has displayed.
   private lastNumberedPageWasRead = false; // has user read to last numbered page?
+
+  private totalAudioDuration = 0;
+  private totalVideoDuration = 0;
+  private reportedAudioOnCurrentPage = false;
+  private reportedVideoOnCurrentPage = false;
 
   async componentDidMount() {
     const bookPath = await BookStorage.openBookForReading(this.book());
@@ -70,17 +76,29 @@ export default class BookReader extends React.PureComponent<IProps, IState> {
   // a single BookOrShelf opened event.
   private onWillBlur() {
     // app is going to close or pause
-    if (this.audioPages === 0 && this.nonAudioPages === 0) {
+    if (
+      this.totalPagesShown === 0 &&
+      this.totalAudioDuration < 0.001 &&
+      this.totalVideoDuration < 0.001
+    ) {
       // no point in reporting nothing was read.
       // (This can happen if no page turns between pauses.)
+      // (We use a small but non-zero value in the duration checks in case of rounding errors.)
       return;
     }
     var book = this.book();
     var args = {
       title: book.title,
       audioPages: this.audioPages,
-      nonAudioPages: this.nonAudioPages,
+      // For historical reasons we report nonAudio pages rather than a grand total.
+      // Now that there are other interesting subcategories, the grand total would
+      // otherwise make more sense.
+      nonAudioPages: this.totalPagesShown - this.audioPages,
+      videoPagesPlayed: this.videoPages,
+      audioDuration: this.totalAudioDuration,
+      videoDuration: this.totalVideoDuration,
       totalNumberedPages: this.totalNumberedPages,
+      // An unfortunate name for the event property, kept to match existing data.
       lastNumberedPage: this.lastNumberedPageWasRead,
       questionCount: this.questionCount,
       contentLang: this.contentLang,
@@ -91,8 +109,9 @@ export default class BookReader extends React.PureComponent<IProps, IState> {
       delete args.brandingProjectName;
     }
     BRAnalytics.reportPagesRead(args);
-    // Reset so we don't report the same page flips multiple times if resumed.
-    this.audioPages = this.nonAudioPages = 0;
+    // Reset so we don't report the same page flips and durations multiple times if resumed.
+    this.audioPages = this.totalPagesShown = this.videoPages = 0;
+    this.totalAudioDuration = this.totalVideoDuration = 0;
   }
 
   async componentWillUnmount() {
@@ -186,6 +205,12 @@ export default class BookReader extends React.PureComponent<IProps, IState> {
         case "pageShown":
           this.onPageShown(data);
           break;
+        case "audioPlayed":
+          this.onAudioPlayed(data);
+          break;
+        case "videoPlayed":
+          this.onVideoPlayed(data);
+          break;
         default:
           ErrorLog.logError({
             logMessage:
@@ -213,14 +238,29 @@ export default class BookReader extends React.PureComponent<IProps, IState> {
     }
   }
 
+  onAudioPlayed(data: any) {
+    const duration = data.duration;
+    this.totalAudioDuration += duration;
+    if (!this.reportedAudioOnCurrentPage) {
+      this.reportedAudioOnCurrentPage = true;
+      this.audioPages++;
+    }
+  }
+
+  onVideoPlayed(data: any) {
+    const duration = data.duration;
+    this.totalVideoDuration += duration;
+    if (!this.reportedVideoOnCurrentPage) {
+      this.reportedVideoOnCurrentPage = true;
+      this.videoPages++;
+    }
+  }
+
   onPageShown(data: any) {
     this.lastNumberedPageWasRead =
       this.lastNumberedPageWasRead || data.lastNumberedPageWasRead;
-    if (data.audioWillPlay) {
-      this.audioPages++;
-    } else {
-      this.nonAudioPages++;
-    }
+    this.totalPagesShown++;
+    this.reportedAudioOnCurrentPage = this.reportedVideoOnCurrentPage = false;
   }
 
   onBookStats(data: any) {
