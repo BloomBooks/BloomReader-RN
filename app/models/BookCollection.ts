@@ -17,7 +17,7 @@ import AsyncStorage from "@react-native-community/async-storage";
 const KEY_PREFIX = "bloomreader.books.";
 const BOOK_LIST_KEY = KEY_PREFIX + "books";
 const SHELF_LIST_KEY = KEY_PREFIX + "shelves";
-export const COLLECTION_FORMAT_VERSION = "4";
+export const COLLECTION_FORMAT_VERSION = "5";
 
 export interface BookCollection {
   books: Book[];
@@ -48,7 +48,7 @@ export async function importBookToCollection(
 ): Promise<BookCollectionWithNewBook> {
   const collection = await getBookCollection();
   const book = await BookStorage.importBookFile(filepath);
-  collection.books = collection.books.filter(b => b.filepath != filepath); // Remove any existing copy
+  collection.books = collection.books.filter(b => b.filename != book.filename); // Remove any existing copy
   collection.books.push(book);
   writeCollection(collection);
   if (importMethod) BRAnalytics.addedBooks(importMethod, [book.title]);
@@ -81,7 +81,8 @@ export async function updateBookListFormatIfNeeded(
   const oldBookList = (await readList(BOOK_LIST_KEY)) as Book[];
   const newBookList: Book[] = [];
   for (let i = 0; i < oldBookList.length; ++i) {
-    newBookList.push(await BookStorage.importBookFile(oldBookList[i].filepath));
+    const newBook = await BookStorage.reimportBook(oldBookList[i]);
+    if (newBook) newBookList.push(newBook);
   }
   await writeList(BOOK_LIST_KEY, newBookList);
 }
@@ -93,10 +94,10 @@ export async function deleteBookOrShelf(
   const toDelete = itemsToDelete(bookOrShelf, collection);
   BookStorage.deleteBooksAndShelves(toDelete);
   collection.books = collection.books.filter(
-    b => !toDelete.some(item => item.filepath == b.filepath)
+    b => !toDelete.some(item => equals(b, item))
   );
   collection.shelves = collection.shelves.filter(
-    s => !toDelete.some(item => isShelf(item) && item.id == s.id)
+    s => !toDelete.some(item => equals(s, item))
   );
   writeCollection(collection);
   return collection;
@@ -108,14 +109,14 @@ function addToCollection(
 ): BookCollection {
   const books = newItems.books.reduce(
     (combinedBooks, newBook) => [
-      ...combinedBooks.filter(b => b.filepath != newBook.filepath),
+      ...combinedBooks.filter(b => !equals(b, newBook)),
       newBook
     ],
     collection.books
   );
   const shelves = newItems.shelves.reduce(
     (combinedShelves, newShelf) => [
-      ...combinedShelves.filter(s => s.id != newShelf.id),
+      ...combinedShelves.filter(s => !equals(s, newShelf)),
       newShelf
     ],
     collection.shelves
@@ -144,11 +145,9 @@ function removeMissingFilesFromCollection(
   collection: BookCollection,
   files: ReadDirItem[]
 ): BookCollection {
-  const privateDirs = BookStorage.privateStorageDirs();
-  // Filter to keep item if from public dir OR if listed among current files
+  // Filter to keep item if from private dir (no filepath) OR if listed among current files
   const notRemovedFilter = (item: BookOrShelf) =>
-    privateDirs.some(dirPath => item.filepath.startsWith(dirPath)) ||
-    files.some(file => file.path == item.filepath);
+    !item.filepath || files.some(file => file.path == item.filepath);
 
   return {
     books: collection.books.filter(notRemovedFilter),
@@ -175,6 +174,12 @@ async function addNewOrUpdatedFilesToCollection(
       newItems.shelves.push(await BookStorage.importShelfFile(file.path));
   }
   return addToCollection(collection, newItems);
+}
+
+function equals(a: BookOrShelf, b: BookOrShelf) {
+  if (isShelf(a) && isShelf(b)) return a.id == b.id;
+  if (!isShelf(a) && !isShelf(b)) return a.filename == b.filename;
+  return false;
 }
 
 export async function getBookCollection(): Promise<BookCollection> {

@@ -12,6 +12,7 @@ import { makeBundle } from "../native_modules/BloomBundleModule";
 import { nameFromPath } from "./FileUtil";
 import { logError } from "./ErrorLog";
 import I18n from "../i18n/i18n";
+import { bookOrShelfPath } from "../storage/BookStorage";
 
 export async function share(
   item: BookOrShelf,
@@ -58,9 +59,9 @@ function shareBundle(bundlePath: string): void {
 
 function shareBook(book: Book): void {
   shareFile({
-    url: `file://${book.filepath}`,
+    url: `file://${bookOrShelfPath(book)}`,
     type: "application/*", // This gets us a better selection of apps to share with than "application/bloom" and seems to work just the same
-    subject: nameFromPath(book.filepath)
+    subject: book.filename
   });
 }
 

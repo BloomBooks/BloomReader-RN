@@ -192,7 +192,7 @@ export default class BookList extends React.PureComponent<IProps, IState> {
         <FlatList
           extraData={this.state}
           data={list}
-          keyExtractor={item => (isShelf(item) ? item.id : item.filepath)}
+          keyExtractor={item => (isShelf(item) ? item.id : item.filename)}
           renderItem={({ item }) => (
             <TouchableOpacity
               onPress={() => this.itemTouch(item)}

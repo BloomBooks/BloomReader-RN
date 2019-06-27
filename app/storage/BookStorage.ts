@@ -14,7 +14,8 @@ import {
   extension,
   readExternalBloomDir,
   rnfsOverwriteMove,
-  rnfsOverwriteCopy
+  rnfsOverwriteCopy,
+  inDir
 } from "../util/FileUtil";
 import getFeaturesList from "../util/getFeaturesList";
 import { logError } from "../util/ErrorLog";
@@ -61,23 +62,32 @@ export async function importSampleBooks() {
 // Caches thumbnail and extracts metadata for BookCollection
 export async function importBookFile(filepath: string): Promise<Book> {
   const tmpBookPath = await extractBookToTmp(filepath);
-  const thumbPath = await saveThumbnail(tmpBookPath, filepath);
+  const thumbFilename = await saveThumbnail(tmpBookPath, filepath);
   const metaData = JSON.parse(await RNFS.readFile(`${tmpBookPath}/meta.json`));
   const bookFeatures = await getFeaturesList(metaData, tmpBookPath);
   const modifiedAt = (await RNFS.stat(filepath)).mtime.valueOf(); // mtime is actually a Date object
   RNFS.unlink(tmpBookPath);
   const book = {
-    filepath,
+    filename: nameFromPath(filepath),
+    filepath: inDir(PRIVATE_BOOKS_DIR, filepath) ? undefined : filepath,
     title: metaData.title,
     allTitles: JSON.parse(metaData.allTitles.replace(/\n/g, " ")), // Remove newlines to avoid JSON parse error
     tags: metaData.tags,
     features: bookFeatures,
-    thumbPath,
+    thumbFilename,
     modifiedAt,
     brandingProjectName: metaData.brandingProjectName,
     bloomdVersion: metaData.bloomdVersion ? metaData.bloomdVersion : 0
   };
   return book;
+}
+
+export async function reimportBook(book: Book): Promise<Book | null> {
+  const bookPath = bookOrShelfPath(book);
+  if (await RNFS.exists(bookPath)) {
+    return importBookFile(bookPath);
+  }
+  return null;
 }
 
 // Parses shelf file and return Shelf based on contents
@@ -86,7 +96,12 @@ export async function importShelfFile(filepath: string): Promise<Shelf> {
     await RNFS.readFile(filepath)
   ) as ShelfFileContents;
   const modifiedAt = (await RNFS.stat(filepath)).mtime.valueOf(); // mtime is actually a Date object
-  return { ...fileContents, filepath, modifiedAt };
+  return {
+    ...fileContents,
+    filename: nameFromPath(filepath),
+    filepath: inDir(PRIVATE_BOOKS_DIR, filepath) ? undefined : filepath,
+    modifiedAt
+  };
 }
 
 export function privateStorageDirs() {
@@ -141,16 +156,16 @@ export async function getPublicDirFiles(): Promise<ReadDirItem[]> {
 
 export async function openBookForReading(book: Book): Promise<string> {
   await rnfsSafeUnlink(OPEN_BOOK_DIR);
-  return await unzip(book.filepath, OPEN_BOOK_DIR);
+  return await unzip(bookOrShelfPath(book), OPEN_BOOK_DIR);
 }
 
 export async function getThumbnail(
   book: Book
 ): Promise<{ data: string; format: string } | undefined> {
-  if (!book.thumbPath) return undefined;
+  if (!book.thumbFilename) return undefined;
   return {
-    data: await RNFS.readFile(book.thumbPath, "base64"),
-    format: extension(book.thumbPath)
+    data: await RNFS.readFile(thumbPath(book.thumbFilename), "base64"),
+    format: extension(book.thumbFilename)
   };
 }
 
@@ -172,8 +187,9 @@ export async function fetchHtml(bookDir = OPEN_BOOK_DIR): Promise<string> {
 
 export function deleteBooksAndShelves(items: BookOrShelf[]) {
   items.forEach(item => {
-    rnfsSafeUnlink(item.filepath);
-    if (!isShelf(item) && item.thumbPath) rnfsSafeUnlink(item.thumbPath);
+    rnfsSafeUnlink(bookOrShelfPath(item));
+    if (!isShelf(item) && item.thumbFilename)
+      rnfsSafeUnlink(thumbPath(item.thumbFilename));
   });
 }
 
@@ -187,6 +203,16 @@ async function extractBookToTmp(inPath: string): Promise<string> {
   return await unzip(inPath, outPath);
 }
 
+export function bookOrShelfPath(item: BookOrShelf): string {
+  return item.filepath
+    ? item.filepath
+    : `${PRIVATE_BOOKS_DIR}/${item.filename}`;
+}
+
+function thumbPath(thumbFilename: string) {
+  return `${THUMBS_DIR}/${thumbFilename}`;
+}
+
 async function saveThumbnail(
   tmpBookPath: string,
   bookFilePath: string
@@ -198,9 +224,8 @@ async function saveThumbnail(
   if (thumbFilename) {
     const extension = thumbFilename.slice(thumbFilename.lastIndexOf("."));
     const inPath = tmpBookPath + "/" + thumbFilename;
-    const outPath =
-      THUMBS_DIR + "/" + nameifyPath(bookFilePath).replace(/\.\w+$/, extension);
-    await rnfsOverwriteMove(inPath, outPath);
-    return outPath;
+    const filename = nameifyPath(bookFilePath).replace(/\.\w+$/, extension);
+    await rnfsOverwriteMove(inPath, thumbPath(filename));
+    return filename;
   }
 }

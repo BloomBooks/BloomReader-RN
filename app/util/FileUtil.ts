@@ -83,3 +83,7 @@ export function nameifyPath(filepath: string): string {
 export function extension(filepath: string): string {
   return filepath.slice(filepath.lastIndexOf(".") + 1).toLocaleLowerCase();
 }
+
+export function inDir(dirpath: string, filepath: string) {
+  return filepath.startsWith(dirpath);
+}

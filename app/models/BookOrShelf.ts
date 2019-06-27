@@ -2,13 +2,22 @@ import { currentLang } from "../i18n/i18n";
 import { BookCollection } from "./BookCollection";
 import { nameFromPath } from "../util/FileUtil";
 
+/**
+  The reason `Book` and `Shelf` persist a filename with an optional filepath is:
+    - the path to app storage on iOS is not stable between app versions
+    - Android allows access to items in various folders besides the primary storage
+  Therefore filename is used for books in the primary storage (which on iOS is all items)
+  and the filepath is provided on Android for items in other directories
+*/
+
 // If you update this interface, increment COLLECTION_FORMAT_VERSION in BookCollection.ts
 export interface Book {
-  filepath: string; // Used as the unique identifier
+  filename: string; // Used as the unique identifier
+  filepath?: string; // [Android only] see block comment above
   title: string;
   allTitles: { [localeName: string]: string };
   features: BookFeatures[];
-  thumbPath?: string;
+  thumbFilename?: string;
   modifiedAt: number;
   tags: string[];
 }
@@ -18,7 +27,8 @@ export interface Shelf {
   id: string; // Used as the unique identifier
   label: Array<{ [localeName: string]: string }>;
   color: string;
-  filepath: string;
+  filename: string;
+  filepath?: string; // [Android only] see block comment above
   modifiedAt: number;
   tags: string[];
 }
@@ -110,33 +120,30 @@ export function sortedListForShelf(
   const list = (shelfCollection.shelves as BookOrShelf[]).concat(
     shelfCollection.books
   );
-  const prunedList = removeDuplicateBooks(list);
-  return prunedList.sort((a, b) =>
-    displayName(a).localeCompare(displayName(b))
-  );
+  return list.sort((a, b) => displayName(a).localeCompare(displayName(b)));
 }
 
 // The book collection is sourced from multiple directories, and there may
 // be duplicates between them. Only show the newest of two books with the same
 // filename
-function removeDuplicateBooks(items: BookOrShelf[]): BookOrShelf[] {
-  return items.reduce(
-    (items, item) => {
-      if (!isShelf(item)) {
-        const duplicateIndex = items.findIndex(
-          i => nameFromPath(i.filepath) == nameFromPath(item.filepath)
-        );
-        if (duplicateIndex >= 0) {
-          const duplicate = items[duplicateIndex];
-          const winner =
-            item.modifiedAt > duplicate.modifiedAt ? item : duplicate;
-          items[duplicateIndex] = winner;
-          return items;
-        }
-      }
-      items.push(item);
-      return items;
-    },
-    [] as BookOrShelf[]
-  );
-}
+// function removeDuplicateBooks(items: BookOrShelf[]): BookOrShelf[] {
+//   return items.reduce(
+//     (items, item) => {
+//       if (!isShelf(item)) {
+//         const duplicateIndex = items.findIndex(
+//           i => nameFromPath(i.filepath) == nameFromPath(item.filepath)
+//         );
+//         if (duplicateIndex >= 0) {
+//           const duplicate = items[duplicateIndex];
+//           const winner =
+//             item.modifiedAt > duplicate.modifiedAt ? item : duplicate;
+//           items[duplicateIndex] = winner;
+//           return items;
+//         }
+//       }
+//       items.push(item);
+//       return items;
+//     },
+//     [] as BookOrShelf[]
+//   );
+// }
