@@ -1,4 +1,5 @@
-import { ToastAndroid, Platform } from "react-native";
+import { Platform } from "react-native";
+import Toast from "react-native-simple-toast";
 import RNFS from "react-native-fs";
 import email from "react-native-email";
 import I18n from "../i18n/i18n";
@@ -14,7 +15,7 @@ interface Options {
 export function logError(options: Options): void {
   writeToErrorLog(options.logMessage);
   if (options.toastMessage) {
-    ToastAndroid.show(options.toastMessage, ToastAndroid.SHORT);
+    Toast.show(options.toastMessage, Toast.SHORT);
   }
   if (!options.toastMessage) {
     // Creates a "Yellow Box" message in development

@@ -1,4 +1,4 @@
-import { ToastAndroid } from "react-native";
+import Toast from "react-native-simple-toast";
 import {
   Book,
   Shelf,
@@ -75,7 +75,8 @@ export async function updateBookListFormatIfNeeded(
   if (oldFormatVersion == COLLECTION_FORMAT_VERSION) return;
 
   // This can take some time, let the user know what we're up to
-  ToastAndroid.show(I18n.t("UpdatingBookCollectionFormat"), ToastAndroid.SHORT);
+
+  Toast.show(I18n.t("UpdatingBookCollectionFormat"), Toast.SHORT);
 
   const oldBookList = (await readList(BOOK_LIST_KEY)) as Book[];
   const newBookList: Book[] = [];

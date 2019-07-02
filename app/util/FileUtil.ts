@@ -26,6 +26,20 @@ export async function rnfsSafeUnlink(path: string): Promise<void> {
   }
 }
 
+// On Android RNFS.moveFile() overwrites, but on iOS there is an error if the target already exists
+// This method deletes any existing target to prevent that error
+export async function rnfsOverwriteMove(fromPath: string, toPath: string) {
+  await rnfsSafeUnlink(toPath);
+  return RNFS.moveFile(fromPath, toPath);
+}
+
+// On Android RNFS.copyFile() overwrites, but on iOS there is an error if the target already exists
+// This method deletes any existing target to prevent that error
+export async function rnfsOverwriteCopy(fromPath: string, toPath: string) {
+  await rnfsSafeUnlink(toPath);
+  return RNFS.copyFile(fromPath, toPath);
+}
+
 // PermissionsAndroid module can't handle overlapping requests
 // and that would be annoying for the user, so we use a SingletonPromise
 // to give the same answer to all requests

@@ -12,11 +12,14 @@ import {
   isBookFile,
   isShelfFile,
   extension,
-  readExternalBloomDir
+  readExternalBloomDir,
+  rnfsOverwriteMove,
+  rnfsOverwriteCopy
 } from "../util/FileUtil";
 import getFeaturesList from "../util/getFeaturesList";
 import { logError } from "../util/ErrorLog";
 import { androidExternalStorageDirs } from "../native_modules/AndroidExternalStorageDirsModule";
+import { Platform } from "react-native";
 
 const PRIVATE_BOOKS_DIR = RNFS.DocumentDirectoryPath + "/books";
 const THUMBS_DIR = RNFS.DocumentDirectoryPath + "/thumbs";
@@ -35,12 +38,23 @@ export async function createDirectories(): Promise<void> {
 }
 
 export async function importSampleBooks() {
-  const sampleBookFiles = await RNFS.readDirAssets("books");
-  for (let i = 0; i < sampleBookFiles.length; ++i) {
-    const sampleBookFile = sampleBookFiles[i];
-    const copyToPath = `${PRIVATE_BOOKS_DIR}/${sampleBookFile.name}`;
-    await RNFS.copyFileAssets(`books/${sampleBookFile.name}`, copyToPath);
-    await importBookToCollection(copyToPath, null);
+  if (Platform.OS == "ios") {
+    const bundleFiles = await RNFS.readDir(RNFS.MainBundlePath);
+    const sampleBookFiles = bundleFiles.filter(file => isBookFile(file));
+    for (let i = 0; i < sampleBookFiles.length; ++i) {
+      const sampleBookFile = sampleBookFiles[i];
+      const copyToPath = `${PRIVATE_BOOKS_DIR}/${sampleBookFile.name}`;
+      await rnfsOverwriteCopy(sampleBookFile.path, copyToPath);
+      await importBookToCollection(copyToPath, null);
+    }
+  } else {
+    const sampleBookFiles = await RNFS.readDirAssets("books");
+    for (let i = 0; i < sampleBookFiles.length; ++i) {
+      const sampleBookFile = sampleBookFiles[i];
+      const copyToPath = `${PRIVATE_BOOKS_DIR}/${sampleBookFile.name}`;
+      await RNFS.copyFileAssets(`books/${sampleBookFile.name}`, copyToPath);
+      await importBookToCollection(copyToPath, null);
+    }
   }
 }
 
@@ -81,13 +95,15 @@ export function privateStorageDirs() {
 
 async function storageDirs() {
   let dirs = privateStorageDirs();
-  dirs = dirs.concat(await androidExternalStorageDirs());
-  try {
-    const oldBloomDirPath = await readExternalBloomDir();
-    dirs.push(oldBloomDirPath);
-  } catch (err) {
-    // Permission refused
-    logError({ logMessage: err });
+  if (Platform.OS == "android") {
+    dirs = dirs.concat(await androidExternalStorageDirs());
+    try {
+      const oldBloomDirPath = await readExternalBloomDir();
+      dirs.push(oldBloomDirPath);
+    } catch (err) {
+      // Permission refused
+      logError({ logMessage: err });
+    }
   }
   return dirs;
 }
@@ -102,7 +118,7 @@ export async function importBooksDir(srcDir: string): Promise<BookCollection> {
     const file = files[i];
     if (isBookFile(file) || isShelfFile(file)) {
       const newPath = `${PRIVATE_BOOKS_DIR}/${file.name}`;
-      await RNFS.moveFile(file.path, newPath);
+      await rnfsOverwriteMove(file.path, newPath);
       if (isBookFile(file)) books.push(await importBookFile(newPath));
       else shelves.push(await importShelfFile(newPath));
     }
@@ -144,7 +160,7 @@ export async function moveBook(): Promise<string> {
   if (!htmlFile || !htmlFile.path) {
     return "";
   }
-  await RNFS.moveFile(htmlFile.path, OPEN_BOOK_DIR + "/openBook.htm");
+  await rnfsOverwriteMove(htmlFile.path, OPEN_BOOK_DIR + "/openBook.htm");
   return htmlFile.path;
 }
 
@@ -184,7 +200,7 @@ async function saveThumbnail(
     const inPath = tmpBookPath + "/" + thumbFilename;
     const outPath =
       THUMBS_DIR + "/" + nameifyPath(bookFilePath).replace(/\.\w+$/, extension);
-    await RNFS.moveFile(inPath, outPath);
+    await rnfsOverwriteMove(inPath, outPath);
     return outPath;
   }
 }

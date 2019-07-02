@@ -64,6 +64,8 @@ android/app/release
 
 #Copied into source tree by package.json script from node_modules
 android/app/src/main/assets/bloom-player
+ios/bloomreader/BloomPlayer.bundle/*
+# !ios/bloomreader/BloomPlayer.bundle/loader.htm  # This file is unique to ios and does not come from bloomplayer
 
 *.orig
 
