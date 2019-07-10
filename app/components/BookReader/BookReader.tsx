@@ -49,21 +49,37 @@ export default class BookReader extends React.PureComponent<IProps, IState> {
   private totalVideoDuration = 0;
   private reportedAudioOnCurrentPage = false;
   private reportedVideoOnCurrentPage = false;
+  private sessionId = this.generateUUID();
 
   async componentDidMount() {
     const bookPath = await BookStorage.openBookForReading(this.book());
     this.setState({ bookPath: bookPath });
     this.loadBook();
-    AppState.addEventListener("change", this.onAppStateChange);
+    //AppState.addEventListener("change", this.onAppStateChange); // see comment on disabled method.
   }
 
-  private onAppStateChange = (nextAppState: AppStateStatus) => {
-    if (nextAppState !== "active") {
-      // We only get the navigation blur event when navigating within the app.
-      // If the whole app gets paused while we're active, we trigger it this way.
-      this.onWillBlur();
-    }
-  };
+  // Possibly worth keeping this block as (1) a record of how to do this if we want to,
+  // and (2) a record that we definitely decided we don't want to.
+  // private onAppStateChange = (nextAppState: AppStateStatus) => {
+  //   if (nextAppState !== "active") {
+  //     // We only get the navigation blur event when navigating within the app.
+  //     // If the whole app gets paused while we're active, we  could trigger it this way.
+  //     // But currently we don't WANT the pages read event to trigger except on
+  //     // internal navigation (i.e., closing the book within the app. BL-7346)
+  //     this.onWillBlur();
+  //   }
+  // };
+
+  private generateUUID() {
+    // Public Domain/MIT (stackoverflow)
+    var d = new Date().getTime();
+
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function(c) {
+      var r = (d + Math.random() * 16) % 16 | 0;
+      d = Math.floor(d / 16);
+      return (c === "x" ? r : (r & 0x3) | 0x8).toString(16);
+    });
+  }
 
   // Triggered by NavigationEvents element (in Render) for navigation inside the app
   // (e.g., back from book to home screen, either using our own control or the hardware
@@ -103,6 +119,7 @@ export default class BookReader extends React.PureComponent<IProps, IState> {
       questionCount: this.questionCount,
       contentLang: this.contentLang,
       features: book.features.join(","),
+      sessionId: this.sessionId,
       brandingProjectName: book.brandingProjectName
     };
     if (!book.brandingProjectName) {
@@ -300,6 +317,7 @@ export default class BookReader extends React.PureComponent<IProps, IState> {
       questionCount: this.questionCount,
       contentLang: this.contentLang,
       features: book.features.join(","),
+      sessionId: this.sessionId,
       brandingProjectName: book.brandingProjectName
     };
     if (!book.brandingProjectName) {
