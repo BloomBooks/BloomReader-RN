@@ -124,6 +124,7 @@ export async function reportPagesRead(args: {
   questionCount: number; // total number of comprehension questions in book
   contentLang: string; // book's primary language
   features: string;
+  sessionId: string;
   brandingProjectName?: string; // bloom enterprise branding that book is part of, if any
 }) {
   track("Pages Read", args);
@@ -135,6 +136,7 @@ export async function reportLoadBook(args: {
   questionCount: number; // total number of comprehension questions in book
   contentLang: string; // book's primary language
   features: string;
+  sessionId: string;
   brandingProjectName?: string; // bloom enterprise branding that book is part of, if any
 }) {
   track("BookOrShelf opened", args);
